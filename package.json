@@ -1,0 +1,25 @@
+{
+  "name": "node-addon-tools",
+  "author": "Luis Blanco <raubtierxxx@gmail.com>",
+  "description": "WebGL for nodejs",
+  "version": "0.0.1",
+  "main": "index.js",
+  "keywords": [
+    "node",
+    "addon",
+    "header",
+    "include"
+  ],
+  "maintainers": [
+    {
+      "name": "Luis Blanco",
+      "email": "raubtierxxx@gmail.com",
+      "skype": "rauber666"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raub/node-addon-tools.git"
+  },
+}
