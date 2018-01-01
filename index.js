@@ -1,6 +1,4 @@
 'use strict';
 
 
-module.exports = {
-	root : __dirname,
-};
+module.exports = `${__dirname}/include`;
