@@ -23,22 +23,24 @@
 		Nan::ThrowTypeError("Expected at least " #N " arguments");
 
 
+#define IS_ARG_EMPTY(I) (info[I]->IsNull() || info[I]->IsUndefined())
+
 #define CHECK_REQ_ARG(I, C, T)                                          \
 	if (info.Length() <= (I) || ! info[I]->C)                           \
 		Nan::ThrowTypeError("Argument " #I " must be " T);
 
 #define CHECK_LET_ARG(I, C, T)                                          \
-	if ( ! (info[I]->IsNull() || info[I]->C) )                          \
+	if ( ! (IS_ARG_EMPTY(I) || info[I]->C) )                            \
 		Nan::ThrowTypeError("Argument " #I " must be " T " or null");
 
 
 #define REQ_UTF8_ARG(I, VAR)                                            \
 	CHECK_REQ_ARG(I, IsString(), "string");                             \
-	String::Utf8Value VAR(info[I]);
+	Nan::Utf8String VAR(info[I]);
 
 #define LET_UTF8_ARG(I, VAR)                                            \
 	CHECK_LET_ARG(I, IsString(), "string");                             \
-	String::Utf8Value VAR(info[I]->IsNull() ? JS_STR("") : info[I]);
+	Nan::Utf8String VAR(info[I]);
 
 
 #define REQ_INT32_ARG(I, VAR)                                           \
@@ -47,7 +49,7 @@
 
 #define LET_INT32_ARG(I, VAR)                                           \
 	CHECK_LET_ARG(I, IsInt32(), "int32");                               \
-	int VAR = info[I]->IsNull() ? 0 : info[I]->Int32Value();
+	int VAR = IS_ARG_EMPTY(I) ? 0 : info[I]->Int32Value();
 
 
 #define REQ_BOOL_ARG(I, VAR)                                            \
@@ -56,7 +58,7 @@
 
 #define LET_BOOL_ARG(I, VAR)                                            \
 	CHECK_LET_ARG(I, IsBoolean(), "bool");                              \
-	int VAR = info[I]->IsNull() ? false : info[I]->BooleanValue();
+	int VAR = IS_ARG_EMPTY(I) ? false : info[I]->BooleanValue();
 
 
 #define REQ_UINT32_ARG(I, VAR)                                          \
@@ -65,7 +67,7 @@
 
 #define LET_UINT32_ARG(I, VAR)                                          \
 	CHECK_LET_ARG(I, IsUint32(), "uint32");                             \
-	unsigned int VAR = info[I]->IsNull() ? 0 : info[I]->Uint32Value();
+	unsigned int VAR = IS_ARG_EMPTY(I) ? 0 : info[I]->Uint32Value();
 
 
 #define REQ_OFFS_ARG(I, VAR)                                            \
@@ -74,7 +76,7 @@
 
 #define LET_OFFS_ARG(I, VAR)                                            \
 	CHECK_LET_ARG(I, IsNumber(), "number");                             \
-	size_t VAR = info[I]->IsNull() ? 0 : static_cast<size_t>(info[I]->IntegerValue());
+	size_t VAR = IS_ARG_EMPTY(I) ? 0 : static_cast<size_t>(info[I]->IntegerValue());
 
 
 #define REQ_DOUBLE_ARG(I, VAR)                                          \
@@ -83,7 +85,7 @@
 
 #define LET_DOUBLE_ARG(I, VAR)                                          \
 	CHECK_LET_ARG(I, IsNumber(), "number");                             \
-	double VAR = info[I]->IsNull() ? 0.0 : info[I]->NumberValue();
+	double VAR = IS_ARG_EMPTY(I) ? 0.0 : info[I]->NumberValue();
 
 
 #define REQ_FLOAT_ARG(I, VAR)                                           \
@@ -92,7 +94,7 @@
 
 #define LET_FLOAT_ARG(I, VAR)                                           \
 	CHECK_LET_ARG(I, IsNumber(), "number");                             \
-	float VAR = info[I]->IsNull() ? 0.f : static_cast<float>(info[I]->NumberValue());
+	float VAR = IS_ARG_EMPTY(I) ? 0.f : static_cast<float>(info[I]->NumberValue());
 
 
 #define REQ_EXT_ARG(I, VAR)                                             \
