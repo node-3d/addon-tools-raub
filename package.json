@@ -2,7 +2,7 @@
   "name": "node-addon-tools-raub",
   "author": "Luis Blanco <raubtierxxx@gmail.com>",
   "description": "A set of extra macros for node addons, shipped as C++ header file.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "index.js",
   "keywords": [
     "node",
