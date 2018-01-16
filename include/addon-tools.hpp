@@ -125,24 +125,23 @@
 
 
 #define SET_PROP(OBJ, KEY, VAL) OBJ->Set(JS_STR(KEY), VAL);
+#define SET_I(ARR, I, VAL) ARR->Set(I, VAL);
 
 
 #define CTOR_CHECK(T)                                                   \
 	if ( ! info.IsConstructCall() )                                     \
 		return Nan::ThrowTypeError(T " must be called with the 'new' keyword.");
 
+#define SETTER_CHECK(C, T)                                              \
+	if ( ! value->C )                                                   \
+		return Nan::ThrowTypeError("Value must be " T);
+
+
 #define ACCESSOR_RW(OBJ, NAME)                                          \
 	Nan::SetAccessor(OBJ, JS_STR(#NAME), NAME ## Getter, NAME ## Setter);
 
 #define ACCESSOR_R(OBJ, NAME)                                           \
 	Nan::SetAccessor(OBJ, JS_STR(#NAME), NAME ## Getter);
-
-#define SET_I(ARR, I, VAL) ARR->Set(I, VAL);
-
-
-#define SETTER_CHECK(C, T)                                              \
-	if ( ! value->C )                                                   \
-		return Nan::ThrowTypeError("Value must be " T);
 
 
 #define SETTER_UTF8_ARG                                                 \
@@ -184,6 +183,68 @@
 #define SETTER_OBJ_ARG                                                  \
 	SETTER_CHECK(IsObject(), "object");                                 \
 	Local<Object> v = Local<Object>::Cast(value);
+
+
+template<typename Type>
+inline Type* getArrayData(Local<Value> arg, int *num = NULL) {
+	
+	Type *data = NULL;
+	
+	if (num) {
+		*num = 0;
+	}
+	
+	if (arg->IsNull() || arg->IsUndefined()) {
+		return pixels;
+	}
+	
+	if (arg->IsArray()) {
+		Nan::ThrowError("JS Array is not supported here.");
+		return data;
+	}
+	
+	if ( ! arg->IsArrayBufferView() ) {
+		Nan::ThrowError("Argument must be a TypedArray.");
+		return data;
+	}
+	
+	Local<ArrayBufferView> arr = Local<ArrayBufferView>::Cast(arg);
+	if (num) {
+		*num = arr->ByteLength() / sizeof(Type);
+	}
+	data = reinterpret_cast<Type*>(arr->Buffer()->GetContents().Data());
+	
+	return data;
+	
+}
+
+
+inline void *getImageData(Local<Value> arg) {
+	
+	void *pixels = NULL;
+	
+	if (arg->IsNull() || arg->IsUndefined()) {
+		return pixels;
+	}
+	
+	Local<Object> obj = Local<Object>::Cast(arg);
+	
+	if ( ! obj->IsObject() ) {
+		Nan::ThrowError("Bad Image argument");
+		return pixels;
+	}
+	
+	if (obj->IsArrayBufferView()) {
+		pixels = getArrayData<BYTE>(obj, NULL);
+	} else if (obj->Has(JS_STR("data"))) {
+		pixels = node::Buffer::Data(Nan::Get(obj, JS_STR("data")).ToLocalChecked());
+	} else {
+		Nan::ThrowError("Bad Image argument");
+	}
+	
+	return pixels;
+	
+}
 
 
 #endif // _ADDON_TOOLS_HPP_
