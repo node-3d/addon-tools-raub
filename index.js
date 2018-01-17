@@ -1,6 +1,8 @@
 'use strict';
 
 
+const thisDir = __dirname.replace(/\\/g, '/');
+
 const allDirs = ['bin_win32', 'bin_win64', 'bin_linux32', 'bin_linux64', 'bin_mac64'];
 
 const platformDirs = {
@@ -16,6 +18,8 @@ const remDirs = allDirs.splice(allDirs.indexOf(binDir), 1);
 
 const paths = dir => {
 	
+	dir = dir.replace(/\\/g, '/');
+	
 	const binPath = `${dir}/${binDir}`;
 	
 	if (process.platform === 'win32') {
@@ -24,7 +28,7 @@ const paths = dir => {
 	
 	return {
 		bin     : binPath,
-		rem     : remDirs.map(k => `${dir.replace(/\\/g, '/')}/${k}`).join(' '),
+		rem     : remDirs.map(k => `${dir}/${k}`).join(' '),
 		include : `${dir}/include`,
 	};
 	
@@ -35,11 +39,10 @@ module.exports = {
 	
 	paths,
 	
-	root    : __dirname,
-	gypi    : `${__dirname}/addon-tools.gypi`,
-	include : `${__dirname}/include`,
+	root    : thisDir,
+	include : `${thisDir}/include`,
 	
-	_rd  :`${__dirname}/_rd.bat`,
-	_del :`${__dirname}/_del.bat`,
+	_rd  :`${thisDir}/_rd.bat`,
+	_del :`${thisDir}/_del.bat`,
 	
 };
