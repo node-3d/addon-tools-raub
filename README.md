@@ -18,9 +18,51 @@ dependency packages.
 `npm i -s node-addon-tools-raub`
 
 
-## Contents
+## Usage
 
-[addon-tools.gypi](#addon-toolsgypi)
+### binding.gyp
+
+```
+'variables': {
+	'_rd' : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._rd)")',
+	'_del' : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._del)")',
+},
+...
+	'include_dirs': [
+		'<!(node -e "require(\'nan\')")',
+		'<!(node -e "console.log(require(\'node-addon-tools-raub\').include)")',
+	],
+...
+	[ 'OS=="linux"', { 'action' : [
+		'rm',
+		'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
+		'<(module_root_dir)/build/Release/addon.node'
+	] } ],
+	[ 'OS=="mac"', { 'action' : [
+		'rm',
+		'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
+		'<(module_root_dir)/build/Release/addon.node'
+	] } ],
+	[ 'OS=="win"', { 'action' : [
+		'<(_del) "<(module_root_dir)/build/Release/addon.*" && ' +
+		'<(_del) "<(module_root_dir)/build/Release/obj/addon/*.*"'
+	] } ],
+```
+
+### Binary dependencies - index.js
+
+```
+module.exports = require('node-addon-tools-raub').paths(__dirname);
+```
+
+### Compiled addon - index.js
+
+```
+module.exports = require('./binary/addon');
+```
+
+
+## Contents
 
 [include/addon-tools.hpp](#includeaddon-toolshpp)
 
@@ -28,19 +70,6 @@ dependency packages.
 
 [\_rd.bat / \_del.bat](#_rdbat--_delbat)
 
-
----
-
-## addon-tools.gypi
-
-Include this gyp file into your `bindings.gyp`.
-
-```
-	'includes': [ '<!(node -e "require(\'node-addon-tools-raub\').gypi")' ],
-```
-
-This will add Nan and Addon Tools include paths to all your targets. Also variables
-`_rd` and `_del` are set for convenience.
 
 
 ---
