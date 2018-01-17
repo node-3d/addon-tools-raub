@@ -19,10 +19,14 @@ dependency packages.
 
 
 ## Contents
-	[addon-tools.gypi](#addon-tools_gypi)
-	[include/addon-tools.hpp](#include_addon-tools_hpp)
-	[index.js](#index_js)
-	[\_rd.bat / \_del.bat](#_rd.bat-_-_del.bat)
+
+[addon-tools.gypi](#addon-toolsgypi)
+
+[include/addon-tools.hpp](#includeaddon-toolshpp)
+
+[index.js](#indexjs)
+
+[\_rd.bat / \_del.bat](#_rdbat--_delbat)
 
 
 ---
