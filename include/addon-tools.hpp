@@ -2,6 +2,9 @@
 #define _ADDON_TOOLS_HPP_
 
 
+#include <nan.h>
+
+
 #define NAN_HS Nan::HandleScope scope;
 
 
@@ -10,13 +13,10 @@
 
 
 #define JS_STR(...) Nan::New<String>(__VA_ARGS__).ToLocalChecked()
-#define JS_INT(val) Nan::New<v8::Integer>(val)
-#define JS_NUM(val) Nan::New<v8::Number>(val)
-#define JS_EXT(val) Nan::New<v8::External>(reinterpret_cast<void*>(val))
+#define JS_INT(val) Nan::New<Integer>(val)
+#define JS_NUM(val) Nan::New<Number>(val)
+#define JS_EXT(val) Nan::New<External>(reinterpret_cast<void*>(val))
 #define JS_BOOL(val) (val) ? Nan::True() : Nan::False()
-
-
-#define JS_RETHROW(tc) v8::Local<v8::Value>::New(tc.Exception());
 
 
 #define REQ_ARGS(N)                                                     \
