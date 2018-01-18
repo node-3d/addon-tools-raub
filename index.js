@@ -3,24 +3,27 @@
 
 const thisDir = __dirname.replace(/\\/g, '/');
 
-const allDirs = ['bin_win32', 'bin_win64', 'bin_linux32', 'bin_linux64', 'bin_mac64'];
+const names = ['win32', 'win64', 'linux32', 'linux64', 'mac64'];
 
-const platformDirs = {
-	get win32()  { return process.arch === 'x64' ? 'bin_win64'   : 'bin_win32';   },
-	get linux()  { return process.arch === 'x64' ? 'bin_linux64' : 'bin_linux32'; },
-	get darwin() { return 'bin_mac64'; },
+const getPlatformDir = platform => {
+	switch (platform) {
+		case 'win32'  : return process.arch === 'x64' ? 'win64'   : 'win32';
+		case 'linux'  : return process.arch === 'x64' ? 'linux64'   : 'linux32';
+		case 'darwin' : return 'mac64';
+		default       : throw new Error(`Platform "${platform}" is not supported.`);
+	}
 };
 
-const binDir  = platformDirs[process.platform];
+const currentDir = getPlatformDir(process.platform);
 
-const remDirs = allDirs.splice(allDirs.indexOf(binDir), 1);
+const remDirs = names.filter(n => n !== currentDir);
 
 
 const paths = dir => {
 	
 	dir = dir.replace(/\\/g, '/');
 	
-	const binPath = `${dir}/${binDir}`;
+	const binPath = `${dir}/${currentDir}`;
 	
 	if (process.platform === 'win32') {
 		process.env.path = `${process.env.path ? `${process.env.path};` : ''}${binPath}`;
