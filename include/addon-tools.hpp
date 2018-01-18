@@ -12,181 +12,182 @@
 #define RET_UNDEFINED RET_VALUE(Nan::Undefined());
 
 
-#define JS_STR(...) Nan::New<String>(__VA_ARGS__).ToLocalChecked()
-#define JS_INT(val) Nan::New<Integer>(val)
-#define JS_NUM(val) Nan::New<Number>(val)
-#define JS_EXT(val) Nan::New<External>(reinterpret_cast<void*>(val))
+#define JS_STR(...) Nan::New<v8::String>(__VA_ARGS__).ToLocalChecked()
+#define JS_INT(val) Nan::New<v8::Integer>(val)
+#define JS_NUM(val) Nan::New<v8::Number>(val)
+#define JS_EXT(val) Nan::New<v8::External>(reinterpret_cast<void*>(val))
 #define JS_BOOL(val) (val) ? Nan::True() : Nan::False()
 
 
-#define REQ_ARGS(N)                                                     \
-	if (info.Length() < (N))                                            \
+#define REQ_ARGS(N)                                                           \
+	if (info.Length() < (N))                                                  \
 		return Nan::ThrowTypeError("Expected at least " #N " arguments");
 
 
 #define IS_ARG_EMPTY(I) (info[I]->IsNull() || info[I]->IsUndefined())
 
-#define CHECK_REQ_ARG(I, C, T)                                          \
-	if (info.Length() <= (I) || ! info[I]->C)                           \
+#define CHECK_REQ_ARG(I, C, T)                                                \
+	if (info.Length() <= (I) || ! info[I]->C)                                 \
 		return Nan::ThrowTypeError("Argument " #I " must be " T);
 
-#define CHECK_LET_ARG(I, C, T)                                          \
-	if ( ! (IS_ARG_EMPTY(I) || info[I]->C) )                            \
+#define CHECK_LET_ARG(I, C, T)                                                \
+	if ( ! (IS_ARG_EMPTY(I) || info[I]->C) )                                  \
 		return Nan::ThrowTypeError("Argument " #I " must be " T " or null");
 
 
-#define REQ_UTF8_ARG(I, VAR)                                            \
-	CHECK_REQ_ARG(I, IsString(), "string");                             \
+#define REQ_UTF8_ARG(I, VAR)                                                  \
+	CHECK_REQ_ARG(I, IsString(), "string");                                   \
 	Nan::Utf8String VAR(info[I]);
 
-#define LET_UTF8_ARG(I, VAR)                                            \
-	CHECK_LET_ARG(I, IsString(), "string");                             \
+#define LET_UTF8_ARG(I, VAR)                                                  \
+	CHECK_LET_ARG(I, IsString(), "string");                                   \
 	Nan::Utf8String VAR(info[I]);
 
 
-#define REQ_INT32_ARG(I, VAR)                                           \
-	CHECK_REQ_ARG(I, IsInt32(), "int32");                               \
+#define REQ_INT32_ARG(I, VAR)                                                 \
+	CHECK_REQ_ARG(I, IsInt32(), "int32");                                     \
 	int VAR = info[I]->Int32Value();
 
-#define LET_INT32_ARG(I, VAR)                                           \
-	CHECK_LET_ARG(I, IsInt32(), "int32");                               \
+#define LET_INT32_ARG(I, VAR)                                                 \
+	CHECK_LET_ARG(I, IsInt32(), "int32");                                     \
 	int VAR = IS_ARG_EMPTY(I) ? 0 : info[I]->Int32Value();
 
 
-#define REQ_BOOL_ARG(I, VAR)                                            \
-	CHECK_REQ_ARG(I, IsBoolean(), "bool");                              \
-	int VAR = info[I]->BooleanValue();
+#define REQ_BOOL_ARG(I, VAR)                                                  \
+	CHECK_REQ_ARG(I, IsBoolean(), "bool");                                    \
+	bool VAR = info[I]->BooleanValue();
 
-#define LET_BOOL_ARG(I, VAR)                                            \
-	CHECK_LET_ARG(I, IsBoolean(), "bool");                              \
-	int VAR = IS_ARG_EMPTY(I) ? false : info[I]->BooleanValue();
+#define LET_BOOL_ARG(I, VAR)                                                  \
+	CHECK_LET_ARG(I, IsBoolean(), "bool");                                    \
+	bool VAR = IS_ARG_EMPTY(I) ? false : info[I]->BooleanValue();
 
 
-#define REQ_UINT32_ARG(I, VAR)                                          \
-	CHECK_REQ_ARG(I, IsUint32(), "uint32");                             \
+#define REQ_UINT32_ARG(I, VAR)                                                \
+	CHECK_REQ_ARG(I, IsUint32(), "uint32");                                   \
 	unsigned int VAR = info[I]->Uint32Value();
 
-#define LET_UINT32_ARG(I, VAR)                                          \
-	CHECK_LET_ARG(I, IsUint32(), "uint32");                             \
+#define LET_UINT32_ARG(I, VAR)                                                \
+	CHECK_LET_ARG(I, IsUint32(), "uint32");                                   \
 	unsigned int VAR = IS_ARG_EMPTY(I) ? 0 : info[I]->Uint32Value();
 
 
-#define REQ_OFFS_ARG(I, VAR)                                            \
-	CHECK_REQ_ARG(I, IsNumber(), "number");                             \
+#define REQ_OFFS_ARG(I, VAR)                                                  \
+	CHECK_REQ_ARG(I, IsNumber(), "number");                                   \
 	size_t VAR = static_cast<size_t>(info[I]->IntegerValue());
 
-#define LET_OFFS_ARG(I, VAR)                                            \
-	CHECK_LET_ARG(I, IsNumber(), "number");                             \
+#define LET_OFFS_ARG(I, VAR)                                                  \
+	CHECK_LET_ARG(I, IsNumber(), "number");                                   \
 	size_t VAR = IS_ARG_EMPTY(I) ? 0 : static_cast<size_t>(info[I]->IntegerValue());
 
 
-#define REQ_DOUBLE_ARG(I, VAR)                                          \
-	CHECK_REQ_ARG(I, IsNumber(), "number");                             \
+#define REQ_DOUBLE_ARG(I, VAR)                                                \
+	CHECK_REQ_ARG(I, IsNumber(), "number");                                   \
 	double VAR = info[I]->NumberValue();
 
-#define LET_DOUBLE_ARG(I, VAR)                                          \
-	CHECK_LET_ARG(I, IsNumber(), "number");                             \
+#define LET_DOUBLE_ARG(I, VAR)                                                \
+	CHECK_LET_ARG(I, IsNumber(), "number");                                   \
 	double VAR = IS_ARG_EMPTY(I) ? 0.0 : info[I]->NumberValue();
 
 
-#define REQ_FLOAT_ARG(I, VAR)                                           \
-	CHECK_REQ_ARG(I, IsNumber(), "number");                             \
+#define REQ_FLOAT_ARG(I, VAR)                                                 \
+	CHECK_REQ_ARG(I, IsNumber(), "number");                                   \
 	float VAR = static_cast<float>(info[I]->NumberValue());
 
-#define LET_FLOAT_ARG(I, VAR)                                           \
-	CHECK_LET_ARG(I, IsNumber(), "number");                             \
+#define LET_FLOAT_ARG(I, VAR)                                                 \
+	CHECK_LET_ARG(I, IsNumber(), "number");                                   \
 	float VAR = IS_ARG_EMPTY(I) ? 0.f : static_cast<float>(info[I]->NumberValue());
 
 
-#define REQ_EXT_ARG(I, VAR)                                             \
-	CHECK_REQ_ARG(I, IsExternal(), "void*");                            \
-	Local<External> VAR = Local<External>::Cast(info[I]);
+#define REQ_EXT_ARG(I, VAR)                                                   \
+	CHECK_REQ_ARG(I, IsExternal(), "void*");                                  \
+	v8::Local<v8::External> VAR = v8::Local<v8::External>::Cast(info[I]);
 
-#define LET_EXT_ARG(I, VAR)                                             \
-	CHECK_LET_ARG(I, IsExternal(), "number");                           \
-	Local<External> VAR = IS_ARG_EMPTY(I) ? JS_EXT(NULL) : Local<External>::Cast(info[I]);
-
-
-#define REQ_FUN_ARG(I, VAR)                                             \
-	CHECK_REQ_ARG(I, IsFunction(), "function");                         \
-	Local<Function> VAR = Local<Function>::Cast(info[I]);
+#define LET_EXT_ARG(I, VAR)                                                   \
+	CHECK_LET_ARG(I, IsExternal(), "number");                                 \
+	v8::Local<v8::External> VAR = IS_ARG_EMPTY(I) ? JS_EXT(NULL) :            \
+		v8::Local<v8::External>::Cast(info[I]);
 
 
-#define REQ_OBJ_ARG(I, VAR)                                             \
-	CHECK_REQ_ARG(I, IsObject(), "object");                             \
-	Local<Object> VAR = Local<Object>::Cast(info[I]);
+#define REQ_FUN_ARG(I, VAR)                                                   \
+	CHECK_REQ_ARG(I, IsFunction(), "function");                           \
+	v8::Local<v8::Function> VAR = v8::Local<v8::Function>::Cast(info[I]);
 
 
-#define REQ_ARRV_ARG(I, VAR)                                            \
-	REQ_OBJ_ARG(I, _obj_##VAR);                                         \
-	if( ! _obj_##VAR->IsArrayBufferView() )                             \
-		return Nan::ThrowTypeError("Argument " #I " must be an array buffer"); \
-	Local<ArrayBufferView> VAR = Local<ArrayBufferView>::Cast(_obj_##VAR);
+#define REQ_OBJ_ARG(I, VAR)                                                   \
+	CHECK_REQ_ARG(I, IsObject(), "object");                               \
+	v8::Local<v8::Object> VAR = v8::Local<v8::Object>::Cast(info[I]);
+
+
+#define REQ_ARRV_ARG(I, VAR)                                                  \
+	REQ_OBJ_ARG(I, _obj_##VAR);                                               \
+	if( ! _obj_##VAR->Isv8::ArrayBufferView() )                               \
+		return Nan::ThrowTypeError("Argument " #I " must be an array buffer");\
+	v8::Local<v8::ArrayBufferView> VAR = v8::Local<v8::ArrayBufferView>::Cast(_obj_##VAR);
 
 
 #define SET_PROP(OBJ, KEY, VAL) OBJ->Set(JS_STR(KEY), VAL);
 #define SET_I(ARR, I, VAL) ARR->Set(I, VAL);
 
 
-#define CTOR_CHECK(T)                                                   \
-	if ( ! info.IsConstructCall() )                                     \
+#define CTOR_CHECK(T)                                                         \
+	if ( ! info.IsConstructCall() )                                           \
 		return Nan::ThrowTypeError(T " must be called with the 'new' keyword.");
 
-#define SETTER_CHECK(C, T)                                              \
-	if ( ! value->C )                                                   \
+#define SETTER_CHECK(C, T)                                                    \
+	if ( ! value->C )                                                         \
 		return Nan::ThrowTypeError("Value must be " T);
 
 
-#define ACCESSOR_RW(OBJ, NAME)                                          \
+#define ACCESSOR_RW(OBJ, NAME)                                                \
 	Nan::SetAccessor(OBJ, JS_STR(#NAME), NAME ## Getter, NAME ## Setter);
 
-#define ACCESSOR_R(OBJ, NAME)                                           \
+#define ACCESSOR_R(OBJ, NAME)                                                 \
 	Nan::SetAccessor(OBJ, JS_STR(#NAME), NAME ## Getter);
 
 
-#define SETTER_UTF8_ARG                                                 \
-	SETTER_CHECK(IsString(), "string");                                 \
+#define SETTER_UTF8_ARG                                                       \
+	SETTER_CHECK(IsString(), "string");                                       \
 	Nan::Utf8String v(value);
 
-#define SETTER_INT32_ARG                                                \
-	SETTER_CHECK(IsInt32(), "int32");                                   \
+#define SETTER_INT32_ARG                                                      \
+	SETTER_CHECK(IsInt32(), "int32");                                         \
 	int v = value->Int32Value();
 
-#define SETTER_BOOL_ARG                                                 \
-	SETTER_CHECK(IsBoolean(), "bool");                                  \
-	bool v = value->BooleanValue(); // TODO APPLY bool TO REQ_BOOL_ARG
+#define SETTER_BOOL_ARG                                                       \
+	SETTER_CHECK(IsBoolean(), "bool");                                        \
+	bool v = value->BooleanValue();
 
-#define SETTER_UINT32_ARG                                               \
-	SETTER_CHECK(IsUint32(), "uint32");                                 \
+#define SETTER_UINT32_ARG                                                     \
+	SETTER_CHECK(IsUint32(), "uint32");                                       \
 	unsigned int v = value->Uint32Value();
 
-#define SETTER_OFFS_ARG                                                 \
-	SETTER_CHECK(IsNumber(), "number");                                 \
+#define SETTER_OFFS_ARG                                                       \
+	SETTER_CHECK(IsNumber(), "number");                                       \
 	size_t v = static_cast<size_t>(value->IntegerValue());
 
-#define SETTER_DOUBLE_ARG                                               \
-	SETTER_CHECK(IsNumber(), "number");                                 \
+#define SETTER_DOUBLE_ARG                                                     \
+	SETTER_CHECK(IsNumber(), "number");                                       \
 	double v = value->NumberValue();
 
-#define SETTER_FLOAT_ARG                                                \
-	SETTER_CHECK(IsNumber(), "number");                                 \
+#define SETTER_FLOAT_ARG                                                      \
+	SETTER_CHECK(IsNumber(), "number");                                       \
 	float v = static_cast<float>(value->NumberValue());
 
-#define SETTER_EXT_ARG                                                  \
-	SETTER_CHECK(IsExternal(), "void*");                                \
-	Local<External> v = Local<External>::Cast(value);
+#define SETTER_EXT_ARG                                                        \
+	SETTER_CHECK(IsExternal(), "void*");                                      \
+	v8::Local<v8::External> v = v8::Local<v8::External>::Cast(value);
 
-#define SETTER_FUN_ARG                                                  \
-	SETTER_CHECK(IsFunction(), "function");                             \
-	Local<Function> v = Local<Function>::Cast(value);
+#define SETTER_FUN_ARG                                                        \
+	SETTER_CHECK(IsFunction(), "function");                               \
+	v8::Local<v8::Function> v = v8::Local<v8::Function>::Cast(value);
 
-#define SETTER_OBJ_ARG                                                  \
-	SETTER_CHECK(IsObject(), "object");                                 \
-	Local<Object> v = Local<Object>::Cast(value);
+#define SETTER_OBJ_ARG                                                        \
+	SETTER_CHECK(IsObject(), "object");                                   \
+	v8::Local<v8::Object> v = v8::Local<v8::Object>::Cast(value);
 
 
 template<typename Type>
-inline Type* getArrayData(Local<Value> arg, int *num = NULL) {
+inline Type* getArrayData(v8::Local<v8::Value> arg, int *num = NULL) {
 	
 	Type *data = NULL;
 	
@@ -195,7 +196,7 @@ inline Type* getArrayData(Local<Value> arg, int *num = NULL) {
 	}
 	
 	if (arg->IsNull() || arg->IsUndefined()) {
-		return pixels;
+		return data;
 	}
 	
 	if (arg->IsArray()) {
@@ -208,7 +209,7 @@ inline Type* getArrayData(Local<Value> arg, int *num = NULL) {
 		return data;
 	}
 	
-	Local<ArrayBufferView> arr = Local<ArrayBufferView>::Cast(arg);
+	v8::Local<v8::ArrayBufferView> arr = v8::Local<v8::ArrayBufferView>::Cast(arg);
 	if (num) {
 		*num = arr->ByteLength() / sizeof(Type);
 	}
@@ -219,7 +220,7 @@ inline Type* getArrayData(Local<Value> arg, int *num = NULL) {
 }
 
 
-inline void *getImageData(Local<Value> arg) {
+inline void *getImageData(v8::Local<v8::Value> arg) {
 	
 	void *pixels = NULL;
 	
@@ -227,7 +228,7 @@ inline void *getImageData(Local<Value> arg) {
 		return pixels;
 	}
 	
-	Local<Object> obj = Local<Object>::Cast(arg);
+	v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(arg);
 	
 	if ( ! obj->IsObject() ) {
 		Nan::ThrowError("Bad Image argument");
