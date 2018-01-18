@@ -5,6 +5,8 @@ const thisDir = __dirname.replace(/\\/g, '/');
 
 const names = ['win32', 'win64', 'linux32', 'linux64', 'mac64'];
 
+const prefixName = name => `bin-${name}`;
+
 const getPlatformDir = platform => {
 	switch (platform) {
 		case 'win32'  : return process.arch === 'x64' ? 'win64'   : 'win32';
@@ -14,9 +16,9 @@ const getPlatformDir = platform => {
 	}
 };
 
-const currentDir = getPlatformDir(process.platform);
+const currentDir = prefixName(getPlatformDir(process.platform));
 
-const remDirs = names.filter(n => n !== currentDir);
+const remDirs = names.map(prefixName).filter(n => n !== currentDir);
 
 
 const paths = dir => {
