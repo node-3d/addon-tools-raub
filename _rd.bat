@@ -1,3 +1,3 @@
-for %%folder in (%*) do (
-	if exist %%folder rd /s /q %%folder
+for %%x in (%*) do (
+	if exist %%x rd /s /q %%x
 )
