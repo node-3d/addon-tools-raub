@@ -18,6 +18,22 @@ dependency packages.
 `npm i -s node-addon-tools-raub`
 
 
+---
+
+## Contents
+
+[Snippets](#snippets)
+
+[include/addon-tools.hpp](#includeaddon-toolshpp)
+
+[index.js](#indexjs)
+
+[\_rd.bat / \_del.bat](#_rdbat--_delbat)
+
+
+---
+
+
 ## Snippets
 
 ### binding.gyp
@@ -179,7 +195,7 @@ module.exports = require('./binary/addon');
 
 <summary>binding.gyp</summary>
 
-* Assume `EXT_LIB` is the name of a Addon Tools compliant binary dependency module.
+* Assume `EXT_LIB` is the name of an Addon Tools compliant binary dependency module.
 * Assume `MY_ADDON` is the name of this addon.
 * Assume C++ code goes to `cpp` directory.
 
@@ -326,18 +342,6 @@ module.exports = require('./binary/addon');
 ```
 
 </details>
-
-
----
-
-## Contents
-
-[include/addon-tools.hpp](#includeaddon-toolshpp)
-
-[index.js](#indexjs)
-
-[\_rd.bat / \_del.bat](#_rdbat--_delbat)
-
 
 
 ---
