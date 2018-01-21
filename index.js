@@ -47,6 +47,8 @@ module.exports = {
 	root    : thisDir,
 	include : `${thisDir}/include`,
 	
+	printNan() { require('nan'); },
+	
 	_rd  :`${thisDir}/_rd.bat`,
 	_del :`${thisDir}/_del.bat`,
 	
