@@ -18,21 +18,33 @@ dependency packages.
 `npm i -s node-addon-tools-raub`
 
 
-## Usage
+## Snippets
 
 ### binding.gyp
+
+* For Windows custom file/folder removers are present, you can put them into variables.
 
 ```
 'variables': {
 	'_rd' : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._rd)")',
 	'_del' : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._del)")',
 },
-...
+```
+
+* Include directories for Addon Tools and Nan (which is preinstalled with Addon Tools)
+are accessible as shown below.
+
+```
 	'include_dirs': [
-		'<!(node -e "require(\'nan\')")',
+		'<!(node -e "require(\'node-addon-tools-raub\').printNan()")',
 		'<!(node -e "console.log(require(\'node-addon-tools-raub\').include)")',
 	],
-...
+```
+
+* Intermediate files can be removed in a separate build-step with `rm` on
+Unix systems and custom remover on Windows.
+
+```
 	[ 'OS=="linux"', { 'action' : [
 		'rm',
 		'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
@@ -49,18 +61,274 @@ dependency packages.
 	] } ],
 ```
 
-### Binary dependencies - index.js
+
+### Binary dependencies
+
+If you design a module with binary dependencies for several platforms, Addon Tools
+would encourage you to abide by the following rules:
+
+* Your binary directories are:
+	* bin-win32
+	* bin-win64
+	* bin-linux32
+	* bin-linux64
+	* bin-mac64
+
+* The following piece of code in your `index.js` without changes. Method `paths()`
+is described [here](#indexjs).
 
 ```
 module.exports = require('node-addon-tools-raub').paths(__dirname);
 ```
 
-### Compiled addon - index.js
+* Your whole `binding.gyp`:
+
+```
+{
+	'variables': {
+		'_rd' : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._rd)")',
+		'rem' : '<!(node -e "console.log(require(\'.\').rem)")',
+	},
+	'targets': [
+		{
+			'target_name' : 'remove_extras',
+			'type'        : 'none',
+			'actions'     : [
+				{
+					'action_name' : 'Unnecessary binaries removed.',
+					'inputs'      : ['<@(rem)'],
+					'outputs'     : ['build'],
+					'conditions'  : [
+						[ 'OS=="linux"', { 'action' : [ 'rm', '-rf', '<@(_inputs)' ] } ],
+						[ 'OS=="mac"'  , { 'action' : [ 'rm', '-rf', '<@(_inputs)' ] } ],
+						[ 'OS=="win"'  , { 'action' : [ '<(_rd)', '<@(_inputs)' ] } ],
+					],
+				}
+			],
+		},
+		
+	]
+}
+
+```
+
+
+
+### Compiled addon
+
+If you always copy your compiled addon to the `binary` directory, it will be easy to
+`require()` it without any hesitation. For copying, you can use the following snippet:
+
+```
+{
+	'target_name'  : 'make_directory',
+	'type'         : 'none',
+	'dependencies' : ['MY_ADDON'],
+	'actions'      : [{
+		'action_name' : 'Directory created.',
+		'inputs'      : [],
+		'outputs'     : ['build'],
+		'conditions'  : [
+			[ 'OS=="linux"', { 'action': ['mkdir', '-p', 'binary'] } ],
+			[ 'OS=="mac"', { 'action': ['mkdir', '-p', 'binary'] } ],
+			[ 'OS=="win"', { 'action': [
+				'<(_rd) "<(module_root_dir)/binary" && ' +
+				'md "<(module_root_dir)/binary"'
+			] } ],
+		],
+	}],
+},
+{
+	'target_name'  : 'copy_binary',
+	'type'         : 'none',
+	'dependencies' : ['make_directory'],
+	'actions'      : [{
+		'action_name' : 'Module copied.',
+		'inputs'      : [],
+		'outputs'     : ['binary'],
+		'conditions'  : [
+			[ 'OS=="linux"', { 'action' : [
+				'cp',
+				'<(module_root_dir)/build/Release/MY_ADDON.node',
+				'<(module_root_dir)/binary/MY_ADDON.node'
+			] } ],
+			[ 'OS=="mac"', { 'action' : [
+				'cp',
+				'<(module_root_dir)/build/Release/MY_ADDON.node',
+				'<(module_root_dir)/binary/MY_ADDON.node'
+			] } ],
+			[ 'OS=="win"', { 'action' : [
+				'copy "<(module_root_dir)/build/Release/MY_ADDON.node"' +
+				' "<(module_root_dir)/binary/MY_ADDON.node"'
+			] } ],
+		],
+	}],
+},
+```
+
+Here `MY_ADDON` should be replaced by any name you like. Then require like
+this:
 
 ```
 module.exports = require('./binary/addon');
 ```
 
+#### Generic addon snippet
+
+<details>
+
+<summary>binding.gyp</summary>
+
+* Assume `EXT_LIB` is the name of a Addon Tools compliant binary dependency module.
+* Assume `MY_ADDON` is the name of this addon.
+* Assume C++ code goes to `cpp` directory.
+
+```
+{
+	'variables': {
+		'_del'           : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._del)")',
+		'_rd'            : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._rd)")',
+		'EXT_LIB_include' : '<!(node -e "console.log(require(\'node-deps-EXT_LIB-raub\').include)")',
+		'EXT_LIB_bin'     : '<!(node -e "console.log(require(\'node-deps-EXT_LIB-raub\').bin)")',
+	},
+	'targets': [
+		{
+			'target_name': 'MY_ADDON',
+			'sources': [
+				'cpp/bindings.cpp',
+				'cpp/MY_ADDON.cpp',
+			],
+			'include_dirs': [
+				'<!(node -e "require(\'node-addon-tools-raub\').printNan()")',
+				'<!(node -e "console.log(require(\'node-addon-tools-raub\').include)")',
+				'<(EXT_LIB_include)',
+				'<(module_root_dir)/include',
+			],
+			'library_dirs': [ '<(EXT_LIB_bin)' ],
+			'conditions': [
+				[
+					'OS=="linux"',
+					{
+						'libraries': [
+							'-Wl,-rpath,<(EXT_LIB_bin)',
+							'<(EXT_LIB_bin)/libEXT_LIB.so',
+						],
+					}
+				],
+				[
+					'OS=="mac"',
+					{
+						'libraries': [
+							'-Wl,-rpath,<(EXT_LIB_bin)',
+							'<(EXT_LIB_bin)/EXT_LIB.dylib',
+						],
+					}
+				],
+				[
+					'OS=="win"',
+					{
+						'libraries': [ 'EXT_LIB.lib' ],
+						'defines' : [
+							'WIN32_LEAN_AND_MEAN',
+							'VC_EXTRALEAN'
+						],
+						'msvs_version'  : '2013',
+						'msvs_settings' : {
+							'VCCLCompilerTool' : {
+								'AdditionalOptions' : [
+									'/O2','/Oy','/GL','/GF','/Gm-','/EHsc',
+									'/MT','/GS','/Gy','/GR-','/Gd',
+								]
+							},
+							'VCLinkerTool' : {
+								'AdditionalOptions' : ['/OPT:REF','/OPT:ICF','/LTCG']
+							},
+						},
+					}
+				],
+			],
+		},
+		{
+			'target_name'  : 'make_directory',
+			'type'         : 'none',
+			'dependencies' : ['MY_ADDON'],
+			'actions'      : [{
+				'action_name' : 'Directory created.',
+				'inputs'      : [],
+				'outputs'     : ['build'],
+				'conditions'  : [
+					[ 'OS=="linux"', { 'action': ['mkdir', '-p', 'binary'] } ],
+					[ 'OS=="mac"', { 'action': ['mkdir', '-p', 'binary'] } ],
+					[ 'OS=="win"', { 'action': [
+						'<(_rd) "<(module_root_dir)/binary" && ' +
+						'md "<(module_root_dir)/binary"'
+					] } ],
+				],
+			}],
+		},
+		{
+			'target_name'  : 'copy_binary',
+			'type'         : 'none',
+			'dependencies' : ['make_directory'],
+			'actions'      : [{
+				'action_name' : 'Module copied.',
+				'inputs'      : [],
+				'outputs'     : ['binary'],
+				'conditions'  : [
+					[ 'OS=="linux"', { 'action' : [
+						'cp',
+						'<(module_root_dir)/build/Release/MY_ADDON.node',
+						'<(module_root_dir)/binary/MY_ADDON.node'
+					] } ],
+					[ 'OS=="mac"', { 'action' : [
+						'cp',
+						'<(module_root_dir)/build/Release/MY_ADDON.node',
+						'<(module_root_dir)/binary/MY_ADDON.node'
+					] } ],
+					[ 'OS=="win"', { 'action' : [
+						'copy "<(module_root_dir)/build/Release/MY_ADDON.node"' +
+						' "<(module_root_dir)/binary/MY_ADDON.node"'
+					] } ],
+				],
+			}],
+		},
+		
+		{
+			'target_name'  : 'remove_extras',
+			'type'         : 'none',
+			'dependencies' : ['copy_binary'],
+			'actions'      : [{
+				'action_name' : 'Build intermediates removed.',
+				'inputs'      : [],
+				'outputs'     : ['cpp'],
+				'conditions'  : [
+					[ 'OS=="linux"', { 'action' : [
+						'rm',
+						'<(module_root_dir)/build/Release/obj.target/MY_ADDON/cpp/MY_ADDON.o',
+						'<(module_root_dir)/build/Release/obj.target/MY_ADDON.node',
+						'<(module_root_dir)/build/Release/MY_ADDON.node'
+					] } ],
+					[ 'OS=="mac"', { 'action' : [
+						'rm',
+						'<(module_root_dir)/build/Release/obj.target/MY_ADDON/cpp/MY_ADDON.o',
+						'<(module_root_dir)/build/Release/MY_ADDON.node'
+					] } ],
+					[ 'OS=="win"', { 'action' : [
+						'<(_del) "<(module_root_dir)/build/Release/MY_ADDON.*" && ' +
+						'<(_del) "<(module_root_dir)/build/Release/obj/MY_ADDON/*.*"'
+					] } ],
+				],
+			}],
+		},
+		
+	]
+}
+```
+
+</details>
+
+
+---
 
 ## Contents
 
