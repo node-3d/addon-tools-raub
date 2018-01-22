@@ -120,7 +120,7 @@
 
 #define REQ_ARRV_ARG(I, VAR)                                                  \
 	REQ_OBJ_ARG(I, _obj_##VAR);                                               \
-	if( ! _obj_##VAR->Isv8::ArrayBufferView() )                               \
+	if( ! _obj_##VAR->IsArrayBufferView() )                               \
 		return Nan::ThrowTypeError("Argument " #I " must be an array buffer");\
 	v8::Local<v8::ArrayBufferView> VAR = v8::Local<v8::ArrayBufferView>::Cast(_obj_##VAR);
 
