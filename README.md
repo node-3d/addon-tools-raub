@@ -15,7 +15,7 @@ dependency packages.
 
 ## Install
 
-`npm i -s node-addon-tools-raub`
+`npm i -s addon-tools-raub`
 
 
 ---
@@ -42,8 +42,8 @@ dependency packages.
 
 ```
 'variables': {
-	'_rd' : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._rd)")',
-	'_del' : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._del)")',
+	'_rd' : '<!(node -e "console.log(require(\'addon-tools-raub\')._rd)")',
+	'_del' : '<!(node -e "console.log(require(\'addon-tools-raub\')._del)")',
 },
 ```
 
@@ -52,8 +52,8 @@ are accessible as shown below.
 
 ```
 	'include_dirs': [
-		'<!(node -e "require(\'node-addon-tools-raub\').printNan()")',
-		'<!(node -e "console.log(require(\'node-addon-tools-raub\').include)")',
+		'<!(node -e "require(\'addon-tools-raub\').printNan()")',
+		'<!(node -e "console.log(require(\'addon-tools-raub\').include)")',
 	],
 ```
 
@@ -94,7 +94,7 @@ would encourage you to abide by the following rules:
 is described [here](#indexjs).
 
 ```
-module.exports = require('node-addon-tools-raub').paths(__dirname);
+module.exports = require('addon-tools-raub').paths(__dirname);
 ```
 
 * Your whole `binding.gyp`:
@@ -102,7 +102,7 @@ module.exports = require('node-addon-tools-raub').paths(__dirname);
 ```
 {
 	'variables': {
-		'_rd' : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._rd)")',
+		'_rd' : '<!(node -e "console.log(require(\'addon-tools-raub\')._rd)")',
 		'rem' : '<!(node -e "console.log(require(\'.\').rem)")',
 	},
 	'targets': [
@@ -202,8 +202,8 @@ module.exports = require('./binary/addon');
 ```
 {
 	'variables': {
-		'_del'           : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._del)")',
-		'_rd'            : '<!(node -e "console.log(require(\'node-addon-tools-raub\')._rd)")',
+		'_del'           : '<!(node -e "console.log(require(\'addon-tools-raub\')._del)")',
+		'_rd'            : '<!(node -e "console.log(require(\'addon-tools-raub\')._rd)")',
 		'EXT_LIB_include' : '<!(node -e "console.log(require(\'node-deps-EXT_LIB-raub\').include)")',
 		'EXT_LIB_bin'     : '<!(node -e "console.log(require(\'node-deps-EXT_LIB-raub\').bin)")',
 	},
@@ -215,8 +215,8 @@ module.exports = require('./binary/addon');
 				'cpp/MY_ADDON.cpp',
 			],
 			'include_dirs': [
-				'<!(node -e "require(\'node-addon-tools-raub\').printNan()")',
-				'<!(node -e "console.log(require(\'node-addon-tools-raub\').include)")',
+				'<!(node -e "require(\'addon-tools-raub\').printNan()")',
+				'<!(node -e "console.log(require(\'addon-tools-raub\').include)")',
 				'<(EXT_LIB_include)',
 				'<(module_root_dir)/include',
 			],
@@ -369,7 +369,7 @@ As it was mentioned above, this can be done automatically. Also an actual path t
 directory is exported from the module and is accessible like this:
 
 ```
-require('node-addon-tools-raub').include
+require('addon-tools-raub').include
 ```
 
 In the file, currently there are following helpers:
@@ -534,8 +534,8 @@ input `dir`.
 	* `bin` - platform binary path.
 	* `rem` - a space-separated list of binary paths to be cleaned on this platform.
 	* `include` - include directory for this `dir`.
-* `root` - where `'node-addon-tools-raub'` module is situated.
-* `include` - `'node-addon-tools-raub'` own 'include' directory.
+* `root` - where `'addon-tools-raub'` module is situated.
+* `include` - `'addon-tools-raub'` own 'include' directory.
 * `_rd` - the location of `'_rd.bat'` file.
 * `_del` - the location of `'_del.bat'` file.
 
