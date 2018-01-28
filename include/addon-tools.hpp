@@ -109,18 +109,18 @@
 
 
 #define REQ_FUN_ARG(I, VAR)                                                   \
-	CHECK_REQ_ARG(I, IsFunction(), "function");                           \
+	CHECK_REQ_ARG(I, IsFunction(), "function");                               \
 	v8::Local<v8::Function> VAR = v8::Local<v8::Function>::Cast(info[I]);
 
 
 #define REQ_OBJ_ARG(I, VAR)                                                   \
-	CHECK_REQ_ARG(I, IsObject(), "object");                               \
+	CHECK_REQ_ARG(I, IsObject(), "object");                                   \
 	v8::Local<v8::Object> VAR = v8::Local<v8::Object>::Cast(info[I]);
 
 
 #define REQ_ARRV_ARG(I, VAR)                                                  \
 	REQ_OBJ_ARG(I, _obj_##VAR);                                               \
-	if( ! _obj_##VAR->IsArrayBufferView() )                               \
+	if( ! _obj_##VAR->IsArrayBufferView() )                                   \
 		return Nan::ThrowTypeError("Argument " #I " must be an array buffer");\
 	v8::Local<v8::ArrayBufferView> VAR = v8::Local<v8::ArrayBufferView>::Cast(_obj_##VAR);
 
@@ -178,11 +178,11 @@
 	v8::Local<v8::External> v = v8::Local<v8::External>::Cast(value);
 
 #define SETTER_FUN_ARG                                                        \
-	SETTER_CHECK(IsFunction(), "function");                               \
+	SETTER_CHECK(IsFunction(), "function");                                   \
 	v8::Local<v8::Function> v = v8::Local<v8::Function>::Cast(value);
 
 #define SETTER_OBJ_ARG                                                        \
-	SETTER_CHECK(IsObject(), "object");                                   \
+	SETTER_CHECK(IsObject(), "object");                                       \
 	v8::Local<v8::Object> v = v8::Local<v8::Object>::Cast(value);
 
 
@@ -236,7 +236,7 @@ inline void *getImageData(v8::Local<v8::Value> arg) {
 	}
 	
 	if (obj->IsArrayBufferView()) {
-		pixels = getArrayData<BYTE>(obj, NULL);
+		pixels = getArrayData<unsigned char>(obj, NULL);
 	} else if (obj->Has(JS_STR("data"))) {
 		pixels = node::Buffer::Data(Nan::Get(obj, JS_STR("data")).ToLocalChecked());
 	} else {
