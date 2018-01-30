@@ -28,7 +28,7 @@ dependency packages.
 
 [index.js](#indexjs)
 
-[\_rd.bat / \_del.bat](#_rdbat--_delbat)
+[Windows BAT](#windows-bat)
 
 
 ---
@@ -38,11 +38,12 @@ dependency packages.
 
 ### binding.gyp
 
-* For Windows custom file/folder removers are present, you can put them into variables.
+* For Windows custom file/folder removers/creators are present, you can put them into variables.
 
 ```
 'variables': {
 	'_rd' : '<!(node -e "console.log(require(\'addon-tools-raub\')._rd)")',
+	'_md' : '<!(node -e "console.log(require(\'addon-tools-raub\')._md)")',
 	'_del' : '<!(node -e "console.log(require(\'addon-tools-raub\')._del)")',
 },
 ```
@@ -72,8 +73,9 @@ Unix systems and custom remover on Windows.
 		'<(module_root_dir)/build/Release/addon.node'
 	] } ],
 	[ 'OS=="win"', { 'action' : [
-		'<(_del) "<(module_root_dir)/build/Release/addon.*" && ' +
-		'<(_del) "<(module_root_dir)/build/Release/obj/addon/*.*"'
+		'<(_del)',
+		'<(module_root_dir)/build/Release/addon.*',
+		'<(module_root_dir)/build/Release/obj/addon/*.*'
 	] } ],
 ```
 
@@ -147,10 +149,7 @@ If you always copy your compiled addon to the `binary` directory, it will be eas
 		'conditions'  : [
 			[ 'OS=="linux"', { 'action': ['mkdir', '-p', 'binary'] } ],
 			[ 'OS=="mac"', { 'action': ['mkdir', '-p', 'binary'] } ],
-			[ 'OS=="win"', { 'action': [
-				'<(_rd) "<(module_root_dir)/binary" && ' +
-				'md "<(module_root_dir)/binary"'
-			] } ],
+			[ 'OS=="win"', { 'action': ['<(_md)', 'binary'] } ],
 		],
 	}],
 },
@@ -203,7 +202,7 @@ module.exports = require('./binary/addon');
 {
 	'variables': {
 		'_del'           : '<!(node -e "console.log(require(\'addon-tools-raub\')._del)")',
-		'_rd'            : '<!(node -e "console.log(require(\'addon-tools-raub\')._rd)")',
+		'_md'            : '<!(node -e "console.log(require(\'addon-tools-raub\')._md)")',
 		'EXT_LIB_include' : '<!(node -e "console.log(require(\'node-deps-EXT_LIB-raub\').include)")',
 		'EXT_LIB_bin'     : '<!(node -e "console.log(require(\'node-deps-EXT_LIB-raub\').bin)")',
 	},
@@ -275,10 +274,7 @@ module.exports = require('./binary/addon');
 				'conditions'  : [
 					[ 'OS=="linux"', { 'action': ['mkdir', '-p', 'binary'] } ],
 					[ 'OS=="mac"', { 'action': ['mkdir', '-p', 'binary'] } ],
-					[ 'OS=="win"', { 'action': [
-						'<(_rd) "<(module_root_dir)/binary" && ' +
-						'md "<(module_root_dir)/binary"'
-					] } ],
+					[ 'OS=="win"', { 'action': ['<(_md)', 'binary'] } ],
 				],
 			}],
 		},
@@ -330,8 +326,9 @@ module.exports = require('./binary/addon');
 						'<(module_root_dir)/build/Release/MY_ADDON.node'
 					] } ],
 					[ 'OS=="win"', { 'action' : [
-						'<(_del) "<(module_root_dir)/build/Release/MY_ADDON.*" && ' +
-						'<(_del) "<(module_root_dir)/build/Release/obj/MY_ADDON/*.*"'
+						'<(_del)',
+						'<(module_root_dir)/build/Release/MY_ADDON.*',
+						'<(module_root_dir)/build/Release/obj/MY_ADDON/*.*'
 					] } ],
 				],
 			}],
@@ -537,18 +534,22 @@ input `dir`.
 * `root` - where `'addon-tools-raub'` module is situated.
 * `include` - `'addon-tools-raub'` own 'include' directory.
 * `_rd` - the location of `'_rd.bat'` file.
+* `_md` - the location of `'_md.bat'` file.
 * `_del` - the location of `'_del.bat'` file.
 
 
 ---
 
-## \_rd.bat / \_del.bat
+## Windows BAT
 
 Windows-only utilities. Because in gyp any `/` on Windows is converted to `\`, it is
 impossible to put correct commands for file/directory removal. Those need such
 parameters as `/Q`, but gyp makes them `\Q` which is inappropriate. So these files
 simply contain their respective commands with all necessary parameters, avoiding any
 conflict with gyp.
+
+Also on Windows there is no `mkdir -p`, hence if directory exists you get an error
+trying to make it great again with `md`.
 
 ```
 ...
@@ -558,7 +559,8 @@ conflict with gyp.
 	'<(module_root_dir)/build/Release/addon.node'
 ] } ],
 [ 'OS=="win"', { 'action' : [
-	'<(_del) "<(module_root_dir)/build/Release/addon.*" && ' +
-	'<(_del) "<(module_root_dir)/build/Release/obj/addon/*.*"'
+	'<(_del)',
+	'<(module_root_dir)/build/Release/addon.*',
+	'<(module_root_dir)/build/Release/obj/addon/*.*'
 ] } ],
 ```
