@@ -42,9 +42,8 @@ dependency packages.
 
 ```
 'variables': {
-	'_rd' : '<!(node -e "console.log(require(\'addon-tools-raub\')._rd)")',
-	'_md' : '<!(node -e "console.log(require(\'addon-tools-raub\')._md)")',
-	'_del' : '<!(node -e "console.log(require(\'addon-tools-raub\')._del)")',
+	'rmrf' : '<!(node -e "console.log(require(\'addon-tools-raub\').rmrf)")',
+	'mkdirp' : '<!(node -e "console.log(require(\'addon-tools-raub\').mkdirp)")',
 },
 ```
 
@@ -173,8 +172,9 @@ If you always copy your compiled addon to the `binary` directory, it will be eas
 				'<(module_root_dir)/binary/MY_ADDON.node'
 			] } ],
 			[ 'OS=="win"', { 'action' : [
-				'copy "<(module_root_dir)/build/Release/MY_ADDON.node"' +
-				' "<(module_root_dir)/binary/MY_ADDON.node"'
+				'copy',
+				'<(module_root_dir)/build/Release/MY_ADDON.node' +
+				'<(module_root_dir)/binary/MY_ADDON.node'
 			] } ],
 		],
 	}],
@@ -533,25 +533,25 @@ input `dir`.
 	* `include` - include directory for this `dir`.
 * `root` - where `'addon-tools-raub'` module is situated.
 * `include` - `'addon-tools-raub'` own 'include' directory.
-* `_rd` - the location of `'_rd.bat'` file.
-* `_md` - the location of `'_md.bat'` file.
-* `_del` - the location of `'_del.bat'` file.
+* `rmrf` - the location of `'rmrf.bat'` file.
+* `mkdirp` - the location of `'mkdirp.bat'` file.
 
 
 ---
 
 ## Windows BAT
 
-Windows-only utilities. Because in gyp any `/` on Windows is converted to `\`, it is
-impossible to put correct commands for file/directory removal. Those need such
-parameters as `/Q`, but gyp makes them `\Q` which is inappropriate. So these files
-simply contain their respective commands with all necessary parameters, avoiding any
-conflict with gyp.
+Windows-only utilities. Disregard `del` vs `rd` aspect of Windows command line.
+Now 
 
 Also on Windows there is no `mkdir -p`, hence if directory exists you get an error
 trying to make it great again with `md`.
 
 ```
+'variables': {
+	'rmrf' : '<!(node -e "console.log(require(\'addon-tools-raub\').rmrf)")',
+	'mkdirp' : '<!(node -e "console.log(require(\'addon-tools-raub\').mkdirp)")',
+},
 ...
 [ 'OS=="mac"', { 'action' : [
 	'rm',
@@ -559,7 +559,7 @@ trying to make it great again with `md`.
 	'<(module_root_dir)/build/Release/addon.node'
 ] } ],
 [ 'OS=="win"', { 'action' : [
-	'<(_del)',
+	'<(rmrf)',
 	'<(module_root_dir)/build/Release/addon.*',
 	'<(module_root_dir)/build/Release/obj/addon/*.*'
 ] } ],

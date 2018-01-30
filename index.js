@@ -49,8 +49,7 @@ module.exports = {
 	
 	printNan() { require('nan'); },
 	
-	_rd  :`${thisDir}/_rd.bat`,
-	_md  :`${thisDir}/_md.bat`,
-	_del :`${thisDir}/_del.bat`,
+	mkdirp : `${thisDir}/mkdirp.bat`,
+	rmrf   : `${thisDir}/rmrf.bat`,
 	
 };
