@@ -51,5 +51,6 @@ module.exports = {
 	
 	mkdir : process.platform === 'win32' ? `"${thisDir}/mkdir.bat"` : 'mkdir',
 	rm    : process.platform === 'win32' ? `"${thisDir}/rm.bat"` : 'rm',
+	cp    : process.platform === 'win32' ? `"${thisDir}/cp.bat"` : 'cp',
 	
 };

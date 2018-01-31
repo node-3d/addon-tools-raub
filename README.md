@@ -582,3 +582,7 @@ be used on all platforms to remove single and multiple files and directories.
 ...
 'action' : ['<(rm)', '-rf', '<@(rem)'],
 ```
+
+### cp
+
+For Windows the `/y` flag was embedded.
