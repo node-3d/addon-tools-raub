@@ -28,7 +28,7 @@ dependency packages.
 
 [index.js](#indexjs)
 
-[Windows BAT](#windows-bat)
+[Crossplatform commands](#crossplatform-commands)
 
 
 ---
@@ -539,28 +539,46 @@ input `dir`.
 
 ---
 
-## Windows BAT
+## Crossplatform commands
 
-Windows-only utilities. Disregard `del` vs `rd` aspect of Windows command line.
-Now 
+Because of the differences between Windows and Unix command shells, often a whole
+lot of conditions have to be introduced in **binding.gyp** file. Now some of
+them can be easily omitted with the new crossplatform commands, supplied by this
+package.
 
-Also on Windows there is no `mkdir -p`, hence if directory exists you get an error
-trying to make it great again with `md`.
+This comes especially handy together with GYP's executable list expansion. For
+example a list of files to be removed for cleaning. Or a list of unnecessary
+binaries to be removed upon installation of a binary-dependency package.
+
+
+### mkdir
+
+On Unix, it will be an actual system `mkdir`, whereas on Windows it will use the
+**mkdir.bat** file, located at the root of this package. This BAT file behaves
+as if it was a `mkdir -p ...` call. You can still pass `-p` switch, which is
+ignored. And the limitation is that you can not create a relative-path **-p**
+folder. This can possibly be bypassed by supplying `./-p` or something like this.
+
 
 ```
 'variables': {
-	'rmrf' : '<!(node -e "console.log(require(\'addon-tools-raub\').rmrf)")',
-	'mkdirp' : '<!(node -e "console.log(require(\'addon-tools-raub\').mkdirp)")',
+	'mkdir' : '<!(node -e "console.log(require(\'addon-tools-raub\').mkdir)")',
 },
 ...
-[ 'OS=="mac"', { 'action' : [
-	'rm',
-	'<(module_root_dir)/build/Release/obj.target/addon/cpp/bindings.o',
-	'<(module_root_dir)/build/Release/addon.node'
-] } ],
-[ 'OS=="win"', { 'action' : [
-	'<(rmrf)',
-	'<(module_root_dir)/build/Release/addon.*',
-	'<(module_root_dir)/build/Release/obj/addon/*.*'
-] } ],
+'action' : ['<(mkdir)', '-p', 'binary'],
+```
+
+
+### rm
+
+Disregard `del` vs `rd` aspect of Windows command line. Now the same command can
+be used on all platforms to remove single and multiple files and directories.
+
+```
+'variables': {
+	'rm'  : '<!(node -e "console.log(require(\'addon-tools-raub\').rm)")',
+	'rem' : '<!(node -e "console.log(require(\'.\').rem)")',
+},
+...
+'action' : ['<(rm)', '-rf', '<@(rem)'],
 ```
