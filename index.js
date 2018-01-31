@@ -49,8 +49,8 @@ module.exports = {
 	
 	printNan() { require('nan'); },
 	
-	mkdir : process.platform === 'win32' ? `"${thisDir}/mkdir.bat"` : 'mkdir',
-	rm    : process.platform === 'win32' ? `"${thisDir}/rm.bat"` : 'rm',
-	cp    : process.platform === 'win32' ? `"${thisDir}/cp.bat"` : 'cp',
+	mkdir : process.platform === 'win32' ? `"${thisDir}/_mkdir.bat"` : 'mkdir',
+	rm    : process.platform === 'win32' ? `"${thisDir}/_rm.bat"` : 'rm',
+	cp    : process.platform === 'win32' ? `"${thisDir}/_cp.bat"` : 'cp',
 	
 };
