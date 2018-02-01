@@ -6,7 +6,7 @@
 This is a set of helpers for simplification and standardization of addons and
 dependency packages.
 
-* Contains helpers of following types: GYP, C++, JS, BAT(Windows).
+* Contains helpers of following types: GYP, C++, JS, BAT (Windows).
 * Platforms: win x32/x64, linux x32/x64, mac x64.
 * Useful links: [V8 Ref](https://v8docs.nodesource.com/node-0.8/d2/dc3/namespacev8.html),
 [Nan Docs](https://github.com/nodejs/nan#api),
@@ -28,7 +28,7 @@ dependency packages.
 
 [index.js](#indexjs)
 
-[Crossplatform commands](#crossplatform-commands)
+[Cross-platform commands](#cross-platform-commands)
 
 
 ---
@@ -38,12 +38,13 @@ dependency packages.
 
 ### binding.gyp
 
-* For Windows custom file/folder removers/creators are present, you can put them into variables.
+* Cross-platform file/folder removers/creators are present, you can put them into variables for later use.
 
 ```
 'variables': {
-	'rmrf' : '<!(node -e "console.log(require(\'addon-tools-raub\').rmrf)")',
-	'mkdirp' : '<!(node -e "console.log(require(\'addon-tools-raub\').mkdirp)")',
+	'rm'    : '<!(node -e "console.log(require(\'addon-tools-raub\').rm)")',
+	'cp'    : '<!(node -e "console.log(require(\'addon-tools-raub\').cp)")',
+	'mkdir' : '<!(node -e "console.log(require(\'addon-tools-raub\').mkdir)")',
 },
 ```
 
@@ -52,27 +53,25 @@ are accessible as shown below.
 
 ```
 	'include_dirs': [
-		'<!(node -e "require(\'addon-tools-raub\').printNan()")',
-		'<!(node -e "console.log(require(\'addon-tools-raub\').include)")',
+		'<!@(node -e "require(\'addon-tools-raub\').include()")',
 	],
 ```
 
-* Intermediate files can be removed in a separate build-step with `rm` on
-Unix systems and custom remover on Windows.
+* Intermediate files can be removed in a separate build-step with `<(rm)`.
 
 ```
 	[ 'OS=="linux"', { 'action' : [
-		'rm',
+		'<(rm)',
 		'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
 		'<(module_root_dir)/build/Release/addon.node'
 	] } ],
 	[ 'OS=="mac"', { 'action' : [
-		'rm',
+		'<(rm)',
 		'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
 		'<(module_root_dir)/build/Release/addon.node'
 	] } ],
 	[ 'OS=="win"', { 'action' : [
-		'<(_del)',
+		'<(rm)',
 		'<(module_root_dir)/build/Release/addon.*',
 		'<(module_root_dir)/build/Release/obj/addon/*.*'
 	] } ],
@@ -103,7 +102,7 @@ module.exports = require('addon-tools-raub').paths(__dirname);
 ```
 {
 	'variables': {
-		'_rd' : '<!(node -e "console.log(require(\'addon-tools-raub\')._rd)")',
+		'rm'  : '<!(node -e "console.log(require(\'addon-tools-raub\').rm)")',
 		'rem' : '<!(node -e "console.log(require(\'.\').rem)")',
 	},
 	'targets': [
@@ -113,17 +112,12 @@ module.exports = require('addon-tools-raub').paths(__dirname);
 			'actions'     : [
 				{
 					'action_name' : 'Unnecessary binaries removed.',
-					'inputs'      : ['<@(rem)'],
+					'inputs'      : [],
 					'outputs'     : ['build'],
-					'conditions'  : [
-						[ 'OS=="linux"', { 'action' : [ 'rm', '-rf', '<@(_inputs)' ] } ],
-						[ 'OS=="mac"'  , { 'action' : [ 'rm', '-rf', '<@(_inputs)' ] } ],
-						[ 'OS=="win"'  , { 'action' : [ '<(_rd)', '<@(_inputs)' ] } ],
-					],
+					'action'      : ['<(rm)', '-rf', '<@(rem)'],
 				}
 			],
-		},
-		
+		}
 	]
 }
 
@@ -145,11 +139,7 @@ If you always copy your compiled addon to the `binary` directory, it will be eas
 		'action_name' : 'Directory created.',
 		'inputs'      : [],
 		'outputs'     : ['build'],
-		'conditions'  : [
-			[ 'OS=="linux"', { 'action': ['mkdir', '-p', 'binary'] } ],
-			[ 'OS=="mac"', { 'action': ['mkdir', '-p', 'binary'] } ],
-			[ 'OS=="win"', { 'action': ['<(_md)', 'binary'] } ],
-		],
+		'action': ['<(mkdir)', '-p', 'binary']
 	}],
 },
 {
@@ -160,23 +150,7 @@ If you always copy your compiled addon to the `binary` directory, it will be eas
 		'action_name' : 'Module copied.',
 		'inputs'      : [],
 		'outputs'     : ['binary'],
-		'conditions'  : [
-			[ 'OS=="linux"', { 'action' : [
-				'cp',
-				'<(module_root_dir)/build/Release/MY_ADDON.node',
-				'<(module_root_dir)/binary/MY_ADDON.node'
-			] } ],
-			[ 'OS=="mac"', { 'action' : [
-				'cp',
-				'<(module_root_dir)/build/Release/MY_ADDON.node',
-				'<(module_root_dir)/binary/MY_ADDON.node'
-			] } ],
-			[ 'OS=="win"', { 'action' : [
-				'copy',
-				'<(module_root_dir)/build/Release/MY_ADDON.node' +
-				'<(module_root_dir)/binary/MY_ADDON.node'
-			] } ],
-		],
+		'action'      : ['<(cp)', 'build/Release/MY_ADDON.node', 'binary/MY_ADDON.node'],
 	}],
 },
 ```
@@ -201,8 +175,9 @@ module.exports = require('./binary/addon');
 ```
 {
 	'variables': {
-		'_del'           : '<!(node -e "console.log(require(\'addon-tools-raub\')._del)")',
-		'_md'            : '<!(node -e "console.log(require(\'addon-tools-raub\')._md)")',
+		'rm'              : '<!(node -e "console.log(require(\'addon-tools-raub\').rm)")',
+		'cp'              : '<!(node -e "console.log(require(\'addon-tools-raub\').cp)")',
+		'mkdir'           : '<!(node -e "console.log(require(\'addon-tools-raub\').mkdir)")',
 		'EXT_LIB_include' : '<!(node -e "console.log(require(\'node-deps-EXT_LIB-raub\').include)")',
 		'EXT_LIB_bin'     : '<!(node -e "console.log(require(\'node-deps-EXT_LIB-raub\').bin)")',
 	},
@@ -210,12 +185,10 @@ module.exports = require('./binary/addon');
 		{
 			'target_name': 'MY_ADDON',
 			'sources': [
-				'cpp/bindings.cpp',
 				'cpp/MY_ADDON.cpp',
 			],
 			'include_dirs': [
-				'<!(node -e "require(\'addon-tools-raub\').printNan()")',
-				'<!(node -e "console.log(require(\'addon-tools-raub\').include)")',
+				'<!(node -e "require(\'addon-tools-raub\').include()")',
 				'<(EXT_LIB_include)',
 				'<(module_root_dir)/include',
 			],
@@ -263,6 +236,7 @@ module.exports = require('./binary/addon');
 				],
 			],
 		},
+		
 		{
 			'target_name'  : 'make_directory',
 			'type'         : 'none',
@@ -271,11 +245,7 @@ module.exports = require('./binary/addon');
 				'action_name' : 'Directory created.',
 				'inputs'      : [],
 				'outputs'     : ['build'],
-				'conditions'  : [
-					[ 'OS=="linux"', { 'action': ['mkdir', '-p', 'binary'] } ],
-					[ 'OS=="mac"', { 'action': ['mkdir', '-p', 'binary'] } ],
-					[ 'OS=="win"', { 'action': ['<(_md)', 'binary'] } ],
-				],
+				'action': ['<(mkdir)', '-p', 'binary']
 			}],
 		},
 		{
@@ -286,22 +256,7 @@ module.exports = require('./binary/addon');
 				'action_name' : 'Module copied.',
 				'inputs'      : [],
 				'outputs'     : ['binary'],
-				'conditions'  : [
-					[ 'OS=="linux"', { 'action' : [
-						'cp',
-						'<(module_root_dir)/build/Release/MY_ADDON.node',
-						'<(module_root_dir)/binary/MY_ADDON.node'
-					] } ],
-					[ 'OS=="mac"', { 'action' : [
-						'cp',
-						'<(module_root_dir)/build/Release/MY_ADDON.node',
-						'<(module_root_dir)/binary/MY_ADDON.node'
-					] } ],
-					[ 'OS=="win"', { 'action' : [
-						'copy "<(module_root_dir)/build/Release/MY_ADDON.node"' +
-						' "<(module_root_dir)/binary/MY_ADDON.node"'
-					] } ],
-				],
+				'action'      : ['<(cp)', 'build/Release/MY_ADDON.node', 'binary/MY_ADDON.node'],
 			}],
 		},
 		
@@ -532,9 +487,11 @@ input `dir`.
 	* `rem` - a space-separated list of binary paths to be cleaned on this platform.
 	* `include` - include directory for this `dir`.
 * `root` - where `'addon-tools-raub'` module is situated.
-* `include` - `'addon-tools-raub'` own 'include' directory.
-* `rmrf` - the location of `'rmrf.bat'` file.
-* `mkdirp` - the location of `'mkdirp.bat'` file.
+* `include()` - prints both `'addon-tools-raub'` and `'nan'` include paths. Use with
+`node -e` through list context command expansion `<!@(...)`
+* `rm` - the location of `'_rm.bat'` file on Windows and plain `rm` on Unix.
+* `cp` - the location of `'_cp.bat'` file on Windows and plain `cp` on Unix.
+* `mkdir` - the location of `'_mkdir.bat'` file on Windows and plain `mkdir` on Unix.
 
 
 ---

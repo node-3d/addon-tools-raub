@@ -1,7 +1,13 @@
 'use strict';
 
+const path = require('path');
+
 
 const thisDir = __dirname.replace(/\\/g, '/');
+
+const nanInclude = path.dirname(require.resolve('nan')).replace(/\\/g, '/');
+const thisInclude = `${thisDir}/include`;
+
 
 const names = ['win32', 'win64', 'linux32', 'linux64', 'mac64'];
 
@@ -16,8 +22,8 @@ const getPlatformDir = platform => {
 	}
 };
 
-const currentDir = prefixName(getPlatformDir(process.platform));
 
+const currentDir = prefixName(getPlatformDir(process.platform));
 const remDirs = names.map(prefixName).filter(n => n !== currentDir);
 
 
@@ -45,12 +51,11 @@ module.exports = {
 	paths,
 	
 	root    : thisDir,
-	include : `${thisDir}/include`,
 	
-	printNan() { require('nan'); },
+	include() { console.log(`${nanInclude} ${thisInclude}`); },
 	
 	mkdir : process.platform === 'win32' ? `${thisDir}/_mkdir.bat` : 'mkdir',
-	rm    : process.platform === 'win32' ? `${thisDir}/_rm.bat` : 'rm',
-	cp    : process.platform === 'win32' ? `${thisDir}/_cp.bat` : 'cp',
+	rm    : process.platform === 'win32' ? `${thisDir}/_rm.bat`    : 'rm',
+	cp    : process.platform === 'win32' ? `${thisDir}/_cp.bat`    : 'cp',
 	
 };
