@@ -9,6 +9,8 @@ const nanInclude = path.dirname(require.resolve('nan')).replace(/\\/g, '/');
 const thisInclude = `${thisDir}/include`;
 
 
+const isWindows = process.platform === 'win32';
+
 const names = ['win32', 'win64', 'linux32', 'linux64', 'mac64'];
 
 const prefixName = name => `bin-${name}`;
@@ -26,7 +28,6 @@ const getPlatformDir = platform => {
 const currentDir = prefixName(getPlatformDir(process.platform));
 const remDirs = names.map(prefixName).filter(n => n !== currentDir);
 
-const isWindows = process.platform === 'win32';
 
 const paths = dir => {
 	
@@ -52,11 +53,9 @@ module.exports = {
 	paths,
 	
 	root() { return console.log(thisDir); },
-	
 	include() { console.log(`${nanInclude} ${thisInclude}`); },
-	
-	mkdir() { return isWindows ? `${thisDir}/_mkdir.bat` : 'mkdir'; },
-	rm()    { return isWindows ? `${thisDir}/_rm.bat`    : 'rm'; },
-	cp()    { return isWindows ? `${thisDir}/_cp.bat`    : 'cp'; },
+	mkdir() { return console.log(isWindows ? `${thisDir}/_mkdir.bat` : 'mkdir'); },
+	rm() { return console.log(isWindows ? `${thisDir}/_rm.bat` : 'rm'); },
+	cp() { return console.log(isWindows ? `${thisDir}/_cp.bat` : 'cp'); },
 	
 };
