@@ -26,6 +26,7 @@ const getPlatformDir = platform => {
 const currentDir = prefixName(getPlatformDir(process.platform));
 const remDirs = names.map(prefixName).filter(n => n !== currentDir);
 
+const isWindows = process.platform === 'win32';
 
 const paths = dir => {
 	
@@ -33,14 +34,14 @@ const paths = dir => {
 	
 	const binPath = `${dir}/${currentDir}`;
 	
-	if (process.platform === 'win32') {
+	if (isWindows) {
 		process.env.path = `${process.env.path ? `${process.env.path};` : ''}${binPath}`;
 	}
 	
 	return {
-		bin     : binPath,
-		rem     : remDirs.map(k => `${dir}/${k}`).join(' '),
-		include : `${dir}/include`,
+		bin() { console.log(binPath); },
+		rem() { console.log(remDirs.map(k => `${dir}/${k}`).join(' ')); },
+		include() { console.log(`${dir}/include`); },
 	};
 	
 };
@@ -50,12 +51,12 @@ module.exports = {
 	
 	paths,
 	
-	root    : thisDir,
+	root() { return console.log(thisDir); },
 	
 	include() { console.log(`${nanInclude} ${thisInclude}`); },
 	
-	mkdir : process.platform === 'win32' ? `${thisDir}/_mkdir.bat` : 'mkdir',
-	rm    : process.platform === 'win32' ? `${thisDir}/_rm.bat`    : 'rm',
-	cp    : process.platform === 'win32' ? `${thisDir}/_cp.bat`    : 'cp',
+	mkdir() { return isWindows ? `${thisDir}/_mkdir.bat` : 'mkdir'; },
+	rm()    { return isWindows ? `${thisDir}/_rm.bat`    : 'rm'; },
+	cp()    { return isWindows ? `${thisDir}/_cp.bat`    : 'cp'; },
 	
 };

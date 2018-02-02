@@ -42,9 +42,9 @@ dependency packages.
 
 ```
 'variables': {
-	'rm'    : '<!(node -e "console.log(require(\'addon-tools-raub\').rm)")',
-	'cp'    : '<!(node -e "console.log(require(\'addon-tools-raub\').cp)")',
-	'mkdir' : '<!(node -e "console.log(require(\'addon-tools-raub\').mkdir)")',
+	'rm'    : '<!(node -e "require(\'addon-tools-raub\').rm()")',
+	'cp'    : '<!(node -e "require(\'addon-tools-raub\').cp()")',
+	'mkdir' : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
 },
 ```
 
@@ -102,8 +102,8 @@ module.exports = require('addon-tools-raub').paths(__dirname);
 ```
 {
 	'variables': {
-		'rm'  : '<!(node -e "console.log(require(\'addon-tools-raub\').rm)")',
-		'rem' : '<!(node -e "console.log(require(\'.\').rem)")',
+		'rm'  : '<!(node -e "require(\'addon-tools-raub\').rm()")',
+		'rem' : '<!(node -e "require(\'.\').rem()")',
 	},
 	'targets': [
 		{
@@ -175,11 +175,11 @@ module.exports = require('./binary/addon');
 ```
 {
 	'variables': {
-		'rm'              : '<!(node -e "console.log(require(\'addon-tools-raub\').rm)")',
-		'cp'              : '<!(node -e "console.log(require(\'addon-tools-raub\').cp)")',
-		'mkdir'           : '<!(node -e "console.log(require(\'addon-tools-raub\').mkdir)")',
-		'EXT_LIB_include' : '<!(node -e "console.log(require(\'node-deps-EXT_LIB-raub\').include)")',
-		'EXT_LIB_bin'     : '<!(node -e "console.log(require(\'node-deps-EXT_LIB-raub\').bin)")',
+		'rm'              : '<!(node -e "require(\'addon-tools-raub\').rm()")',
+		'cp'              : '<!(node -e "require(\'addon-tools-raub\').cp()")',
+		'mkdir'           : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
+		'EXT_LIB_include' : '<!(node -e "require(\'node-deps-EXT_LIB-raub\').include()")',
+		'EXT_LIB_bin'     : '<!(node -e "require(\'node-deps-EXT_LIB-raub\').bin()")',
 	},
 	'targets': [
 		{
@@ -496,7 +496,7 @@ input `dir`.
 
 ---
 
-## Crossplatform commands
+## Cross-platform commands
 
 Because of the differences between Windows and Unix command shells, often a whole
 lot of conditions have to be introduced in **binding.gyp** file. Now some of
@@ -519,7 +519,7 @@ folder. This can possibly be bypassed by supplying `./-p` or something like this
 
 ```
 'variables': {
-	'mkdir' : '<!(node -e "console.log(require(\'addon-tools-raub\').mkdir)")',
+	'mkdir' : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
 },
 ...
 'action' : ['<(mkdir)', '-p', 'binary'],
@@ -533,8 +533,8 @@ be used on all platforms to remove single and multiple files and directories.
 
 ```
 'variables': {
-	'rm'  : '<!(node -e "console.log(require(\'addon-tools-raub\').rm)")',
-	'rem' : '<!(node -e "console.log(require(\'.\').rem)")',
+	'rm'  : '<!(node -e "require(\'addon-tools-raub\').rm()")',
+	'rem' : '<!(node -e "require(\'.\').rem()")',
 },
 ...
 'action' : ['<(rm)', '-rf', '<@(rem)'],
@@ -543,3 +543,11 @@ be used on all platforms to remove single and multiple files and directories.
 ### cp
 
 For Windows the `/y` flag was embedded.
+
+```
+'variables': {
+	'cp'  : '<!(node -e "require(\'addon-tools-raub\').cp()")',
+},
+...
+'action' : ['<(cp)', 'a', 'b'],
+```
