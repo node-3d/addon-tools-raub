@@ -483,15 +483,23 @@ For unacceptable values throws TypeError.
 Exports:
 * `paths(dir)` - function. Returns a set of platform dependent paths depending on
 input `dir`.
-	* `bin` - platform binary path.
-	* `rem` - a space-separated list of binary paths to be cleaned on this platform.
-	* `include` - include directory for this `dir`.
-* `root` - where `'addon-tools-raub'` module is situated.
+	* `bin()` - prints platform binary path.
+	* `rem()` - prints a space-separated list of binary paths to be cleaned on this platform.
+	* `include()` - prints include directory for this `dir`.
+	* `binPath` - platform binary path.
+	* `remPath` - a space-separated list of binary paths to be cleaned on this platform.
+	* `includePath` - include directory for this `dir`.
+* `root()` - prints where `'addon-tools-raub'` module is situated.
 * `include()` - prints both `'addon-tools-raub'` and `'nan'` include paths. Use with
 `node -e` through list context command expansion `<!@(...)`
-* `rm` - the location of `'_rm.bat'` file on Windows and plain `rm` on Unix.
-* `cp` - the location of `'_cp.bat'` file on Windows and plain `cp` on Unix.
-* `mkdir` - the location of `'_mkdir.bat'` file on Windows and plain `mkdir` on Unix.
+* `rm()` - prints the location of `'_rm.bat'` file on Windows and plain `rm` on Unix.
+* `cp()` - prints the location of `'_cp.bat'` file on Windows and plain `cp` on Unix.
+* `mkdir()` - prints the location of `'_mkdir.bat'` file on Windows and plain `mkdir` on Unix.
+* `rootPath` - where `'addon-tools-raub'` module is situated.
+* `includePath` - both `'addon-tools-raub'` and `'nan'` include paths.
+* `rmPath` - the location of `'_rm.bat'` file on Windows and plain `rm` on Unix.
+* `cpPath` - the location of `'_cp.bat'` file on Windows and plain `cp` on Unix.
+* `mkdirPath` - the location of `'_mkdir.bat'` file on Windows and plain `mkdir` on Unix.
 
 
 ---

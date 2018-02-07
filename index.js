@@ -3,10 +3,10 @@
 const path = require('path');
 
 
-const thisDir = __dirname.replace(/\\/g, '/');
+const rootPath = __dirname.replace(/\\/g, '/');
 
 const nanInclude = path.dirname(require.resolve('nan')).replace(/\\/g, '/');
-const thisInclude = `${thisDir}/include`;
+const thisInclude = `${rootPath}/include`;
 
 
 const isWindows = process.platform === 'win32';
@@ -39,23 +39,45 @@ const paths = dir => {
 		process.env.path = `${process.env.path ? `${process.env.path};` : ''}${binPath}`;
 	}
 	
+	const remPath = remDirs.map(k => `${dir}/${k}`).join(' ');
+	const includePath = `${dir}/include`;
+	
 	return {
+		
+		binPath,
+		remPath,
+		includePath,
+		
 		bin() { console.log(binPath); },
-		rem() { console.log(remDirs.map(k => `${dir}/${k}`).join(' ')); },
-		include() { console.log(`${dir}/include`); },
+		rem() { console.log(remPath); },
+		include() { console.log(includePath); },
+		
 	};
 	
 };
 
 
+const includePath = `${nanInclude} ${thisInclude}`;
+
+const mkdirPath = isWindows ? `${rootPath}/_mkdir.bat` : 'mkdir';
+const rmPath    = isWindows ? `${rootPath}/_rm.bat` : 'rm';
+const cpPath    = isWindows ? `${rootPath}/_cp.bat` : 'cp';
+
 module.exports = {
 	
 	paths,
 	
-	root() { return console.log(thisDir); },
-	include() { console.log(`${nanInclude} ${thisInclude}`); },
-	mkdir() { return console.log(isWindows ? `${thisDir}/_mkdir.bat` : 'mkdir'); },
-	rm() { return console.log(isWindows ? `${thisDir}/_rm.bat` : 'rm'); },
-	cp() { return console.log(isWindows ? `${thisDir}/_cp.bat` : 'cp'); },
+	rootPath,
+	includePath,
+	mkdirPath,
+	rmPath,
+	cpPath,
+	
+	root() { return console.log(rootPath); },
+	include() { console.log(includePath); },
+	
+	mkdir() { return console.log(mkdirPath); },
+	rm() { return console.log(rmPath); },
+	cp() { return console.log(cpPath); },
 	
 };
