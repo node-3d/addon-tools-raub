@@ -7,11 +7,11 @@ using namespace v8;
 using namespace node;
 using namespace std;
 
-#define THIS_EXAMPLE                                                             \
+#define THIS_EXAMPLE                                                          \
 	Example *example = ObjectWrap::Unwrap<Example>(info.This());
 
 #define THIS_CHECK                                                            \
-	if (body->_isDestroyed) return;
+	if (example->_isDestroyed) return;
 
 
 Nan::Persistent<v8::Function> Example::_constructor;
@@ -60,14 +60,14 @@ Example::Example() {
 }
 
 
-Body::~Body() {
+Example::~Example() {
 	
 	_destroy();
 	
 }
 
 
-void Body::_destroy() { DES_CHECK;
+void Example::_destroy() { DES_CHECK;
 	
 	_isDestroyed = true;
 	
@@ -76,7 +76,7 @@ void Body::_destroy() { DES_CHECK;
 }
 
 
-NAN_METHOD(Body::destroy) { THIS_BODY; THIS_CHECK;
+NAN_METHOD(Example::destroy) { THIS_EXAMPLE; THIS_CHECK;
 	
 	example->_destroy();
 	

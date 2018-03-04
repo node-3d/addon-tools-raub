@@ -4,5 +4,7 @@
 
 #include <addon-tools.hpp>
 
+#define DES_CHECK                                                             \
+	if (_isDestroyed) return;
 
 #endif /* _COMMON_HPP_ */

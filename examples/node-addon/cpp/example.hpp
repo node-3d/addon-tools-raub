@@ -27,6 +27,11 @@ protected:
 	
 private:
 	
+	void _destroy();
+	
+	
+private:
+	
 	static Nan::Persistent<v8::Function> _constructor;
 	
 	bool _isDestroyed;

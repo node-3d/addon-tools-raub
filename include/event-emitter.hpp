@@ -17,7 +17,7 @@ class EventEmitter : public Nan::ObjectWrap {
 	typedef Nan::CopyablePersistentTraits<v8::Function>::CopyablePersistent FN_TYPE;
 	typedef std::deque<FN_TYPE> VEC_TYPE;
 	typedef std::map<std::string, VEC_TYPE> MAP_TYPE;
-	typedef std::map<FN_TYPE, FN_TYPE> FNMAP_TYPE;
+	typedef std::map<int, FN_TYPE> FNMAP_TYPE;
 	typedef VEC_TYPE::iterator IT_TYPE;
 	typedef MAP_TYPE::iterator MAP_IT_TYPE;
 	
@@ -25,6 +25,7 @@ public:
 	
 	EventEmitter () {
 		_maxListeners = _defaultMaxListeners;
+		_freeId = 0;
 	}
 	~EventEmitter () {}
 	
@@ -87,12 +88,12 @@ public:
 	// Deprecated method
 	static NAN_METHOD(jsStaticListenerCount) {
 		
-		EventEmitter *emitter = ObjectWrap::Unwrap<EventEmitter>(info[0]);
-		REQ_UTF8_ARG(1, name);
+		// EventEmitter *emitter = ObjectWrap::Unwrap<EventEmitter>(info[0]);
+		// REQ_UTF8_ARG(1, name);
 		
-		const VEC_TYPE &list = emitter->_listeners[*name];
+		// const VEC_TYPE &list = emitter->_listeners[*name];
 		
-		RET_VALUE(JS_INT(list.size()));
+		// RET_VALUE(JS_NUM(list.size()));
 		
 	}
 	
@@ -166,7 +167,7 @@ public:
 		
 		const VEC_TYPE &list = emitter->_listeners[*name];
 		
-		RET_VALUE(JS_INT(list.size()));
+		RET_VALUE(JS_INT(static_cast<int>(list.size())));
 		
 	}
 	
@@ -245,7 +246,10 @@ public:
 			emitter->_listeners[name].push_back(cb);
 			emitter->_raw[name].push_back(raw);
 		}
-		emitter->_wrapped[raw] = cb;
+		
+		int nextId = _freeId++;
+		emitter->_wrappedIds[nextId] = cb;
+		emitter->_rawIds[nextId] = raw;
 		
 	}
 	
@@ -292,11 +296,11 @@ public:
 	
 	static NAN_METHOD(jsRemoveAllListeners) { THIS_EMITTER;
 		
-		if (info->Length > 0 && info[0]->IsString()) {
+		if (info.Length() > 0 && info[0]->IsString()) {
 			
-			_listeners->clear();
-			_raw->clear();
-			_wrapped->clear();
+			emitter->_listeners.clear();
+			emitter->_raw.clear();
+			emitter->_wrapped.clear();
 			
 			return;
 			
@@ -313,12 +317,12 @@ public:
 		
 		for (IT_TYPE it = list.begin(); it != list.end(); ++it) {
 			
-			emitter->_wrapped.erase(*it)
+			emitter->_wrapped.erase(*it);
 			
 		}
 		
-		emitter->_listeners[*name].clear();
-		emitter->_raw[*name].clear();
+		emitter->_listeners[name].clear();
+		emitter->_raw[name].clear();
 		
 	}
 	
@@ -328,8 +332,8 @@ public:
 		REQ_UTF8_ARG(0, n);
 		REQ_FUN_ARG(1, raw);
 		
-		Nan::Persistent<v8::Function> persistentCb;
-		persistentCb.Reset(raw);
+		Nan::Persistent<v8::Function> persistentRaw;
+		persistentRaw.Reset(raw);
 		
 		std::string name = std::string(*n);
 		
@@ -342,7 +346,7 @@ public:
 		
 		for (IT_TYPE it = rawList.begin(); it != rawList.end(); ++it) {
 			
-			if (*it === persistentCb) {
+			if (*it == persistentRaw) {
 				rawList.erase(it);
 				break;
 			}
@@ -352,11 +356,11 @@ public:
 		
 		VEC_TYPE &wrapList = emitter->_listeners[name];
 		
-		if (emitter->_wrapped.count(persistentCb) == 0) {
+		if (emitter->_wrapped.count(persistentRaw) == 0) {
 			
 			for (IT_TYPE it = wrapList.begin(); it != wrapList.end(); ++it) {
 				
-				if (*it === persistentCb) {
+				if (*it == persistentRaw) {
 					wrapList.erase(it);
 					break;
 				}
@@ -368,18 +372,18 @@ public:
 		}
 		
 		
-		const FN_TYPE &wrapped = _wrapped[persistentCb];
+		const FN_TYPE &wrapped = emitter->_wrapped[persistentRaw];
 		
 		for (IT_TYPE it = wrapList.begin(); it != wrapList.end(); ++it) {
 			
-			if (*it === wrapped) {
+			if (*it == wrapped) {
 				wrapList.erase(it);
 				break;
 			}
 			
 		}
 		
-		emitter->_wrapped.erase(persistentCb);
+		emitter->_wrapped.erase(persistentRaw);
 		
 	}
 	
@@ -399,7 +403,7 @@ public:
 		
 		VEC_TYPE &list = emitter->_raw[*name];
 		
-		Local<Array> jsListeners = Nan::New<Array>(list.size());
+		v8::Local<v8::Array> jsListeners = Nan::New<v8::Array>(list.size());
 		
 		if (list.empty()) {
 			RET_VALUE(jsListeners);
@@ -429,7 +433,10 @@ private:
 	
 	MAP_TYPE _listeners;
 	MAP_TYPE _raw;
-	FNMAP_TYPE _wrapped;
+	
+	int _freeId;
+	FNMAP_TYPE _wrappedIds;
+	FNMAP_TYPE _rawIds;
 	
 };
 
