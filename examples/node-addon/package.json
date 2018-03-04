@@ -1,0 +1,25 @@
+{
+  "name": "example",
+  "version": "0.0.1",
+  "description": "EXAMPLE",
+  "main": "index.js",
+  "author": "Luis Blanco <raubtierxxx@gmail.com>",
+  "keywords": [
+    "addon"
+  ],
+  "maintainers": [
+    {
+      "name": "Luis Blanco",
+      "email": "raubtierxxx@gmail.com",
+      "skype": "rauber666"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/raub/node-addon-tools"
+  },
+  "dependencies": {
+    "addon-tools-raub": "../../"
+  }
+}

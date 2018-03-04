@@ -1,0 +1,29 @@
+{
+	"name": "deps-example",
+	"author": "Luis Blanco <raubtierxxx@gmail.com>",
+	"description": "EXAMPLE",
+	"version": "0.0.1",
+	"main": "index.js",
+	"keywords": [
+		"deps",
+		"dependency",
+		"lib",
+		"library",
+		"binary"
+	],
+	"maintainers": [
+		{
+			"name": "Luis Blanco",
+			"email": "raubtierxxx@gmail.com",
+			"skype": "rauber666"
+		}
+	],
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/raub/node-addon-tools"
+	},
+	"dependencies": {
+		"addon-tools-raub": "../../"
+	}
+}
