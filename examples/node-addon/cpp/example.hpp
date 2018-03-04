@@ -25,6 +25,12 @@ protected:
 	static NAN_METHOD(destroy);
 	
 	
+protected:
+	
+	void setDefaultMaxListeners(int count) { }
+	int getDefaultMaxListeners() { return 10; }
+	
+	
 private:
 	
 	void _destroy();

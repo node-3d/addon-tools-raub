@@ -20,6 +20,7 @@ class EventEmitter : public Nan::ObjectWrap {
 	typedef std::map<int, FN_TYPE> FNMAP_TYPE;
 	typedef VEC_TYPE::iterator IT_TYPE;
 	typedef MAP_TYPE::iterator MAP_IT_TYPE;
+	typedef FNMAP_TYPE::iterator FNMAP_IT_TYPE;
 	
 public:
 	
@@ -247,7 +248,7 @@ public:
 			emitter->_raw[name].push_back(raw);
 		}
 		
-		int nextId = _freeId++;
+		int nextId = emitter->_freeId++;
 		emitter->_wrappedIds[nextId] = cb;
 		emitter->_rawIds[nextId] = raw;
 		
@@ -300,7 +301,8 @@ public:
 			
 			emitter->_listeners.clear();
 			emitter->_raw.clear();
-			emitter->_wrapped.clear();
+			emitter->_wrappedIds.clear();
+			emitter->_rawIds.clear();
 			
 			return;
 			
@@ -315,11 +317,34 @@ public:
 			return;
 		}
 		
-		for (IT_TYPE it = list.begin(); it != list.end(); ++it) {
+		if (emitter->_rawIds.size()) {
 			
-			emitter->_wrapped.erase(*it);
+			std::vector<int> removes;
+			
+			for (IT_TYPE it = list.begin(); it != list.end(); ++it) {
+				
+				FN_TYPE fn = *it;
+				
+				for (FNMAP_IT_TYPE itRaw = emitter->_rawIds.begin(); itRaw != emitter->_rawIds.end(); ++itRaw) {
+					// emitter->_wrappedIds.erase(*it);
+					if (fn == itRaw->second) {
+						removes.push_back(itRaw->first);
+					}
+				}
+				
+			}
+			
+			if (removes.size()) {
+				for (std::vector<int>::const_iterator it = removes.begin(); it != removes.end(); ++it) {
+					
+					emitter->_wrappedIds.erase(*it);
+					emitter->_rawIds.erase(*it);
+					
+				}
+			}
 			
 		}
+		
 		
 		emitter->_listeners[name].clear();
 		emitter->_raw[name].clear();
@@ -356,7 +381,7 @@ public:
 		
 		VEC_TYPE &wrapList = emitter->_listeners[name];
 		
-		if (emitter->_wrapped.count(persistentRaw) == 0) {
+		if (emitter->_wrappedIds.size() == 0) {
 			
 			for (IT_TYPE it = wrapList.begin(); it != wrapList.end(); ++it) {
 				
@@ -372,18 +397,29 @@ public:
 		}
 		
 		
-		const FN_TYPE &wrapped = emitter->_wrapped[persistentRaw];
-		
-		for (IT_TYPE it = wrapList.begin(); it != wrapList.end(); ++it) {
+		for (FNMAP_IT_TYPE itRaw = emitter->_rawIds.begin(); itRaw != emitter->_rawIds.end(); ++itRaw) {
 			
-			if (*it == wrapped) {
-				wrapList.erase(it);
+			if (persistentRaw == itRaw->second) {
+				
+				FN_TYPE fn = emitter->_wrappedIds[itRaw->first];
+				
+				for (IT_TYPE it = wrapList.begin(); it != wrapList.end(); ++it) {
+					
+					if (*it == fn) {
+						wrapList.erase(it);
+						break;
+					}
+					
+				}
+				
+				emitter->_wrappedIds.erase(itRaw->first);
+				emitter->_rawIds.erase(itRaw->first);
+				
 				break;
+				
 			}
 			
 		}
-		
-		emitter->_wrapped.erase(persistentRaw);
 		
 	}
 	
