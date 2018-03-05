@@ -26,21 +26,28 @@ console.log('setMaxListeners', example.setMaxListeners);
 console.log('rawListeners', example.rawListeners);
 console.log('destroy', example.destroy);
 
-
+// console.log('example.eventNames -2', example.eventNames());
 example.on('evt1', (arg1, arg2) => {
-	console.log('EVT1', arg1, arg2);
+	console.log('EVT1', arg1, arg2, example.eventNames());
 });
-
+// console.log('example.eventNames -1', example.eventNames());
 example.once('evt2', (arg1, arg2) => {
-	console.log('EVT2', arg1, arg2);
+	console.log('EVT2', arg1, arg2, example.eventNames());
 });
 
+// console.log('example.eventNames 0', example.eventNames());
 
 example.emit('evt1', 111, '221');
 example.emit('evt1', 112, '222');
 
+console.log('example.eventNames 1', example.eventNames());
+
 example.emit('evt2', 111, '221');
+
+console.log('example.eventNames 2', example.eventNames());
+
 example.emit('evt2', 112, '222');
 
+// console.log('example.eventNames 3', example.eventNames());
 
 module.exports = Example;

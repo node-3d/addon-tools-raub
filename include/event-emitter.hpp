@@ -6,6 +6,7 @@
 
 #include <map>
 #include <deque>
+#include <iostream>
 
 
 #define THIS_EMITTER                                                          \
@@ -161,38 +162,48 @@ protected:
 	
 	
 	static NAN_METHOD(jsEmit) { THIS_EMITTER;
-		
+		std::cout << "emit 0 " << emitter->_listeners.size() << std::endl;
+		for (MAP_IT_TYPE it = emitter->_listeners.begin(); it != emitter->_listeners.end(); ++it) {
+			
+			std::cout << "emit 0 _listeners " << it->first << std::endl;
+			
+		}
+		for (MAP_IT_TYPE it = emitter->_raw.begin(); it != emitter->_raw.end(); ++it) {
+			
+			std::cout << "emit 0 _raw " << it->first << std::endl;
+			
+		}
 		REQ_UTF8_ARG(0, name);
 		
 		int length = info.Length();
 		
 		std::vector< v8::Local<v8::Value> > args;
-		
+		std::cout << "emit 1 " << emitter->_listeners.size() << std::endl;
 		for (int i = 1; i < length; i++) {
 			args.push_back(info[i]);
 		}
-		
+		std::cout << "emit 2 " << emitter->_listeners.size() << std::endl;
 		emitter->emit(*name, length - 1, &args[0]);
-		
+		std::cout << "emit 3 " << emitter->_listeners.size() << std::endl;
 	}
 	
 	
 	static NAN_METHOD(jsEventNames) { THIS_EMITTER;
+		std::cout << "jsEventNames 0 " << emitter->_raw.size() << std::endl;
+		v8::Local<v8::Array> jsNames = Nan::New<v8::Array>(emitter->_raw.size());
 		
-		v8::Local<v8::Array> jsNames = Nan::New<v8::Array>(emitter->_listeners.size());
-		
-		if (emitter->_listeners.empty()) {
+		if (emitter->_raw.empty()) {
 			RET_VALUE(jsNames);
 			return;
 		}
-		
+		std::cout << "jsEventNames 1 " << emitter->_raw.size() << std::endl;
 		int i = 0;
-		for (MAP_IT_TYPE it = emitter->_listeners.begin(); it != emitter->_listeners.end(); ++it, i++) {
+		for (MAP_IT_TYPE it = emitter->_raw.begin(); it != emitter->_raw.end(); ++it, i++) {
 			
 			jsNames->Set(JS_INT(i), JS_STR(it->first));
 			
 		}
-		
+		std::cout << "jsEventNames 2 " << emitter->_raw.size() << std::endl;
 		RET_VALUE(jsNames);
 		
 	}
@@ -447,6 +458,9 @@ protected:
 			
 			if (*it == persistentRaw) {
 				rawList.erase(it);
+				if (rawList.empty()) {
+					emitter->_raw.erase(name);
+				}
 				break;
 			}
 			
@@ -461,6 +475,9 @@ protected:
 				
 				if (*it == persistentRaw) {
 					wrapList.erase(it);
+					if (wrapList.empty()) {
+						emitter->_listeners.erase(name);
+					}
 					break;
 				}
 				
@@ -482,6 +499,9 @@ protected:
 					
 					if (*it == fn) {
 						wrapList.erase(it);
+						if (wrapList.empty()) {
+							emitter->_listeners.erase(name);
+						}
 						break;
 					}
 					
