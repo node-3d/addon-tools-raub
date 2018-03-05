@@ -12,7 +12,19 @@
 	EventEmitter *emitter = ObjectWrap::Unwrap<EventEmitter>(info.This());
 
 
-class EventEmitter : public Nan::ObjectWrap {
+// Use the dummy template for static-int initialization
+
+template< class Dummy >
+class EventEmitterStatics {
+protected:
+	static int _defaultMaxListeners;
+};
+
+template< class Dummy >
+int EventEmitterStatics<Dummy>::_defaultMaxListeners = 10;
+
+
+class EventEmitter : public Nan::ObjectWrap, public EventEmitterStatics<void> {
 	
 	typedef Nan::CopyablePersistentTraits<v8::Function>::CopyablePersistent FN_TYPE;
 	typedef std::deque<FN_TYPE> VEC_TYPE;
@@ -22,7 +34,50 @@ class EventEmitter : public Nan::ObjectWrap {
 	typedef MAP_TYPE::iterator MAP_IT_TYPE;
 	typedef FNMAP_TYPE::iterator FNMAP_IT_TYPE;
 	
+	
 public:
+	
+	// C++ side emit() method
+	void emit(const std::string &name, int argc = 0, v8::Local<v8::Value> *argv = NULL) {
+		
+		VEC_TYPE list = _listeners[name];
+		
+		if (list.empty()) {
+			return;
+		}
+		
+		for (IT_TYPE it = list.begin(); it != list.end(); ++it) {
+			
+			Nan::Callback callback(Nan::New(*it));
+			
+			if ( ! callback.IsEmpty() ) {
+				callback.Call(argc, argv);
+			}
+			
+		}
+		
+	}
+	
+	// C++ side on() method
+	void on(const std::string &name, v8::Local<v8::Value> that, const std::string &method) {
+		
+		v8::Local<v8::String> code = JS_STR(
+			"((emitter, name, that, method) => emitter.on(name, that[method]))"
+		);
+		
+		v8::Local<v8::Function> connector = v8::Local<v8::Function>::Cast(v8::Script::Compile(code)->Run());
+		Nan::Callback connectorCb(connector);
+		
+		v8::Local<v8::Object> emitter = Nan::New<v8::Object>();
+		this->Wrap(emitter);
+		
+		v8::Local<v8::Value> argv[] = { emitter, JS_STR(name.c_str()), that, JS_STR(method.c_str()) };
+		connectorCb.Call(4, argv);
+		
+	}
+	
+	
+protected:
 	
 	EventEmitter () {
 		_maxListeners = _defaultMaxListeners;
@@ -31,17 +86,7 @@ public:
 	~EventEmitter () {}
 	
 	
-	static void extend(v8::Local<v8::FunctionTemplate> &ctor, v8::Local<v8::ObjectTemplate> &proto) {
-		
-		v8::Local<v8::Function> ctorFunc = Nan::GetFunction(ctor).ToLocalChecked();
-		v8::Local<v8::Object> ctorObj = ctorFunc;
-		
-		
-		// -------- static
-		
-		Nan::SetMethod(ctorFunc, "listenerCount", jsStaticListenerCount);
-		ACCESSOR_RW(ctorObj, defaultMaxListeners);
-		
+	static void extend(v8::Local<v8::FunctionTemplate> &ctor) {
 		
 		// -------- dynamic
 		
@@ -60,41 +105,31 @@ public:
 		Nan::SetPrototypeMethod(ctor, "setMaxListeners", jsSetMaxListeners);
 		Nan::SetPrototypeMethod(ctor, "rawListeners", jsRawListeners);
 		
+		
+		// -------- static
+		
+		v8::Local<v8::Function> ctorFunc = Nan::GetFunction(ctor).ToLocalChecked();
+		v8::Local<v8::Object> ctorObj = ctorFunc;
+		
+		Nan::SetMethod(ctorFunc, "listenerCount", jsStaticListenerCount);
+		ACCESSOR_RW(ctorObj, defaultMaxListeners);
+		
+		//Local<ObjectTemplate> proto = ctor->PrototypeTemplate();
 		// ACCESSOR_RW(proto, type);
 		
 	}
 	
 	
-	void emit(const std::string &name, int argc = 0, v8::Local<v8::Value> *argv = NULL) {
-		
-		VEC_TYPE &list = _listeners[name];
-		
-		if (list.empty()) {
-			return;
-		}
-		
-		for (IT_TYPE it = list.begin(); it != list.end(); ++it) {
-			
-			Nan::Callback callback(Nan::New(*it));
-			
-			if ( ! callback.IsEmpty() ) {
-				callback.Call(argc, argv);
-			}
-			
-		}
-		
-	}
-	
-	
-	// Deprecated method
+	// Deprecated static method
 	static NAN_METHOD(jsStaticListenerCount) {
 		
-		// EventEmitter *emitter = ObjectWrap::Unwrap<EventEmitter>(info[0]);
-		// REQ_UTF8_ARG(1, name);
+		REQ_OBJ_ARG(0, obj);
+		EventEmitter *emitter = ObjectWrap::Unwrap<EventEmitter>(obj);
+		REQ_UTF8_ARG(1, name);
 		
-		// const VEC_TYPE &list = emitter->_listeners[*name];
+		const VEC_TYPE &list = emitter->_listeners[*name];
 		
-		// RET_VALUE(JS_NUM(list.size()));
+		RET_VALUE(JS_INT(static_cast<int>(list.size())));
 		
 	}
 	
@@ -129,7 +164,15 @@ public:
 		
 		REQ_UTF8_ARG(0, name);
 		
-		emitter->emit(*name, info.Length() - 1, &info[1]);
+		int length = info.Length();
+		
+		std::vector< v8::Local<v8::Value> > args;
+		
+		for (int i = 1; i < length; i++) {
+			args.push_back(info[i]);
+		}
+		
+		emitter->emit(*name, length - 1, &args[0]);
 		
 	}
 	
@@ -205,6 +248,9 @@ public:
 		bool isFront
 	) { THIS_EMITTER;
 		
+		v8::Local<v8::Value> args[] = { info[0], info[1] };
+		emitter->emit("newListener", 2, args);
+		
 		if (isFront) {
 			emitter->_listeners[name].push_front(cb);
 			emitter->_raw[name].push_front(cb);
@@ -240,6 +286,9 @@ public:
 		bool isFront
 	) { THIS_EMITTER;
 		
+		v8::Local<v8::Value> args[] = { info[0], info[1] };
+		emitter->emit("newListener", 2, args);
+		
 		if (isFront) {
 			emitter->_listeners[name].push_front(cb);
 			emitter->_raw[name].push_front(raw);
@@ -264,16 +313,16 @@ public:
 		REQ_FUN_ARG(1, raw);
 		
 		v8::Local<v8::String> code = JS_STR(
-			"((emitter, cb) => (...args) => {\n\
+			"((emitter, name, cb) => (...args) => {\n\
 				cb(...args);\n\
-				emitter.removeListener(cb);\n\
+				emitter.removeListener(name, cb);\n\
 			})"
 		);
 		
 		v8::Local<v8::Function> decor = v8::Local<v8::Function>::Cast(v8::Script::Compile(code)->Run());
 		Nan::Callback decorCb(decor);
-		v8::Local<v8::Value> argv[] = { info.This(), raw };
-		v8::Local<v8::Function> wrap = v8::Local<v8::Function>::Cast(decorCb.Call(2, argv));
+		v8::Local<v8::Value> argv[] = { info.This(), info[0], raw };
+		v8::Local<v8::Function> wrap = v8::Local<v8::Function>::Cast(decorCb.Call(3, argv));
 		
 		Nan::Persistent<v8::Function> persistentWrap;
 		persistentWrap.Reset(wrap);
@@ -299,10 +348,26 @@ public:
 		
 		if (info.Length() > 0 && info[0]->IsString()) {
 			
+			MAP_TYPE tmpMap = emitter->_raw;
+			
 			emitter->_listeners.clear();
 			emitter->_raw.clear();
 			emitter->_wrappedIds.clear();
 			emitter->_rawIds.clear();
+			
+			for (MAP_IT_TYPE itMap = tmpMap.begin(); itMap != tmpMap.end(); ++itMap) {
+				
+				const std::string &current = itMap->first;
+				VEC_TYPE &list = itMap->second;
+				
+				for (IT_TYPE it = list.begin(); it != list.end(); ++it) {
+					
+					v8::Local<v8::Value> args[] = { JS_STR(current.c_str()), Nan::New(*it) };
+					emitter->emit("removeListener", 2, args);
+					
+				}
+				
+			}
 			
 			return;
 			
@@ -326,7 +391,6 @@ public:
 				FN_TYPE fn = *it;
 				
 				for (FNMAP_IT_TYPE itRaw = emitter->_rawIds.begin(); itRaw != emitter->_rawIds.end(); ++itRaw) {
-					// emitter->_wrappedIds.erase(*it);
 					if (fn == itRaw->second) {
 						removes.push_back(itRaw->first);
 					}
@@ -346,8 +410,17 @@ public:
 		}
 		
 		
+		VEC_TYPE tmpVec = emitter->_raw[name];
+		
 		emitter->_listeners[name].clear();
 		emitter->_raw[name].clear();
+		
+		for (IT_TYPE it = tmpVec.begin(); it != tmpVec.end(); ++it) {
+			
+			v8::Local<v8::Value> args[] = { JS_STR(name.c_str()), Nan::New(*it) };
+			emitter->emit("removeListener", 2, args);
+			
+		}
 		
 	}
 	
@@ -362,12 +435,13 @@ public:
 		
 		std::string name = std::string(*n);
 		
-		
 		VEC_TYPE &rawList = emitter->_raw[name];
 		
 		if (rawList.empty()) {
 			return;
 		}
+		
+		v8::Local<v8::Value> args[] = { info[0], info[1] };
 		
 		for (IT_TYPE it = rawList.begin(); it != rawList.end(); ++it) {
 			
@@ -392,6 +466,7 @@ public:
 				
 			}
 			
+			emitter->emit("removeListener", 2, args);
 			return;
 			
 		}
@@ -420,6 +495,8 @@ public:
 			}
 			
 		}
+		
+		emitter->emit("removeListener", 2, args);
 		
 	}
 	
@@ -456,11 +533,6 @@ public:
 		RET_VALUE(jsListeners);
 		
 	}
-	
-	
-private:
-	
-	static int _defaultMaxListeners;
 	
 	
 private:

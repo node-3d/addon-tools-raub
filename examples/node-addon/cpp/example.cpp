@@ -28,11 +28,12 @@ void Example::init(Handle<Object> target) {
 	// prototype
 	Nan::SetPrototypeMethod(ctor, "destroy", destroy);
 	
+	extend(ctor);
+	
+	
 	Local<ObjectTemplate> proto = ctor->PrototypeTemplate();
 	// ACCESSOR_RW(proto, prop);
 	
-	
-	EventEmitter::extend(ctor, proto);
 	
 	
 	_constructor.Reset(Nan::GetFunction(ctor).ToLocalChecked());
