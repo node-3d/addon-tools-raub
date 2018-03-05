@@ -1,6 +1,6 @@
 'use strict';
 
-const Example = require('./core');
+const { Example } = require('./core');
 
 console.log('Example', Example);
 
@@ -43,4 +43,4 @@ example.emit('evt2', 111, '221');
 example.emit('evt2', 112, '222');
 
 
-module.exports = { Wrapped, Example };
+module.exports = Example;
