@@ -6,15 +6,14 @@
 
 #include <map>
 #include <deque>
-#include <iostream>
+// #include <iostream> -> std::cout << "..." << std::endl;
 
 
 #define THIS_EMITTER                                                          \
 	EventEmitter *emitter = ObjectWrap::Unwrap<EventEmitter>(info.This());
 
 
-// Use the dummy template for static-int initialization
-
+// Use the dummy template class for static-int initialization
 template< class Dummy >
 class EventEmitterStatics {
 protected:
@@ -34,48 +33,6 @@ class EventEmitter : public Nan::ObjectWrap, public EventEmitterStatics<void> {
 	typedef VEC_TYPE::iterator IT_TYPE;
 	typedef MAP_TYPE::iterator MAP_IT_TYPE;
 	typedef FNMAP_TYPE::iterator FNMAP_IT_TYPE;
-	
-	
-public:
-	
-	// C++ side emit() method
-	void emit(const std::string &name, int argc = 0, v8::Local<v8::Value> *argv = NULL) {
-		
-		VEC_TYPE list = _listeners[name];
-		
-		if (list.empty()) {
-			return;
-		}
-		
-		for (IT_TYPE it = list.begin(); it != list.end(); ++it) {
-			
-			Nan::Callback callback(Nan::New(*it));
-			
-			if ( ! callback.IsEmpty() ) {
-				callback.Call(argc, argv);
-			}
-			
-		}
-		
-	}
-	
-	// C++ side on() method
-	void on(const std::string &name, v8::Local<v8::Value> that, const std::string &method) {
-		
-		v8::Local<v8::String> code = JS_STR(
-			"((emitter, name, that, method) => emitter.on(name, that[method]))"
-		);
-		
-		v8::Local<v8::Function> connector = v8::Local<v8::Function>::Cast(v8::Script::Compile(code)->Run());
-		Nan::Callback connectorCb(connector);
-		
-		v8::Local<v8::Object> emitter = Nan::New<v8::Object>();
-		this->Wrap(emitter);
-		
-		v8::Local<v8::Value> argv[] = { emitter, JS_STR(name.c_str()), that, JS_STR(method.c_str()) };
-		connectorCb.Call(4, argv);
-		
-	}
 	
 	
 protected:
@@ -115,11 +72,58 @@ protected:
 		Nan::SetMethod(ctorFunc, "listenerCount", jsStaticListenerCount);
 		ACCESSOR_RW(ctorObj, defaultMaxListeners);
 		
-		//Local<ObjectTemplate> proto = ctor->PrototypeTemplate();
-		// ACCESSOR_RW(proto, type);
+	}
+	
+public:
+	
+	// C++ side emit() method
+	void emit(const std::string &name, int argc = 0, v8::Local<v8::Value> *argv = NULL) {
+		
+		// Important! As actual get map[key] produces a new (empty) map entry
+		if ( _listeners.find(name) == _listeners.end() ) {
+			return;
+		}
+		
+		// A copy is intended, because handlers can call removeListener (and they DO)
+		VEC_TYPE list = _listeners[name];
+		
+		if (list.empty()) {
+			return;
+		}
+		
+		for (IT_TYPE it = list.begin(); it != list.end(); ++it) {
+			
+			Nan::Callback callback(Nan::New(*it));
+			
+			if ( ! callback.IsEmpty() ) {
+				callback.Call(argc, argv);
+			}
+			
+		}
 		
 	}
 	
+	
+	// C++ side on() method
+	void on(const std::string &name, v8::Local<v8::Value> that, const std::string &method) {
+		
+		v8::Local<v8::String> code = JS_STR(
+			"((emitter, name, that, method) => emitter.on(name, that[method]))"
+		);
+		
+		v8::Local<v8::Function> connector = v8::Local<v8::Function>::Cast(v8::Script::Compile(code)->Run());
+		Nan::Callback connectorCb(connector);
+		
+		v8::Local<v8::Object> emitter = Nan::New<v8::Object>();
+		this->Wrap(emitter);
+		
+		v8::Local<v8::Value> argv[] = { emitter, JS_STR(name.c_str()), that, JS_STR(method.c_str()) };
+		connectorCb.Call(4, argv);
+		
+	}
+	
+	
+protected:
 	
 	// Deprecated static method
 	static NAN_METHOD(jsStaticListenerCount) {
@@ -137,73 +141,53 @@ protected:
 	
 	static NAN_SETTER(defaultMaxListenersSetter) { THIS_EMITTER; SETTER_INT32_ARG;
 		
-		EventEmitter::_defaultMaxListeners = v;
+		_defaultMaxListeners = v;
 		
 	}
 	
 	static NAN_GETTER(defaultMaxListenersGetter) { THIS_EMITTER;
 		
-		RET_VALUE(JS_INT(EventEmitter::_defaultMaxListeners));
+		RET_VALUE(JS_INT(_defaultMaxListeners));
 		
 	}
 	
 	
-	static NAN_METHOD(jsAddListener) { THIS_EMITTER;
-		
-		REQ_UTF8_ARG(0, name);
-		REQ_FUN_ARG(1, cb);
-		
-		Nan::Persistent<v8::Function> persistentCb;
-		persistentCb.Reset(cb);
-		
-		emitter->_listeners[std::string(*name)].push_back(persistentCb);
-		
-	}
+	static NAN_METHOD(jsAddListener) { _wrapListener(info); }
 	
 	
 	static NAN_METHOD(jsEmit) { THIS_EMITTER;
-		std::cout << "emit 0 " << emitter->_listeners.size() << std::endl;
-		for (MAP_IT_TYPE it = emitter->_listeners.begin(); it != emitter->_listeners.end(); ++it) {
-			
-			std::cout << "emit 0 _listeners " << it->first << std::endl;
-			
-		}
-		for (MAP_IT_TYPE it = emitter->_raw.begin(); it != emitter->_raw.end(); ++it) {
-			
-			std::cout << "emit 0 _raw " << it->first << std::endl;
-			
-		}
+		
 		REQ_UTF8_ARG(0, name);
 		
 		int length = info.Length();
 		
 		std::vector< v8::Local<v8::Value> > args;
-		std::cout << "emit 1 " << emitter->_listeners.size() << std::endl;
+		
 		for (int i = 1; i < length; i++) {
 			args.push_back(info[i]);
 		}
-		std::cout << "emit 2 " << emitter->_listeners.size() << std::endl;
+		
 		emitter->emit(*name, length - 1, &args[0]);
-		std::cout << "emit 3 " << emitter->_listeners.size() << std::endl;
+		
 	}
 	
 	
 	static NAN_METHOD(jsEventNames) { THIS_EMITTER;
-		std::cout << "jsEventNames 0 " << emitter->_raw.size() << std::endl;
+		
 		v8::Local<v8::Array> jsNames = Nan::New<v8::Array>(emitter->_raw.size());
 		
 		if (emitter->_raw.empty()) {
 			RET_VALUE(jsNames);
 			return;
 		}
-		std::cout << "jsEventNames 1 " << emitter->_raw.size() << std::endl;
+		
 		int i = 0;
 		for (MAP_IT_TYPE it = emitter->_raw.begin(); it != emitter->_raw.end(); ++it, i++) {
 			
 			jsNames->Set(JS_INT(i), JS_STR(it->first));
 			
 		}
-		std::cout << "jsEventNames 2 " << emitter->_raw.size() << std::endl;
+		
 		RET_VALUE(jsNames);
 		
 	}

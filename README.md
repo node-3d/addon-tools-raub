@@ -30,6 +30,7 @@ dependency packages.
 
 [Cross-platform commands](#cross-platform-commands)
 
+[Class EventEmitter](#class-eventemitter)
 
 ---
 
@@ -559,3 +560,22 @@ For Windows the `/y` flag was embedded.
 ...
 'action' : ['<(cp)', 'a', 'b'],
 ```
+
+---
+
+
+## class EventEmitter
+
+A C++ implementation of [Events API](https://nodejs.org/api/events.html).
+
+An example of it's usage can be found in **examples/node-addon** directory.
+There is `Example` class, implemented in **cpp/example.cpp**, that inherits
+EventEmitter behavior and is exported to JS.
+
+For C++ side `EventEmitter` has following public methods:
+* `void emit(const std::string &name, int argc = 0, v8::Local<v8::Value> *argv = NULL)`
+emits an event with the given `name` and, optionally, some additional arguments where
+`argc` is the number of arguments and `argv` is a pointer to the arguments array.
+* `void on(const std::string &name, v8::Local<v8::Value> that, const std::string &method)`
+subscribes `that[method]` to receive `name` events from this emitter, basically
+`emitter.on(name, that[method])`.
