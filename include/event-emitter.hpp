@@ -6,25 +6,14 @@
 
 #include <map>
 #include <deque>
-// #include <iostream> -> std::cout << "..." << std::endl;
+#include <iostream> // -> std::cout << "..." << std::endl;
 
 
 #define THIS_EMITTER                                                          \
 	EventEmitter *emitter = ObjectWrap::Unwrap<EventEmitter>(info.This());
 
 
-// Use the dummy template class for static-int initialization
-template< class Dummy >
-class EventEmitterStatics {
-protected:
-	static int _defaultMaxListeners;
-};
-
-template< class Dummy >
-int EventEmitterStatics<Dummy>::_defaultMaxListeners = 10;
-
-
-class EventEmitter : public Nan::ObjectWrap, public EventEmitterStatics<void> {
+class EventEmitter : public Nan::ObjectWrap {
 	
 	typedef Nan::CopyablePersistentTraits<v8::Function>::CopyablePersistent FN_TYPE;
 	typedef std::deque<FN_TYPE> VEC_TYPE;
@@ -38,41 +27,41 @@ class EventEmitter : public Nan::ObjectWrap, public EventEmitterStatics<void> {
 protected:
 	
 	EventEmitter () {
-		_maxListeners = _defaultMaxListeners;
+		_maxListeners = 0;
 		_freeId = 0;
 	}
-	~EventEmitter () {}
+	
+	virtual ~EventEmitter () {}
 	
 	
-	static void extend(v8::Local<v8::FunctionTemplate> &ctor) {
+	static void extendPrototype(v8::Local<v8::FunctionTemplate> &proto) {
 		
-		// -------- dynamic
-		
-		Nan::SetPrototypeMethod(ctor, "listenerCount", jsListenerCount);
-		Nan::SetPrototypeMethod(ctor, "addListener", jsAddListener);
-		Nan::SetPrototypeMethod(ctor, "emit", jsEmit);
-		Nan::SetPrototypeMethod(ctor, "eventNames", jsEventNames);
-		Nan::SetPrototypeMethod(ctor, "getMaxListeners", jsGetMaxListeners);
-		Nan::SetPrototypeMethod(ctor, "listeners", jsListeners);
-		Nan::SetPrototypeMethod(ctor, "on", jsOn);
-		Nan::SetPrototypeMethod(ctor, "once", jsOnce);
-		Nan::SetPrototypeMethod(ctor, "prependListener", jsPrependListener);
-		Nan::SetPrototypeMethod(ctor, "prependOnceListener", jsPrependOnceListener);
-		Nan::SetPrototypeMethod(ctor, "removeAllListeners", jsRemoveAllListeners);
-		Nan::SetPrototypeMethod(ctor, "removeListener", jsRemoveListener);
-		Nan::SetPrototypeMethod(ctor, "setMaxListeners", jsSetMaxListeners);
-		Nan::SetPrototypeMethod(ctor, "rawListeners", jsRawListeners);
-		
-		
-		// -------- static
-		
-		v8::Local<v8::Function> ctorFunc = Nan::GetFunction(ctor).ToLocalChecked();
-		v8::Local<v8::Object> ctorObj = ctorFunc;
-		
-		Nan::SetMethod(ctorFunc, "listenerCount", jsStaticListenerCount);
-		ACCESSOR_RW(ctorObj, defaultMaxListeners);
+		Nan::SetPrototypeMethod(proto, "listenerCount", jsListenerCount);
+		Nan::SetPrototypeMethod(proto, "addListener", jsAddListener);
+		Nan::SetPrototypeMethod(proto, "emit", jsEmit);
+		Nan::SetPrototypeMethod(proto, "eventNames", jsEventNames);
+		Nan::SetPrototypeMethod(proto, "getMaxListeners", jsGetMaxListeners);
+		Nan::SetPrototypeMethod(proto, "listeners", jsListeners);
+		Nan::SetPrototypeMethod(proto, "on", jsOn);
+		Nan::SetPrototypeMethod(proto, "once", jsOnce);
+		Nan::SetPrototypeMethod(proto, "prependListener", jsPrependListener);
+		Nan::SetPrototypeMethod(proto, "prependOnceListener", jsPrependOnceListener);
+		Nan::SetPrototypeMethod(proto, "removeAllListeners", jsRemoveAllListeners);
+		Nan::SetPrototypeMethod(proto, "removeListener", jsRemoveListener);
+		Nan::SetPrototypeMethod(proto, "setMaxListeners", jsSetMaxListeners);
+		Nan::SetPrototypeMethod(proto, "rawListeners", jsRawListeners);
 		
 	}
+	
+	
+	static void extendConstructor(v8::Local<v8::Function> &ctorFn) {
+		
+		v8::Local<v8::Object> ctor = v8::Local<v8::Object>::Cast(ctorFn);
+		
+		Nan::SetMethod(ctor, "listenerCount", jsStaticListenerCount);
+		
+	}
+	
 	
 public:
 	
@@ -135,19 +124,6 @@ protected:
 		const VEC_TYPE &list = emitter->_listeners[*name];
 		
 		RET_VALUE(JS_INT(static_cast<int>(list.size())));
-		
-	}
-	
-	
-	static NAN_SETTER(defaultMaxListenersSetter) { THIS_EMITTER; SETTER_INT32_ARG;
-		
-		_defaultMaxListeners = v;
-		
-	}
-	
-	static NAN_GETTER(defaultMaxListenersGetter) { THIS_EMITTER;
-		
-		RET_VALUE(JS_INT(_defaultMaxListeners));
 		
 	}
 	
@@ -252,6 +228,19 @@ protected:
 		} else {
 			emitter->_listeners[name].push_back(cb);
 			emitter->_raw[name].push_back(cb);
+		}
+		
+		if (emitter->_maxListeners > 0 && emitter->_raw.size() > emitter->_maxListeners) {
+			
+			std::cout << "EventEmitter Warning: too many listeners (";
+			std::cout << emitter->_raw.size() << " > " << emitter->_maxListeners;
+			std::cout << ") possible memory leak." << std::endl;
+			
+			v8::Local<v8::String> code = JS_STR("(new Error()).stack");
+			v8::Local<v8::String> stack = v8::Local<v8::String>::Cast(v8::Script::Compile(code)->Run());
+			Nan::Utf8String stackStr(stack);
+			std::cout << *stackStr << std::endl;
+			
 		}
 		
 	}

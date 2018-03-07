@@ -19,25 +19,29 @@ Nan::Persistent<v8::Function> Example::_constructor;
 
 void Example::init(Handle<Object> target) {
 	
-	Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(newCtor);
+	Local<FunctionTemplate> proto = Nan::New<FunctionTemplate>(newCtor);
 	
-	ctor->InstanceTemplate()->SetInternalFieldCount(1);
-	ctor->SetClassName(JS_STR("Example"));
-	
-	
-	// prototype
-	Nan::SetPrototypeMethod(ctor, "destroy", destroy);
-	
-	extend(ctor);
+	proto->InstanceTemplate()->SetInternalFieldCount(1);
+	proto->SetClassName(JS_STR("Example"));
 	
 	
-	Local<ObjectTemplate> proto = ctor->PrototypeTemplate();
-	// ACCESSOR_RW(proto, prop);
+	// -------- dynamic
+	
+	// Add EventEmitter methods
+	extendPrototype(proto);
+	
+	Nan::SetPrototypeMethod(proto, "destroy", destroy);
 	
 	
+	// -------- static
 	
-	_constructor.Reset(Nan::GetFunction(ctor).ToLocalChecked());
-	Nan::Set(target, JS_STR("Example"), Nan::GetFunction(ctor).ToLocalChecked());
+	Local<Function> ctor = Nan::GetFunction(proto).ToLocalChecked();
+	
+	extendConstructor(ctor);
+	
+	
+	_constructor.Reset(ctor);
+	Nan::Set(target, JS_STR("Example"), ctor);
 	
 }
 

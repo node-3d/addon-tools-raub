@@ -568,14 +568,81 @@ For Windows the `/y` flag was embedded.
 
 A C++ implementation of [Events API](https://nodejs.org/api/events.html).
 
+NOTE: This implementation has some minor deviations from the above standard.
+Specifically there is no static `EventEmitter.defaultMaxListeners` property.
+However the dynamic one persists.
+
 An example of it's usage can be found in **examples/node-addon** directory.
 There is `Example` class, implemented in **cpp/example.cpp**, that inherits
 EventEmitter behavior and is exported to JS.
 
-For C++ side `EventEmitter` has following public methods:
+For the C++ side `EventEmitter` has following public methods:
+
 * `void emit(const std::string &name, int argc = 0, v8::Local<v8::Value> *argv = NULL)`
 emits an event with the given `name` and, optionally, some additional arguments where
 `argc` is the number of arguments and `argv` is a pointer to the arguments array.
+
 * `void on(const std::string &name, v8::Local<v8::Value> that, const std::string &method)`
 subscribes `that[method]` to receive `name` events from this emitter, basically
 `emitter.on(name, that[method])`.
+
+
+Be sure to add the include directory in **binding.gyp**:
+
+```
+	'include_dirs': [
+		'<!@(node -e "require(\'addon-tools-raub\').include()")',
+	],
+```
+
+Include the **event-emitter.hpp**, it already includes **addon-tools.hpp**.
+Inherit from `EventEmitter`, it already inherits from `Nan::ObjectWrap`:
+
+```
+#include <event-emitter.hpp>
+
+class Example : public EventEmitter {
+	...
+}
+```
+
+
+First add EventEmitter dynamic methods to the prototype via
+`static void extendPrototype(v8::Local<v8::FunctionTemplate> &proto)` and then,
+after constructor function instance is created,
+`static void extendConstructor(v8::Local<v8::Function> &ctorFn)`:
+
+```
+void Example::init(Handle<Object> target) {
+	
+	Local<FunctionTemplate> proto = Nan::New<FunctionTemplate>(newCtor);
+	
+	proto->InstanceTemplate()->SetInternalFieldCount(1);
+	proto->SetClassName(JS_STR("Example"));
+	
+	
+	// -------- dynamic
+	
+	// Add EventEmitter methods
+	extendPrototype(proto);
+	
+	Nan::SetPrototypeMethod(proto, "destroy", destroy);
+	
+	
+	// -------- static
+	
+	Local<Function> ctor = Nan::GetFunction(proto).ToLocalChecked();
+	
+	extendConstructor(ctor);
+	
+	
+	_constructor.Reset(ctor);
+	Nan::Set(target, JS_STR("Example"), ctor);
+	
+}
+```
+
+NOTE: after a `v8::Function` is created from the `v8::FunctionTemplate`, no
+additional methods can be added to the prototype. Also static members can only
+be added to the created `v8::Function` representing the constructor. This is why
+there are 2 extend methods: `extendPrototype` and `extendConstructor`.
