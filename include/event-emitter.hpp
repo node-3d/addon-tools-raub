@@ -292,6 +292,26 @@ protected:
 		emitter->_wrappedIds[nextId] = cb;
 		emitter->_rawIds[nextId] = raw;
 		
+		int count = emitter->_raw[name].size();
+		
+		if (emitter->_maxListeners > 0 && count > emitter->_maxListeners) {
+			
+			std::cout << "EventEmitter Warning: too many listeners (";
+			std::cout << count << " > " << emitter->_maxListeners << ") on '";
+			std::cout << name << "' event, possible memory leak." << std::endl;
+			
+			// Some JS magic to retrieve the call stack
+			v8::Local<v8::String> code = JS_STR(
+				"(new Error()).stack.split('\\n').slice(1).join('\\n')"
+			);
+			v8::Local<v8::String> stack = v8::Local<v8::String>::Cast(
+				v8::Script::Compile(code)->Run()
+			);
+			Nan::Utf8String stackStr(stack);
+			std::cout << *stackStr << std::endl;
+			
+		}
+		
 	}
 	
 	
