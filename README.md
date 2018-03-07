@@ -570,9 +570,9 @@ A C++ implementation of [Events API](https://nodejs.org/api/events.html).
 
 NOTE: This implementation has some minor deviations from the above standard.
 Specifically there is no static `EventEmitter.defaultMaxListeners` property.
-However the dynamic one persists.
+However the dynamic one persists and is infinite (`0`) by default.
 
-An example of it's usage can be found in **examples/node-addon** directory.
+An example can be found in **examples/node-addon** directory.
 There is `Example` class, implemented in **cpp/example.cpp**, that inherits
 EventEmitter behavior and is exported to JS.
 
@@ -595,7 +595,7 @@ Be sure to add the include directory in **binding.gyp**:
 	],
 ```
 
-Include the **event-emitter.hpp**, it already includes **addon-tools.hpp**.
+Include the **event-emitter.hpp**, it also includes **addon-tools.hpp**.
 Inherit from `EventEmitter`, it already inherits from `Nan::ObjectWrap`:
 
 ```

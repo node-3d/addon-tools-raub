@@ -230,14 +230,21 @@ protected:
 			emitter->_raw[name].push_back(cb);
 		}
 		
-		if (emitter->_maxListeners > 0 && emitter->_raw.size() > emitter->_maxListeners) {
+		int count = emitter->_raw[name].size();
+		
+		if (emitter->_maxListeners > 0 && count > emitter->_maxListeners) {
 			
 			std::cout << "EventEmitter Warning: too many listeners (";
-			std::cout << emitter->_raw.size() << " > " << emitter->_maxListeners;
-			std::cout << ") possible memory leak." << std::endl;
+			std::cout << count << " > " << emitter->_maxListeners << ") on '";
+			std::cout << name << "' event, possible memory leak." << std::endl;
 			
-			v8::Local<v8::String> code = JS_STR("(new Error()).stack");
-			v8::Local<v8::String> stack = v8::Local<v8::String>::Cast(v8::Script::Compile(code)->Run());
+			// Some JS magic to retrieve the call stack
+			v8::Local<v8::String> code = JS_STR(
+				"(new Error()).stack.split('\\n').slice(1).join('\\n')"
+			);
+			v8::Local<v8::String> stack = v8::Local<v8::String>::Cast(
+				v8::Script::Compile(code)->Run()
+			);
 			Nan::Utf8String stackStr(stack);
 			std::cout << *stackStr << std::endl;
 			

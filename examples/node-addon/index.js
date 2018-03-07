@@ -52,7 +52,9 @@ example.emit('evt2', 112, '222');
 console.log('example 1', example);
 
 
-Example.defaultMaxListeners = -1;
-
+example.setMaxListeners(2);
+example.on('max1', () => {});
+example.on('max1', () => {});
+example.on('max1', () => {});
 
 module.exports = Example;
