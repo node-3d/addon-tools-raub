@@ -23,9 +23,9 @@
 #define JS_DOUBLE(val) Nan::New<v8::Number>(val)
 #define JS_EXT(val) Nan::New<v8::External>(reinterpret_cast<void*>(val))
 #define JS_BOOL(val) (val) ? Nan::True() : Nan::False()
-#define JS_FUN(val) Nan::New<v8::Function>(val).ToLocalChecked()
-#define JS_OBJ(val) Nan::New<v8::Object>(val).ToLocalChecked()
-#define JS_ARRV(val) Nan::New<v8::Object>(val).ToLocalChecked()
+#define JS_FUN(val) Nan::New<v8::Function>(val)
+#define JS_OBJ(val) Nan::New<v8::Object>(val)
+#define JS_ARRV(val) Nan::New<v8::Object>(val)
 
 
 #define REQ_ARGS(N)                                                           \
