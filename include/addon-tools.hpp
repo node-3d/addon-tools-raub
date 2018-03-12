@@ -13,10 +13,19 @@
 
 
 #define JS_STR(...) Nan::New<v8::String>(__VA_ARGS__).ToLocalChecked()
+#define JS_UTF8(...) Nan::New<v8::String>(__VA_ARGS__).ToLocalChecked()
 #define JS_INT(val) Nan::New<v8::Integer>(val)
+#define JS_INT32(val) Nan::New<v8::Integer>(val)
+#define JS_UINT32(val) Nan::New<v8::Integer>(val)
 #define JS_NUM(val) Nan::New<v8::Number>(val)
+#define JS_OFFS(val) Nan::New<v8::Number>(val)
+#define JS_FLOAT(val) Nan::New<v8::Number>(val)
+#define JS_DOUBLE(val) Nan::New<v8::Number>(val)
 #define JS_EXT(val) Nan::New<v8::External>(reinterpret_cast<void*>(val))
 #define JS_BOOL(val) (val) ? Nan::True() : Nan::False()
+#define JS_FUN(val) Nan::New<v8::Function>(val).ToLocalChecked()
+#define JS_OBJ(val) Nan::New<v8::Object>(val).ToLocalChecked()
+#define JS_ARRV(val) Nan::New<v8::Object>(val).ToLocalChecked()
 
 
 #define REQ_ARGS(N)                                                           \
@@ -132,6 +141,9 @@
 #define CTOR_CHECK(T)                                                         \
 	if ( ! info.IsConstructCall() )                                           \
 		return Nan::ThrowTypeError(T " must be called with the 'new' keyword.");
+
+#define DES_CHECK                                                             \
+	if (_isDestroyed) return;
 
 #define SETTER_CHECK(C, T)                                                    \
 	if ( ! value->C )                                                         \

@@ -1,31 +1,31 @@
 {
-  "name": "addon-tools-raub",
-  "author": "Luis Blanco <raubtierxxx@gmail.com>",
-  "description": "A set of extra tools for Node.js addons",
-  "version": "0.0.9",
-  "main": "index.js",
-  "keywords": [
-    "node",
-    "addon",
-    "header",
-    "include",
-    "platform",
-    "build",
-    "paths"
-  ],
-  "maintainers": [
-    {
-      "name": "Luis Blanco",
-      "email": "raubtierxxx@gmail.com",
-      "skype": "rauber666"
-    }
-  ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/raub/node-addon-tools.git"
-  },
-  "dependencies": {
-    "nan": "2.8.0"
-  }
+	"name": "addon-tools-raub",
+	"author": "Luis Blanco <raubtierxxx@gmail.com>",
+	"description": "A set of extra tools for Node.js addons",
+	"version": "0.1.0",
+	"main": "index.js",
+	"keywords": [
+		"node",
+		"addon",
+		"header",
+		"include",
+		"platform",
+		"build",
+		"paths"
+	],
+	"maintainers": [
+		{
+			"name": "Luis Blanco",
+			"email": "raubtierxxx@gmail.com",
+			"skype": "rauber666"
+		}
+	],
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/raub/node-addon-tools.git"
+	},
+	"dependencies": {
+		"nan": "2.8.0"
+	}
 }
