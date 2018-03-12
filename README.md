@@ -6,6 +6,7 @@
 This is a set of helpers for simplification and standardization of addons and
 dependency packages.
 
+* EventEmitter C++ implementation.
 * Contains helpers of following types: GYP, C++, JS, BAT (Windows).
 * Platforms: win x32/x64, linux x32/x64, mac x64.
 * Useful links: [V8 Ref](https://v8docs.nodesource.com/node-0.8/d2/dc3/namespacev8.html),
