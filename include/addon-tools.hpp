@@ -18,7 +18,7 @@
 #define JS_INT32(val) Nan::New<v8::Integer>(val)
 #define JS_UINT32(val) Nan::New<v8::Integer>(val)
 #define JS_NUM(val) Nan::New<v8::Number>(val)
-#define JS_OFFS(val) Nan::New<v8::Number>(val)
+#define JS_OFFS(val) Nan::New<v8::Number>(static_cast<double>(val))
 #define JS_FLOAT(val) Nan::New<v8::Number>(val)
 #define JS_DOUBLE(val) Nan::New<v8::Number>(val)
 #define JS_EXT(val) Nan::New<v8::External>(reinterpret_cast<void*>(val))
