@@ -2,7 +2,7 @@
 	"name": "addon-tools-raub",
 	"author": "Luis Blanco <raubtierxxx@gmail.com>",
 	"description": "A set of extra tools for Node.js addons",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"main": "index.js",
 	"keywords": [
 		"node",

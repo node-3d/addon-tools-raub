@@ -2,36 +2,33 @@
 #define _EXAMPLE_HPP_
 
 
-#include <event-emitter.hpp>
+#include <addon-tools.hpp>
 
 #include "common.hpp"
 
 
-class Example : public EventEmitter {
+class Example : public Nan::ObjectWrap {
 	
 public:
 	
 	static void init(v8::Handle<v8::Object> target);
 	
-	virtual ~Example();
 	
-	
-protected:
+private:
 	
 	Example();
+	virtual ~Example();
 	
 	static NAN_METHOD(newCtor);
 	
 	static NAN_METHOD(destroy);
-	
-	
-private:
 	
 	void _destroy();
 	
 	
 private:
 	
+	static Nan::Persistent<v8::FunctionTemplate> _prototype;
 	static Nan::Persistent<v8::Function> _constructor;
 	
 	bool _isDestroyed;

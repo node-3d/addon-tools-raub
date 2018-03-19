@@ -9,11 +9,27 @@
 #include <iostream> // -> std::cout << "..." << std::endl;
 
 
-#define THIS_EMITTER                                                          \
-	EventEmitter *emitter = ObjectWrap::Unwrap<EventEmitter>(info.This());
+#define THIS_EVENT_EMITTER                                                    \
+	EventEmitter *eventEmitter = ObjectWrap::Unwrap<EventEmitter>(info.This());
+
+#define EVENT_EMITTER_THIS_CHECK                                                            \
+	if (eventEmitter->_isDestroyed) return;
+
+#define EVENT_EMITTER_DES_CHECK                                                             \
+	if (_isDestroyed) return;
 
 
-class EventEmitter : public Nan::ObjectWrap {
+template <typename T>
+struct StaticHolder {
+	static Nan::Persistent<v8::FunctionTemplate> _prototype;
+	static Nan::Persistent<v8::Function> _constructor;
+};
+
+template <typename T> Nan::Persistent<v8::FunctionTemplate> StaticHolder<T>::_prototype;
+template <typename T> Nan::Persistent<v8::Function> StaticHolder<T>::_constructor;
+
+
+class EventEmitter : public StaticHolder<int>, public Nan::ObjectWrap {
 	
 	typedef Nan::CopyablePersistentTraits<v8::Function>::CopyablePersistent FN_TYPE;
 	typedef std::deque<FN_TYPE> VEC_TYPE;
@@ -23,18 +39,23 @@ class EventEmitter : public Nan::ObjectWrap {
 	typedef MAP_TYPE::iterator MAP_IT_TYPE;
 	typedef FNMAP_TYPE::iterator FNMAP_IT_TYPE;
 	
+// Public V8 init
+public:
 	
-protected:
-	
-	EventEmitter () {
-		_maxListeners = 0;
-		_freeId = 0;
-	}
-	
-	virtual ~EventEmitter () {}
-	
-	
-	static void extendPrototype(v8::Local<v8::FunctionTemplate> &proto) {
+	static void init(v8::Local<v8::Object> target) {
+		
+		v8::Local<v8::FunctionTemplate> proto = Nan::New<v8::FunctionTemplate>(newCtor);
+		
+		proto->InstanceTemplate()->SetInternalFieldCount(1);
+		proto->SetClassName(JS_STR("EventEmitter"));
+		
+		
+		// Accessors
+		v8::Local<v8::ObjectTemplate> obj = proto->PrototypeTemplate();
+		ACCESSOR_R(obj, isDestroyed);
+		
+		
+		// -------- dynamic
 		
 		Nan::SetPrototypeMethod(proto, "listenerCount", jsListenerCount);
 		Nan::SetPrototypeMethod(proto, "addListener", jsAddListener);
@@ -51,19 +72,22 @@ protected:
 		Nan::SetPrototypeMethod(proto, "setMaxListeners", jsSetMaxListeners);
 		Nan::SetPrototypeMethod(proto, "rawListeners", jsRawListeners);
 		
+		// -------- static
+		
+		v8::Local<v8::Function> ctor = Nan::GetFunction(proto).ToLocalChecked();
+		
+		v8::Local<v8::Object> ctorObj = v8::Local<v8::Object>::Cast(ctor);
+		
+		Nan::SetMethod(ctorObj, "listenerCount", jsStaticListenerCount);
+		
+		
+		_constructor.Reset(ctor);
+		_prototype.Reset(proto);
+		
+		Nan::Set(target, JS_STR("EventEmitter"), ctor);
+		
 	}
 	
-	
-	static void extendConstructor(v8::Local<v8::Function> &ctorFn) {
-		
-		v8::Local<v8::Object> ctor = v8::Local<v8::Object>::Cast(ctorFn);
-		
-		Nan::SetMethod(ctor, "listenerCount", jsStaticListenerCount);
-		
-	}
-	
-	
-public:
 	
 	// C++ side emit() method
 	void emit(const std::string &name, int argc = 0, v8::Local<v8::Value> *argv = NULL) {
@@ -112,16 +136,55 @@ public:
 	}
 	
 	
-protected:
+	void _destroy() { EVENT_EMITTER_DES_CHECK;
+		_isDestroyed = true;
+		emit("destroy");
+	}
+	
+	
+private:
+	
+	EventEmitter () {
+		_isDestroyed = false;
+		_maxListeners = 0;
+		_freeId = 0;
+	}
+	
+	virtual ~EventEmitter () { _destroy(); }
+	
+	
+	static NAN_METHOD(newCtor) {
+		
+		EventEmitter *eventEmitter = new EventEmitter();
+		eventEmitter->Wrap(info.This());
+		
+		RET_VALUE(info.This());
+		
+	}
+	
+	
+	static NAN_GETTER(isDestroyedGetter) { THIS_EVENT_EMITTER;
+		
+		RET_VALUE(JS_BOOL(eventEmitter->_isDestroyed));
+		
+	}
+	
+	
+	NAN_METHOD(destroy) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
+		
+		eventEmitter->_destroy();
+		
+	}
+	
 	
 	// Deprecated static method
 	static NAN_METHOD(jsStaticListenerCount) {
 		
 		REQ_OBJ_ARG(0, obj);
-		EventEmitter *emitter = ObjectWrap::Unwrap<EventEmitter>(obj);
+		EventEmitter *eventEmitter = ObjectWrap::Unwrap<EventEmitter>(obj);
 		REQ_UTF8_ARG(1, name);
 		
-		const VEC_TYPE &list = emitter->_listeners[*name];
+		const VEC_TYPE &list = eventEmitter->_listeners[*name];
 		
 		RET_VALUE(JS_INT(static_cast<int>(list.size())));
 		
@@ -131,7 +194,7 @@ protected:
 	static NAN_METHOD(jsAddListener) { _wrapListener(info); }
 	
 	
-	static NAN_METHOD(jsEmit) { THIS_EMITTER;
+	static NAN_METHOD(jsEmit) { THIS_EVENT_EMITTER;
 		
 		REQ_UTF8_ARG(0, name);
 		
@@ -143,22 +206,22 @@ protected:
 			args.push_back(info[i]);
 		}
 		
-		emitter->emit(*name, length - 1, &args[0]);
+		eventEmitter->emit(*name, length - 1, &args[0]);
 		
 	}
 	
 	
-	static NAN_METHOD(jsEventNames) { THIS_EMITTER;
+	static NAN_METHOD(jsEventNames) { THIS_EVENT_EMITTER;
 		
-		v8::Local<v8::Array> jsNames = Nan::New<v8::Array>(emitter->_raw.size());
+		v8::Local<v8::Array> jsNames = Nan::New<v8::Array>(eventEmitter->_raw.size());
 		
-		if (emitter->_raw.empty()) {
+		if (eventEmitter->_raw.empty()) {
 			RET_VALUE(jsNames);
 			return;
 		}
 		
 		int i = 0;
-		for (MAP_IT_TYPE it = emitter->_raw.begin(); it != emitter->_raw.end(); ++it, i++) {
+		for (MAP_IT_TYPE it = eventEmitter->_raw.begin(); it != eventEmitter->_raw.end(); ++it, i++) {
 			
 			jsNames->Set(JS_INT(i), JS_STR(it->first));
 			
@@ -169,29 +232,29 @@ protected:
 	}
 	
 	
-	static NAN_METHOD(jsGetMaxListeners) { THIS_EMITTER;
+	static NAN_METHOD(jsGetMaxListeners) { THIS_EVENT_EMITTER;
 		
-		RET_VALUE(JS_INT(emitter->_maxListeners));
+		RET_VALUE(JS_INT(eventEmitter->_maxListeners));
 		
 	}
 	
 	
-	static NAN_METHOD(jsListenerCount) { THIS_EMITTER;
+	static NAN_METHOD(jsListenerCount) { THIS_EVENT_EMITTER;
 		
 		REQ_UTF8_ARG(0, name);
 		
-		const VEC_TYPE &list = emitter->_listeners[*name];
+		const VEC_TYPE &list = eventEmitter->_listeners[*name];
 		
 		RET_VALUE(JS_INT(static_cast<int>(list.size())));
 		
 	}
 	
 	
-	static NAN_METHOD(jsListeners) { THIS_EMITTER;
+	static NAN_METHOD(jsListeners) { THIS_EVENT_EMITTER;
 		
 		REQ_UTF8_ARG(0, name);
 		
-		VEC_TYPE &list = emitter->_listeners[*name];
+		VEC_TYPE &list = eventEmitter->_listeners[*name];
 		
 		v8::Local<v8::Array> jsListeners = Nan::New<v8::Array>(list.size());
 		
@@ -217,25 +280,25 @@ protected:
 		const std::string &name,
 		Nan::Persistent<v8::Function> &cb,
 		bool isFront
-	) { THIS_EMITTER;
+	) { THIS_EVENT_EMITTER;
 		
 		v8::Local<v8::Value> args[] = { info[0], info[1] };
-		emitter->emit("newListener", 2, args);
+		eventEmitter->emit("newListener", 2, args);
 		
 		if (isFront) {
-			emitter->_listeners[name].push_front(cb);
-			emitter->_raw[name].push_front(cb);
+			eventEmitter->_listeners[name].push_front(cb);
+			eventEmitter->_raw[name].push_front(cb);
 		} else {
-			emitter->_listeners[name].push_back(cb);
-			emitter->_raw[name].push_back(cb);
+			eventEmitter->_listeners[name].push_back(cb);
+			eventEmitter->_raw[name].push_back(cb);
 		}
 		
-		int count = emitter->_raw[name].size();
+		int count = eventEmitter->_raw[name].size();
 		
-		if (emitter->_maxListeners > 0 && count > emitter->_maxListeners) {
+		if (eventEmitter->_maxListeners > 0 && count > eventEmitter->_maxListeners) {
 			
 			std::cout << "EventEmitter Warning: too many listeners (";
-			std::cout << count << " > " << emitter->_maxListeners << ") on '";
+			std::cout << count << " > " << eventEmitter->_maxListeners << ") on '";
 			std::cout << name << "' event, possible memory leak." << std::endl;
 			
 			// Some JS magic to retrieve the call stack
@@ -275,29 +338,29 @@ protected:
 		Nan::Persistent<v8::Function> &raw,
 		Nan::Persistent<v8::Function> &cb,
 		bool isFront
-	) { THIS_EMITTER;
+	) { THIS_EVENT_EMITTER;
 		
 		v8::Local<v8::Value> args[] = { info[0], info[1] };
-		emitter->emit("newListener", 2, args);
+		eventEmitter->emit("newListener", 2, args);
 		
 		if (isFront) {
-			emitter->_listeners[name].push_front(cb);
-			emitter->_raw[name].push_front(raw);
+			eventEmitter->_listeners[name].push_front(cb);
+			eventEmitter->_raw[name].push_front(raw);
 		} else {
-			emitter->_listeners[name].push_back(cb);
-			emitter->_raw[name].push_back(raw);
+			eventEmitter->_listeners[name].push_back(cb);
+			eventEmitter->_raw[name].push_back(raw);
 		}
 		
-		int nextId = emitter->_freeId++;
-		emitter->_wrappedIds[nextId] = cb;
-		emitter->_rawIds[nextId] = raw;
+		int nextId = eventEmitter->_freeId++;
+		eventEmitter->_wrappedIds[nextId] = cb;
+		eventEmitter->_rawIds[nextId] = raw;
 		
-		int count = emitter->_raw[name].size();
+		int count = eventEmitter->_raw[name].size();
 		
-		if (emitter->_maxListeners > 0 && count > emitter->_maxListeners) {
+		if (eventEmitter->_maxListeners > 0 && count > eventEmitter->_maxListeners) {
 			
 			std::cout << "EventEmitter Warning: too many listeners (";
-			std::cout << count << " > " << emitter->_maxListeners << ") on '";
+			std::cout << count << " > " << eventEmitter->_maxListeners << ") on '";
 			std::cout << name << "' event, possible memory leak." << std::endl;
 			
 			// Some JS magic to retrieve the call stack
@@ -355,16 +418,16 @@ protected:
 	static NAN_METHOD(jsPrependOnceListener) { _wrapOnceListener(info, true); }
 	
 	
-	static NAN_METHOD(jsRemoveAllListeners) { THIS_EMITTER;
+	static NAN_METHOD(jsRemoveAllListeners) { THIS_EVENT_EMITTER;
 		
 		if (info.Length() > 0 && info[0]->IsString()) {
 			
-			MAP_TYPE tmpMap = emitter->_raw;
+			MAP_TYPE tmpMap = eventEmitter->_raw;
 			
-			emitter->_listeners.clear();
-			emitter->_raw.clear();
-			emitter->_wrappedIds.clear();
-			emitter->_rawIds.clear();
+			eventEmitter->_listeners.clear();
+			eventEmitter->_raw.clear();
+			eventEmitter->_wrappedIds.clear();
+			eventEmitter->_rawIds.clear();
 			
 			for (MAP_IT_TYPE itMap = tmpMap.begin(); itMap != tmpMap.end(); ++itMap) {
 				
@@ -374,7 +437,7 @@ protected:
 				for (IT_TYPE it = list.begin(); it != list.end(); ++it) {
 					
 					v8::Local<v8::Value> args[] = { JS_STR(current.c_str()), Nan::New(*it) };
-					emitter->emit("removeListener", 2, args);
+					eventEmitter->emit("removeListener", 2, args);
 					
 				}
 				
@@ -387,13 +450,13 @@ protected:
 		REQ_UTF8_ARG(0, n);
 		
 		std::string name = std::string(*n);
-		VEC_TYPE &list = emitter->_raw[name];
+		VEC_TYPE &list = eventEmitter->_raw[name];
 		
 		if (list.empty()) {
 			return;
 		}
 		
-		if (emitter->_rawIds.size()) {
+		if (eventEmitter->_rawIds.size()) {
 			
 			std::vector<int> removes;
 			
@@ -401,7 +464,7 @@ protected:
 				
 				FN_TYPE fn = *it;
 				
-				for (FNMAP_IT_TYPE itRaw = emitter->_rawIds.begin(); itRaw != emitter->_rawIds.end(); ++itRaw) {
+				for (FNMAP_IT_TYPE itRaw = eventEmitter->_rawIds.begin(); itRaw != eventEmitter->_rawIds.end(); ++itRaw) {
 					if (fn == itRaw->second) {
 						removes.push_back(itRaw->first);
 					}
@@ -412,8 +475,8 @@ protected:
 			if (removes.size()) {
 				for (std::vector<int>::const_iterator it = removes.begin(); it != removes.end(); ++it) {
 					
-					emitter->_wrappedIds.erase(*it);
-					emitter->_rawIds.erase(*it);
+					eventEmitter->_wrappedIds.erase(*it);
+					eventEmitter->_rawIds.erase(*it);
 					
 				}
 			}
@@ -421,22 +484,22 @@ protected:
 		}
 		
 		
-		VEC_TYPE tmpVec = emitter->_raw[name];
+		VEC_TYPE tmpVec = eventEmitter->_raw[name];
 		
-		emitter->_listeners[name].clear();
-		emitter->_raw[name].clear();
+		eventEmitter->_listeners[name].clear();
+		eventEmitter->_raw[name].clear();
 		
 		for (IT_TYPE it = tmpVec.begin(); it != tmpVec.end(); ++it) {
 			
 			v8::Local<v8::Value> args[] = { JS_STR(name.c_str()), Nan::New(*it) };
-			emitter->emit("removeListener", 2, args);
+			eventEmitter->emit("removeListener", 2, args);
 			
 		}
 		
 	}
 	
 	
-	static NAN_METHOD(jsRemoveListener) { THIS_EMITTER;
+	static NAN_METHOD(jsRemoveListener) { THIS_EVENT_EMITTER;
 		
 		REQ_UTF8_ARG(0, n);
 		REQ_FUN_ARG(1, raw);
@@ -446,7 +509,7 @@ protected:
 		
 		std::string name = std::string(*n);
 		
-		VEC_TYPE &rawList = emitter->_raw[name];
+		VEC_TYPE &rawList = eventEmitter->_raw[name];
 		
 		if (rawList.empty()) {
 			return;
@@ -459,7 +522,7 @@ protected:
 			if (*it == persistentRaw) {
 				rawList.erase(it);
 				if (rawList.empty()) {
-					emitter->_raw.erase(name);
+					eventEmitter->_raw.erase(name);
 				}
 				break;
 			}
@@ -467,48 +530,48 @@ protected:
 		}
 		
 		
-		VEC_TYPE &wrapList = emitter->_listeners[name];
+		VEC_TYPE &wrapList = eventEmitter->_listeners[name];
 		
-		if (emitter->_wrappedIds.size() == 0) {
+		if (eventEmitter->_wrappedIds.size() == 0) {
 			
 			for (IT_TYPE it = wrapList.begin(); it != wrapList.end(); ++it) {
 				
 				if (*it == persistentRaw) {
 					wrapList.erase(it);
 					if (wrapList.empty()) {
-						emitter->_listeners.erase(name);
+						eventEmitter->_listeners.erase(name);
 					}
 					break;
 				}
 				
 			}
 			
-			emitter->emit("removeListener", 2, args);
+			eventEmitter->emit("removeListener", 2, args);
 			return;
 			
 		}
 		
 		
-		for (FNMAP_IT_TYPE itRaw = emitter->_rawIds.begin(); itRaw != emitter->_rawIds.end(); ++itRaw) {
+		for (FNMAP_IT_TYPE itRaw = eventEmitter->_rawIds.begin(); itRaw != eventEmitter->_rawIds.end(); ++itRaw) {
 			
 			if (persistentRaw == itRaw->second) {
 				
-				FN_TYPE fn = emitter->_wrappedIds[itRaw->first];
+				FN_TYPE fn = eventEmitter->_wrappedIds[itRaw->first];
 				
 				for (IT_TYPE it = wrapList.begin(); it != wrapList.end(); ++it) {
 					
 					if (*it == fn) {
 						wrapList.erase(it);
 						if (wrapList.empty()) {
-							emitter->_listeners.erase(name);
+							eventEmitter->_listeners.erase(name);
 						}
 						break;
 					}
 					
 				}
 				
-				emitter->_wrappedIds.erase(itRaw->first);
-				emitter->_rawIds.erase(itRaw->first);
+				eventEmitter->_wrappedIds.erase(itRaw->first);
+				eventEmitter->_rawIds.erase(itRaw->first);
 				
 				break;
 				
@@ -516,25 +579,25 @@ protected:
 			
 		}
 		
-		emitter->emit("removeListener", 2, args);
+		eventEmitter->emit("removeListener", 2, args);
 		
 	}
 	
 	
-	static NAN_METHOD(jsSetMaxListeners) { THIS_EMITTER;
+	static NAN_METHOD(jsSetMaxListeners) { THIS_EVENT_EMITTER;
 		
 		REQ_INT32_ARG(0, value);
 		
-		emitter->_maxListeners = value;
+		eventEmitter->_maxListeners = value;
 		
 	}
 	
 	
-	static NAN_METHOD(jsRawListeners) { THIS_EMITTER;
+	static NAN_METHOD(jsRawListeners) { THIS_EVENT_EMITTER;
 		
 		REQ_UTF8_ARG(0, name);
 		
-		VEC_TYPE &list = emitter->_raw[*name];
+		VEC_TYPE &list = eventEmitter->_raw[*name];
 		
 		v8::Local<v8::Array> jsListeners = Nan::New<v8::Array>(list.size());
 		
@@ -556,6 +619,8 @@ protected:
 	
 	
 private:
+	
+	bool _isDestroyed;
 	
 	int _maxListeners;
 	
