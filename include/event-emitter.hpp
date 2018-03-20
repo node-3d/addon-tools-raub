@@ -106,7 +106,8 @@ public:
 			Nan::Callback callback(Nan::New(*it));
 			
 			if ( ! callback.IsEmpty() ) {
-				callback.Call(argc, argv);
+				Nan::AsyncResource async("EventEmitter::cpp_emit()");
+				callback.Call(argc, argv, &async);
 			}
 			
 		}
@@ -128,7 +129,8 @@ public:
 		this->Wrap(emitter);
 		
 		v8::Local<v8::Value> argv[] = { emitter, JS_STR(name.c_str()), that, JS_STR(method.c_str()) };
-		connectorCb.Call(4, argv);
+		Nan::AsyncResource async("EventEmitter::cpp_on()");
+		connectorCb.Call(4, argv, &async);
 		
 	}
 	
@@ -397,7 +399,9 @@ private:
 		v8::Local<v8::Function> decor = v8::Local<v8::Function>::Cast(v8::Script::Compile(code)->Run());
 		Nan::Callback decorCb(decor);
 		v8::Local<v8::Value> argv[] = { info.This(), info[0], raw };
-		v8::Local<v8::Function> wrap = v8::Local<v8::Function>::Cast(decorCb.Call(3, argv));
+		Nan::AsyncResource async("EventEmitter::js_once()");
+		v8::Local<v8::Value> wrapValue = decorCb.Call(3, argv, &async).ToLocalChecked();
+		v8::Local<v8::Function> wrap = v8::Local<v8::Function>::Cast(wrapValue);
 		
 		Nan::Persistent<v8::Function> persistentWrap;
 		persistentWrap.Reset(wrap);
