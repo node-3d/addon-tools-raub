@@ -56,12 +56,13 @@ void Example::init(Handle<Object> target) {
 
 NAN_METHOD(Example::newCtor) {
 	
+	std::cout << "Example() 1" << std::endl;
 	v8::Local<v8::Function> superCtor = Nan::New(EventEmitter::_constructor);
 	superCtor->Call(info.This(), 0, nullptr);
-	
+	std::cout << "Example() 2" << std::endl;
 	Example *example = new Example();
 	example->Wrap(info.This());
-	
+	std::cout << "Example() 3 @" << example << std::endl;
 	RET_VALUE(info.This());
 	
 }

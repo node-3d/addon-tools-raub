@@ -12,10 +12,10 @@
 #define THIS_EVENT_EMITTER                                                    \
 	EventEmitter *eventEmitter = ObjectWrap::Unwrap<EventEmitter>(info.This());
 
-#define EVENT_EMITTER_THIS_CHECK                                                            \
+#define EVENT_EMITTER_THIS_CHECK                                              \
 	if (eventEmitter->_isDestroyed) return;
 
-#define EVENT_EMITTER_DES_CHECK                                                             \
+#define EVENT_EMITTER_DES_CHECK                                               \
 	if (_isDestroyed) return;
 
 
@@ -154,10 +154,10 @@ private:
 	
 	
 	static NAN_METHOD(newCtor) {
-		
+		std::cout << "EventEmitter() 1" << std::endl;
 		EventEmitter *eventEmitter = new EventEmitter();
 		eventEmitter->Wrap(info.This());
-		
+		std::cout << "EventEmitter() 2 : @" << eventEmitter << std::endl;
 		RET_VALUE(info.This());
 		
 	}
@@ -213,8 +213,10 @@ private:
 	
 	static NAN_METHOD(jsEventNames) { THIS_EVENT_EMITTER;
 		
-		v8::Local<v8::Array> jsNames = Nan::New<v8::Array>(eventEmitter->_raw.size());
+		std::cout << "jsEventNames() 1: @" << eventEmitter << " x " << eventEmitter->_raw.size() << std::endl;
 		
+		v8::Local<v8::Array> jsNames = Nan::New<v8::Array>(eventEmitter->_raw.size());
+		std::cout << "jsEventNames() 2" << std::endl;
 		if (eventEmitter->_raw.empty()) {
 			RET_VALUE(jsNames);
 			return;

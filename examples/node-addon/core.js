@@ -2,12 +2,14 @@
 
 const util = require('util');
 
-const { Example } = require('./binary/addon');
+const core = require('./binary/addon');
 
+
+const { Example } = core;
 
 Example.prototype[util.inspect.custom] = function() {
 	return `Example { listeners: [${this.eventNames()}] }`;
 };
 
 
-module.exports = Example;
+module.exports = core;

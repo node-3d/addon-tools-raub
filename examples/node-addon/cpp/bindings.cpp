@@ -1,5 +1,7 @@
 #include <cstdlib>
 
+#include <event-emitter.hpp>
+
 #include "example.hpp"
 
 using namespace v8;
@@ -12,6 +14,7 @@ extern "C" {
 
 void init(Handle<Object> target) {
 	
+	EventEmitter::init(target);
 	Example::init(target);
 	
 }
