@@ -587,6 +587,10 @@ emits an event with the given `name` and, optionally, some additional arguments 
 subscribes `that[method]` to receive `name` events from this emitter, basically
 `emitter.on(name, that[method])`.
 
+* `virtual void _destroy()` - destroys the object, i.e. deactivates it and frees
+resources, also emitting a `'destroy'` event. This is what also called inside
+`~EventEmitter()`, but only the first call is effective anyway.
+
 
 Be sure to add the include directory in **binding.gyp**:
 
@@ -596,7 +600,8 @@ Be sure to add the include directory in **binding.gyp**:
 	],
 ```
 
-Include the **event-emitter.hpp**, it also includes **addon-tools.hpp**.
+Though it is the same directory for all the **addon-tools**.
+Then include the **event-emitter.hpp**, it also includes **addon-tools.hpp**.
 Inherit from `EventEmitter`, it already inherits from `Nan::ObjectWrap`:
 
 ```
@@ -607,43 +612,30 @@ class Example : public EventEmitter {
 }
 ```
 
+NOTE: Do not forget to call `EventEmitter::init()` once, in the module `init()`.
 
-First add EventEmitter dynamic methods to the prototype via
-`static void extendPrototype(v8::Local<v8::FunctionTemplate> &proto)` and then,
-after constructor function instance is created,
-`static void extendConstructor(v8::Local<v8::Function> &ctorFn)`:
+
+Now that everything is in place, consider providing **V8** with JS inheritance info:
 
 ```
 void Example::init(Handle<Object> target) {
 	
 	Local<FunctionTemplate> proto = Nan::New<FunctionTemplate>(newCtor);
 	
+	// -------------------------- HERE!
+	// class Example extends EventEmitter
+	Local<FunctionTemplate> parent = Nan::New(EventEmitter::_prototype);
+	proto->Inherit(parent);
+	// --------------------------
+	
 	proto->InstanceTemplate()->SetInternalFieldCount(1);
 	proto->SetClassName(JS_STR("Example"));
 	
-	
-	// -------- dynamic
-	
-	// Add EventEmitter methods
-	extendPrototype(proto);
-	
-	Nan::SetPrototypeMethod(proto, "destroy", destroy);
-	
-	
-	// -------- static
-	
 	Local<Function> ctor = Nan::GetFunction(proto).ToLocalChecked();
 	
-	extendConstructor(ctor);
+	_prototype.Reset(proto);
 	
-	
-	_constructor.Reset(ctor);
 	Nan::Set(target, JS_STR("Example"), ctor);
 	
 }
 ```
-
-NOTE: after a `v8::Function` is created from the `v8::FunctionTemplate`, no
-additional methods can be added to the prototype. Also static members can only
-be added to the created `v8::Function` representing the constructor. This is why
-there are 2 extend methods: `extendPrototype` and `extendConstructor`.

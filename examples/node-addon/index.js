@@ -7,7 +7,7 @@ console.log('Example', Example);
 
 const example = new Example();
 
-console.log('example 0', example);
+console.log('example 0', example, 'instanceof EventEmitter', example instanceof EventEmitter);
 
 console.log('static listenerCount', EventEmitter.listenerCount);
 
@@ -27,11 +27,11 @@ console.log('setMaxListeners', example.setMaxListeners);
 console.log('rawListeners', example.rawListeners);
 console.log('destroy', example.destroy);
 
-console.log('index.js', 'ON1');
+
 example.on('evt1', (arg1, arg2) => {
 	console.log('EVT1', arg1, arg2, example.eventNames());
 });
-console.log('index.js', 'ON2');
+
 example.once('evt2', (arg1, arg2) => {
 	console.log('EVT2', arg1, arg2, example.eventNames());
 });

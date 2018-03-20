@@ -15,9 +15,6 @@
 #define EVENT_EMITTER_THIS_CHECK                                              \
 	if (eventEmitter->_isDestroyed) return;
 
-#define EVENT_EMITTER_DES_CHECK                                               \
-	if (_isDestroyed) return;
-
 
 template <typename T>
 struct StaticHolder {
@@ -136,13 +133,13 @@ public:
 	}
 	
 	
-	void _destroy() { EVENT_EMITTER_DES_CHECK;
+	virtual void _destroy() { DES_CHECK;
 		_isDestroyed = true;
 		emit("destroy");
 	}
 	
 	
-private:
+protected:
 	
 	EventEmitter () {
 		_isDestroyed = false;
@@ -153,11 +150,15 @@ private:
 	virtual ~EventEmitter () { _destroy(); }
 	
 	
+private:
+	
 	static NAN_METHOD(newCtor) {
-		std::cout << "EventEmitter() 1" << std::endl;
+		
+		CTOR_CHECK("EventEmitter");
+		
 		EventEmitter *eventEmitter = new EventEmitter();
 		eventEmitter->Wrap(info.This());
-		std::cout << "EventEmitter() 2 : @" << eventEmitter << std::endl;
+		
 		RET_VALUE(info.This());
 		
 	}
@@ -213,10 +214,8 @@ private:
 	
 	static NAN_METHOD(jsEventNames) { THIS_EVENT_EMITTER;
 		
-		std::cout << "jsEventNames() 1: @" << eventEmitter << " x " << eventEmitter->_raw.size() << std::endl;
-		
 		v8::Local<v8::Array> jsNames = Nan::New<v8::Array>(eventEmitter->_raw.size());
-		std::cout << "jsEventNames() 2" << std::endl;
+		
 		if (eventEmitter->_raw.empty()) {
 			RET_VALUE(jsNames);
 			return;
