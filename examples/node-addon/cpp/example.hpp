@@ -20,6 +20,7 @@ protected:
 	
 	
 private:
+	
 	static NAN_METHOD(newCtor);
 	
 	static NAN_METHOD(destroy);

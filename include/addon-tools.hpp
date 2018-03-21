@@ -25,7 +25,6 @@
 #define JS_BOOL(val) (val) ? Nan::True() : Nan::False()
 #define JS_FUN(val) Nan::New<v8::Function>(val)
 #define JS_OBJ(val) Nan::New<v8::Object>(val)
-#define JS_ARRV(val) Nan::New<v8::Object>(val)
 
 
 #define REQ_ARGS(N)                                                           \
@@ -50,8 +49,10 @@
 
 #define LET_UTF8_ARG(I, VAR)                                                  \
 	CHECK_LET_ARG(I, IsString(), "string");                                   \
-	Nan::Utf8String VAR(info[I]);
+	Nan::Utf8String VAR(JS_STR(""));
 
+#define REQ_STR_ARG(I, VAR) REQ_UTF8_ARG(I, VAR)
+#define LET_STR_ARG(I, VAR) LET_UTF8_ARG(I, VAR)
 
 #define REQ_INT32_ARG(I, VAR)                                                 \
 	CHECK_REQ_ARG(I, IsInt32(), "int32");                                     \
@@ -60,17 +61,7 @@
 #define LET_INT32_ARG(I, VAR)                                                 \
 	CHECK_LET_ARG(I, IsInt32(), "int32");                                     \
 	int VAR = IS_ARG_EMPTY(I) ? 0 : info[I]->Int32Value();
-
-
-#define REQ_BOOL_ARG(I, VAR)                                                  \
-	CHECK_REQ_ARG(I, IsBoolean(), "bool");                                    \
-	bool VAR = info[I]->BooleanValue();
-
-#define LET_BOOL_ARG(I, VAR)                                                  \
-	CHECK_LET_ARG(I, IsBoolean(), "bool");                                    \
-	bool VAR = IS_ARG_EMPTY(I) ? false : info[I]->BooleanValue();
-
-
+	
 #define REQ_UINT32_ARG(I, VAR)                                                \
 	CHECK_REQ_ARG(I, IsUint32(), "uint32");                                   \
 	unsigned int VAR = info[I]->Uint32Value();
@@ -79,6 +70,16 @@
 	CHECK_LET_ARG(I, IsUint32(), "uint32");                                   \
 	unsigned int VAR = IS_ARG_EMPTY(I) ? 0 : info[I]->Uint32Value();
 
+#define REQ_INT_ARG(I, VAR) LET_INT32_ARG(I, VAR)
+#define LET_INT_ARG(I, VAR) REQ_UINT32_ARG(I, VAR)
+
+#define REQ_BOOL_ARG(I, VAR)                                                  \
+	CHECK_REQ_ARG(I, IsBoolean(), "bool");                                    \
+	bool VAR = info[I]->BooleanValue();
+
+#define LET_BOOL_ARG(I, VAR)                                                  \
+	CHECK_LET_ARG(I, IsBoolean(), "bool");                                    \
+	bool VAR = IS_ARG_EMPTY(I) ? false : info[I]->BooleanValue();
 
 #define REQ_OFFS_ARG(I, VAR)                                                  \
 	CHECK_REQ_ARG(I, IsNumber(), "number");                                   \
@@ -161,9 +162,13 @@
 	SETTER_CHECK(IsString(), "string");                                       \
 	Nan::Utf8String v(value);
 
+#define SETTER_UTF8_ARG SETTER_STR_ARG
+
 #define SETTER_INT32_ARG                                                      \
 	SETTER_CHECK(IsInt32(), "int32");                                         \
 	int v = value->Int32Value();
+
+#define SETTER_INT_ARG SETTER_INT32_ARG
 
 #define SETTER_BOOL_ARG                                                       \
 	SETTER_CHECK(IsBoolean(), "bool");                                        \
@@ -196,6 +201,14 @@
 #define SETTER_OBJ_ARG                                                        \
 	SETTER_CHECK(IsObject(), "object");                                       \
 	v8::Local<v8::Object> v = v8::Local<v8::Object>::Cast(value);
+
+#define SETTER_ARRV_ARG                                                       \
+	SETTER_CHECK(IsObject(), "object");                                       \
+	v8::Local<v8::Object> _obj_v = v8::Local<v8::Object>::Cast(value);        \
+	if( ! _obj_v->IsArrayBufferView() )                                       \
+		return Nan::ThrowTypeError("The value must be an array buffer");      \
+	v8::Local<v8::ArrayBufferView> v = v8::Local<v8::ArrayBufferView>::Cast(_obj_v);
+	
 
 
 template<typename Type>

@@ -161,7 +161,7 @@ Here `MY_ADDON` should be replaced by any name you like. Then require like
 this:
 
 ```
-module.exports = require('./binary/addon');
+module.exports = require('./binary/MY_ADDON');
 ```
 
 #### Generic addon snippet
@@ -304,7 +304,7 @@ module.exports = require('./binary/addon');
 
 There is a C++ header file, `addon-tools.hpp`, shipped with this package. It
 introduces several useful macros and utilities. Also it includes Nan automatically,
-so that you can replace.
+so that you can replace:
 
 ```
 // #include <v8.h> // node.h includes it
@@ -323,7 +323,8 @@ As it was mentioned above, this can be done automatically. Also an actual path t
 directory is exported from the module and is accessible like this:
 
 ```
-require('addon-tools-raub').include
+require('addon-tools-raub').include() // implicit console.log()
+require('addon-tools-raub').includePath // just a string
 ```
 
 In the file, currently there are following helpers:
@@ -334,7 +335,7 @@ In the file, currently there are following helpers:
 * `NAN_HS` - creates a HandleScope. Also, you do not need them within `NAN_METHOD`,
 `NAN_SETTER`, and `NAN_GETTER`, as it is stated in
 [Nan doc](https://github.com/nodejs/nan/blob/master/doc/methods.md#api_nan_method).
-So it is most likely to be used in native callbacks.
+So it is most likely to be used in parts of code called from C++ land.
 
 ```
 void windowFocusCB(GLFWwindow *window, int focused) { NAN_HS;
@@ -347,17 +348,25 @@ glfwSetWindowFocusCallback(window, windowFocusCB);
 
 #### Method return
 
-* RET_VALUE(VAL) - set method return value
-* RET_UNDEFINED - set method return value as undefined
+* `RET_VALUE(VAL)` - set method return value
+* `RET_UNDEFINED` - set method return value as undefined
 
 
 #### New JS value
 
-* JS_STR(...) - create a string value
-* JS_INT(val) - create an integer value
-* JS_NUM(val) - create a numeric value
-* JS_EXT(val) - create an external (pointer) value
-* JS_BOOL(val) - create a boolean value
+* `JS_STR(...)` - create a string value
+* `JS_UTF8(...)` - same as JS_STR
+* `JS_INT(val)` - create an integer value
+* `JS_INT32(val)` - same as `JS_INT`
+* `JS_UINT32(val)` - same as `JS_INT`
+* `JS_NUM(val)` - create a numeric value
+* `JS_OFFS(val)` - same as `JS_NUM`, but has a cast designed to avoid `size_t -> double` warning
+* `JS_FLOAT(val)` - same as `JS_NUM`
+* `JS_DOUBLE(val)` - same as `JS_NUM`
+* `JS_EXT(val)` - create an external (pointer) value
+* `JS_BOOL(val)` - create a boolean value
+* `JS_FUN(val)` - get a function from persistent.
+* `JS_OBJ(val)` - get an object from persistent.
 
 
 #### Method check
@@ -368,12 +377,13 @@ in error messages. `C` is
 check method, like `IsObject()`. `I` is the index of argument as in `info[I]`,
 starting from `0`.
 
-* REQ_ARGS(N) - check if at least `N` arguments passed
-* IS_ARG_EMPTY(I) - check if argument `I` is `undefined` or `null`
-* CHECK_REQ_ARG(I, C, T) - check if argument `I` is approved by `C` check.
-* CHECK_LET_ARG(I, C, T) - check if argument `I` is approved by `C` check or empty.
-* CTOR_CHECK(T) - check if method is called as a constructor
-* SETTER_CHECK(C, T) - check if setter `value` is approved by `C` check.
+* `REQ_ARGS(N)` - check if at least `N` arguments passed
+* `IS_ARG_EMPTY(I)` - check if argument `I` is `undefined` or `null`
+* `CHECK_REQ_ARG(I, C, T)` - check if argument `I` is approved by `C` check.
+* `CHECK_LET_ARG(I, C, T) - check if argument `I` is approved by `C` check or empty.
+* `CTOR_CHECK(T)` - check if method is called as a constructor
+* `SETTER_CHECK(C, T)` - check if setter `value` is approved by `C` check.
+* `DES_CHECK` - within dynamic method check if the instance wasn't destroyed by `_destroy()`.
 
 
 #### Method arguments
@@ -383,28 +393,32 @@ is that `LET_` allows the argument to be empty, using some zero-default in this 
 `I` is the index of argument as in `info[I]`,
 starting from `0`. `VAR` is the name of the `Local<Value>` variable to be created.
 
-* REQ_UTF8_ARG(I, VAR)
-* LET_UTF8_ARG(I, VAR)
-* REQ_INT32_ARG(I, VAR)
-* LET_INT32_ARG(I, VAR)
-* REQ_BOOL_ARG(I, VAR)
-* LET_BOOL_ARG(I, VAR)
-* REQ_UINT32_ARG(I, VAR)
-* LET_UINT32_ARG(I, VAR)
-* REQ_OFFS_ARG(I, VAR)
-* LET_OFFS_ARG(I, VAR)
-* REQ_DOUBLE_ARG(I, VAR)
-* LET_DOUBLE_ARG(I, VAR)
-* REQ_FLOAT_ARG(I, VAR)
-* LET_FLOAT_ARG(I, VAR)
-* REQ_EXT_ARG(I, VAR)
-* LET_EXT_ARG(I, VAR)
-* REQ_FUN_ARG(I, VAR)
-* REQ_OBJ_ARG(I, VAR)
-* REQ_ARRV_ARG(I, VAR)
+* `REQ_UTF8_ARG(I, VAR)` - require `I`'th argument to be a `string`. Stored at `Nan::Utf8String VAR`.
+* `LET_UTF8_ARG(I, VAR)` - let optional `I`'th argument to be a `string`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `REQ_STR_ARG(I, VAR)` - require `I`'th argument to be a `string`. Stored at `Nan::Utf8String VAR`.
+* `LET_STR_ARG(I, VAR)` - let optional `I`'th argument to be a `string`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `REQ_INT32_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `int VAR`.
+* `LET_INT32_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0`. Stored at `int VAR`.
+* `REQ_INT32_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `int VAR`.
+* `LET_INT32_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0`. Stored at `int VAR`.
+* `REQ_UINT32_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `unsigned VAR`.
+* `LET_UINT32_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0`. Stored at `unsigned VAR`.
+* `REQ_BOOL_ARG(I, VAR)` - require `I`'th argument to be a `boolean`. Stored at `bool VAR`.
+* `LET_BOOL_ARG(I, VAR)` - let optional `I`'th argument to be a `boolean`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `REQ_OFFS_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `size_t VAR`.
+* `LET_OFFS_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `REQ_DOUBLE_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `double VAR`.
+* `LET_DOUBLE_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `REQ_FLOAT_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `float VAR`.
+* `LET_FLOAT_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `REQ_EXT_ARG(I, VAR)` - require `I`'th argument to be an `external`. Stored at `Local<External> VAR`.
+* `LET_EXT_ARG(I, VAR)` - let optional `I`'th argument to be an `external`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `REQ_FUN_ARG(I, VAR)` - require `I`'th argument to be a `function`. Stored at `Local<Function> VAR`.
+* `REQ_OBJ_ARG(I, VAR)` - require `I`'th argument to be an `object`. Stored at `Local<Object> VAR`.
+* `REQ_ARRV_ARG(I, VAR)` - require `I`'th argument to be a `TypedArray`. Stored at `Local<ArrayBufferView> VAR`.
 
 ```
-NAN_METHOD(testScene) {
+NAN_METHOD(test) {
 	
 	REQ_UINT32_ARG(0, width);
 	REQ_UINT32_ARG(1, height);
@@ -413,14 +427,16 @@ NAN_METHOD(testScene) {
 	...
 ```
 
+NOTE: The conversion from `Nan::Utf8String` to `std::string` (via `char *`) is possible with unary `*` operator.
+
 
 #### Set properties
 
 Set-helpers for string and numeric keys. String keys are converted to JS strings
 automatically.
 
-* SET_PROP(OBJ, KEY, VAL)
-* SET_I(ARR, I, VAL)
+* `SET_PROP(OBJ, KEY, VAL)`
+* `SET_I(ARR, I, VAL)`
 
 
 #### Set object accessors
@@ -428,8 +444,8 @@ automatically.
 Simplified accessor assignment, adds accessors of NAME for OBJ. Read accessor is
 assumed to have the name `NAME+'Getter'` and write accessor is `NAME+'Setter'`.
 
-* ACCESSOR_RW(OBJ, NAME) - add read and write accessors of NAME for OBJ.
-* ACCESSOR_R(OBJ, NAME) - read-only property.
+* `ACCESSOR_RW(OBJ, NAME)` - add read and write accessors of NAME for OBJ.
+* `ACCESSOR_R(OBJ, NAME)` - read-only property.
 
 ```
 void MyClass::init(Handle<Object> target) {
@@ -445,18 +461,22 @@ NAN_SETTER(MyClass::messageSetter) { ...
 
 #### Setter argument
 
-Useful addition to NAN_SETTER macro. 
+Useful addition to NAN_SETTER macro. Works similar to method arguments. But there
+is always only one required argument stored in `v`.
 
-* SETTER_UTF8_ARG
-* SETTER_INT32_ARG
-* SETTER_BOOL_ARG
-* SETTER_UINT32_ARG
-* SETTER_OFFS_ARG
-* SETTER_DOUBLE_ARG
-* SETTER_FLOAT_ARG
-* SETTER_EXT_ARG
-* SETTER_FUN_ARG
-* SETTER_OBJ_ARG
+* `SETTER_UTF8_ARG` - require the value to be a `string`. Stored at `Nan::Utf8String v`.
+* `SETTER_STR_ARG` - require the value to be a `string`. Stored at `Nan::Utf8String v`.
+* `SETTER_INT32_ARG` - require the value to be a `number`. Stored at `int v`.
+* `SETTER_INT_ARG` - require the value to be a `number`. Stored at `int v`.
+* `SETTER_UINT32_ARG` - require the value to be a `number`. Stored at `unsigned v`.
+* `SETTER_BOOL_ARG` - require the value to be a `boolean`. Stored at `bool v`.
+* `SETTER_OFFS_ARG` - require the value to be a `number`. Stored at `size_t v`.
+* `SETTER_DOUBLE_ARG` - require the value to be a `number`. Stored at `double v`.
+* `SETTER_FLOAT_ARG` - require the value to be a `number`. Stored at `float v`.
+* `SETTER_EXT_ARG` - require the value to be an `external`. Stored at `Local<External> v`.
+* `SETTER_FUN_ARG` - require the value to be a `function`. Stored at `Local<Function> v`.
+* `SETTER_OBJ_ARG` - require the value to be an `object`. Stored at `Local<Object> v`.
+* `SETTER_ARRV_ARG` - require the value to be a `TypedArray`. Stored at `Local<ArrayBufferView> v`.
 
 ```
 NAN_SETTER(MyClass::messageSetter) { SETTER_UTF8_ARG;
