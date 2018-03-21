@@ -653,7 +653,7 @@ void Example::init(Handle<Object> target) {
 	
 	Local<Function> ctor = Nan::GetFunction(proto).ToLocalChecked();
 	
-	_prototype.Reset(proto);
+	_constructor.Reset(ctor);
 	
 	Nan::Set(target, JS_STR("Example"), ctor);
 	

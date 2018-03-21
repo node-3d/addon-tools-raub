@@ -16,12 +16,13 @@
 	if (eventEmitter->_isDestroyed) return;
 
 
+// This template class provides static-member initialization in-header
 template <typename T>
-struct StaticHolder {
+class StaticHolder {
+protected:
 	static Nan::Persistent<v8::FunctionTemplate> _prototype;
 	static Nan::Persistent<v8::Function> _constructor;
 };
-
 template <typename T> Nan::Persistent<v8::FunctionTemplate> StaticHolder<T>::_prototype;
 template <typename T> Nan::Persistent<v8::Function> StaticHolder<T>::_constructor;
 
@@ -36,9 +37,9 @@ class EventEmitter : public StaticHolder<int>, public Nan::ObjectWrap {
 	typedef MAP_TYPE::iterator MAP_IT_TYPE;
 	typedef FNMAP_TYPE::iterator FNMAP_IT_TYPE;
 	
-// Public V8 init
 public:
 	
+	// Public V8 init
 	static void init(v8::Local<v8::Object> target) {
 		
 		v8::Local<v8::FunctionTemplate> proto = Nan::New<v8::FunctionTemplate>(newCtor);
