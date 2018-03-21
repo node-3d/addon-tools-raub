@@ -162,7 +162,7 @@
 	SETTER_CHECK(IsString(), "string");                                       \
 	Nan::Utf8String v(value);
 
-#define SETTER_UTF8_ARG SETTER_STR_ARG
+#define SETTER_STR_ARG SETTER_UTF8_ARG
 
 #define SETTER_INT32_ARG                                                      \
 	SETTER_CHECK(IsInt32(), "int32");                                         \
