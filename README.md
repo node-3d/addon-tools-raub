@@ -404,15 +404,15 @@ starting from `0`. `VAR` is the name of the `Local<Value>` variable to be create
 * `REQ_UINT32_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `unsigned VAR`.
 * `LET_UINT32_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0`. Stored at `unsigned VAR`.
 * `REQ_BOOL_ARG(I, VAR)` - require `I`'th argument to be a `boolean`. Stored at `bool VAR`.
-* `LET_BOOL_ARG(I, VAR)` - let optional `I`'th argument to be a `boolean`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `LET_BOOL_ARG(I, VAR)` - let optional `I`'th argument to be a `boolean`, the default is `false`. Stored at `Nan::Utf8String VAR`.
 * `REQ_OFFS_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `size_t VAR`.
-* `LET_OFFS_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `LET_OFFS_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0`. Stored at `Nan::Utf8String VAR`.
 * `REQ_DOUBLE_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `double VAR`.
-* `LET_DOUBLE_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `LET_DOUBLE_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0.0`. Stored at `Nan::Utf8String VAR`.
 * `REQ_FLOAT_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `float VAR`.
-* `LET_FLOAT_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `LET_FLOAT_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0.0f`. Stored at `Nan::Utf8String VAR`.
 * `REQ_EXT_ARG(I, VAR)` - require `I`'th argument to be an `external`. Stored at `Local<External> VAR`.
-* `LET_EXT_ARG(I, VAR)` - let optional `I`'th argument to be an `external`, the default is `""`. Stored at `Nan::Utf8String VAR`.
+* `LET_EXT_ARG(I, VAR)` - let optional `I`'th argument to be an `external`, the default is `nullptr`. Stored at `Nan::Utf8String VAR`.
 * `REQ_FUN_ARG(I, VAR)` - require `I`'th argument to be a `function`. Stored at `Local<Function> VAR`.
 * `REQ_OBJ_ARG(I, VAR)` - require `I`'th argument to be an `object`. Stored at `Local<Object> VAR`.
 * `REQ_ARRV_ARG(I, VAR)` - require `I`'th argument to be a `TypedArray`. Stored at `Local<ArrayBufferView> VAR`.
