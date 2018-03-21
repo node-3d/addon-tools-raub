@@ -20,11 +20,11 @@
 template <typename T>
 class StaticHolder {
 protected:
-	static Nan::Persistent<v8::FunctionTemplate> _prototype;
-	static Nan::Persistent<v8::Function> _constructor;
+	static Nan::Persistent<v8::FunctionTemplate> _protoEventEmitter;
+	static Nan::Persistent<v8::Function> _ctorEventEmitter;
 };
-template <typename T> Nan::Persistent<v8::FunctionTemplate> StaticHolder<T>::_prototype;
-template <typename T> Nan::Persistent<v8::Function> StaticHolder<T>::_constructor;
+template <typename T> Nan::Persistent<v8::FunctionTemplate> StaticHolder<T>::_protoEventEmitter;
+template <typename T> Nan::Persistent<v8::Function> StaticHolder<T>::_ctorEventEmitter;
 
 
 class EventEmitter : public StaticHolder<int>, public Nan::ObjectWrap {
@@ -79,8 +79,8 @@ public:
 		Nan::SetMethod(ctorObj, "listenerCount", jsStaticListenerCount);
 		
 		
-		_constructor.Reset(ctor);
-		_prototype.Reset(proto);
+		_ctorEventEmitter.Reset(ctor);
+		_protoEventEmitter.Reset(proto);
 		
 		Nan::Set(target, JS_STR("EventEmitter"), ctor);
 		

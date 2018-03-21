@@ -15,7 +15,7 @@ using namespace std;
 	if (example->_isDestroyed) return;
 
 
-Nan::Persistent<v8::Function> Example::_constructor;
+Nan::Persistent<v8::Function> Example::_ctorExample;
 
 
 void Example::init(Handle<Object> target) {
@@ -23,7 +23,7 @@ void Example::init(Handle<Object> target) {
 	Local<FunctionTemplate> proto = Nan::New<FunctionTemplate>(newCtor);
 	
 	// class Example extends EventEmitter
-	Local<FunctionTemplate> parent = Nan::New(EventEmitter::_prototype);
+	Local<FunctionTemplate> parent = Nan::New(EventEmitter::_protoEventEmitter);
 	proto->Inherit(parent);
 	
 	proto->InstanceTemplate()->SetInternalFieldCount(1);
@@ -35,7 +35,7 @@ void Example::init(Handle<Object> target) {
 	// -------- static
 	Local<Function> ctor = Nan::GetFunction(proto).ToLocalChecked();
 	
-	_constructor.Reset(ctor);
+	_ctorExample.Reset(ctor);
 	
 	Nan::Set(target, JS_STR("Example"), ctor);
 	

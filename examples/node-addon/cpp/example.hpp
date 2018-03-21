@@ -28,7 +28,7 @@ private:
 	
 private:
 	
-	static Nan::Persistent<v8::Function> _constructor;
+	static Nan::Persistent<v8::Function> _ctorExample;
 	
 	bool _isDestroyed;
 	
