@@ -391,7 +391,7 @@ starting from `0`.
 Two types of argument retrieval are supported: `REQ_` and `LET_`. The difference
 is that `LET_` allows the argument to be empty, using some zero-default in this case.
 `I` is the index of argument as in `info[I]`,
-starting from `0`. `VAR` is the name of the `Local<Value>` variable to be created.
+starting from `0`. `VAR` is the name of the variable to be created.
 
 * `REQ_UTF8_ARG(I, VAR)` - require `I`'th argument to be a `string`. Stored at `Nan::Utf8String VAR`.
 * `LET_UTF8_ARG(I, VAR)` - let optional `I`'th argument to be a `string`, the default is `""`. Stored at `Nan::Utf8String VAR`.
@@ -492,7 +492,7 @@ the given JS value. Does not accept Array, checked with `IsArrayBufferView()`.
 Returns `NULL` for empty JS values. For unacceptable values throws TypeError.
 
 
-* `BYTE *getImageData(value)` - if value is a TypedArray, then the result of
+* `void *getImageData(value)` - if value is a TypedArray, then the result of
 `getArrayData(value)` is returned. Otherwise if value has `'data'` property, it's
 content is then returned as `node::Buffer`. Returns `NULL` for empty JS values.
 For unacceptable values throws TypeError.
