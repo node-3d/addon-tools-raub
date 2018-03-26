@@ -4,6 +4,7 @@
 
 #include <addon-tools.hpp>
 
+#include <string>
 #include <map>
 #include <deque>
 #include <iostream> // -> std::cout << "..." << std::endl;
@@ -20,11 +21,11 @@
 template <typename T>
 class StaticHolder {
 protected:
-	static Nan::Persistent<v8::FunctionTemplate> _protoEventEmitter;
-	static Nan::Persistent<v8::Function> _ctorEventEmitter;
+	static V8_STORE_FT _protoEventEmitter;
+	static V8_STORE_FUNC _ctorEventEmitter;
 };
-template <typename T> Nan::Persistent<v8::FunctionTemplate> StaticHolder<T>::_protoEventEmitter;
-template <typename T> Nan::Persistent<v8::Function> StaticHolder<T>::_ctorEventEmitter;
+template <typename T> V8_STORE_FT StaticHolder<T>::_protoEventEmitter;
+template <typename T> V8_STORE_FUNC StaticHolder<T>::_ctorEventEmitter;
 
 
 class EventEmitter : public StaticHolder<int>, public Nan::ObjectWrap {
@@ -40,16 +41,16 @@ class EventEmitter : public StaticHolder<int>, public Nan::ObjectWrap {
 public:
 	
 	// Public V8 init
-	static void init(v8::Local<v8::Object> target) {
+	static void init(V8_VAR_OBJ target) {
 		
-		v8::Local<v8::FunctionTemplate> proto = Nan::New<v8::FunctionTemplate>(newCtor);
+		V8_VAR_FT proto = Nan::New<v8::FunctionTemplate>(newCtor);
 		
 		proto->InstanceTemplate()->SetInternalFieldCount(1);
 		proto->SetClassName(JS_STR("EventEmitter"));
 		
 		
 		// Accessors
-		v8::Local<v8::ObjectTemplate> obj = proto->PrototypeTemplate();
+		V8_VAR_OT obj = proto->PrototypeTemplate();
 		ACCESSOR_R(obj, isDestroyed);
 		
 		
@@ -72,9 +73,9 @@ public:
 		
 		// -------- static
 		
-		v8::Local<v8::Function> ctor = Nan::GetFunction(proto).ToLocalChecked();
+		V8_VAR_FUNC ctor = Nan::GetFunction(proto).ToLocalChecked();
 		
-		v8::Local<v8::Object> ctorObj = v8::Local<v8::Object>::Cast(ctor);
+		V8_VAR_OBJ ctorObj = V8_VAR_OBJ::Cast(ctor);
 		
 		Nan::SetMethod(ctorObj, "listenerCount", jsStaticListenerCount);
 		
@@ -88,7 +89,7 @@ public:
 	
 	
 	// C++ side emit() method
-	void emit(const std::string &name, int argc = 0, v8::Local<v8::Value> *argv = NULL) {
+	void emit(const std::string &name, int argc = 0, V8_VAR_VAL *argv = NULL) {
 		
 		// Important! As actual get map[key] produces a new (empty) map entry
 		if ( _listeners.find(name) == _listeners.end() ) {
@@ -117,19 +118,19 @@ public:
 	
 	
 	// C++ side on() method
-	void on(const std::string &name, v8::Local<v8::Value> that, const std::string &method) {
+	void on(const std::string &name, V8_VAR_VAL that, const std::string &method) {
 		
 		v8::Local<v8::String> code = JS_STR(
 			"((emitter, name, that, method) => emitter.on(name, that[method]))"
 		);
 		
-		v8::Local<v8::Function> connector = v8::Local<v8::Function>::Cast(v8::Script::Compile(code)->Run());
+		V8_VAR_FUNC connector = V8_VAR_FUNC::Cast(v8::Script::Compile(code)->Run());
 		Nan::Callback connectorCb(connector);
 		
-		v8::Local<v8::Object> emitter = Nan::New<v8::Object>();
+		V8_VAR_OBJ emitter = Nan::New<v8::Object>();
 		this->Wrap(emitter);
 		
-		v8::Local<v8::Value> argv[] = { emitter, JS_STR(name.c_str()), that, JS_STR(method.c_str()) };
+		V8_VAR_VAL argv[] = { emitter, JS_STR(name.c_str()), that, JS_STR(method.c_str()) };
 		Nan::AsyncResource async("EventEmitter::cpp_on()");
 		connectorCb.Call(4, argv, &async);
 		
@@ -204,7 +205,7 @@ private:
 		
 		int length = info.Length();
 		
-		std::vector< v8::Local<v8::Value> > args;
+		std::vector< V8_VAR_VAL > args;
 		
 		for (int i = 1; i < length; i++) {
 			args.push_back(info[i]);
@@ -282,11 +283,11 @@ private:
 	static inline void _addListener(
 		const Nan::FunctionCallbackInfo<v8::Value> &info,
 		const std::string &name,
-		Nan::Persistent<v8::Function> &cb,
+		V8_STORE_FUNC &cb,
 		bool isFront
 	) { THIS_EVENT_EMITTER;
 		
-		v8::Local<v8::Value> args[] = { info[0], info[1] };
+		V8_VAR_VAL args[] = { info[0], info[1] };
 		eventEmitter->emit("newListener", 2, args);
 		
 		if (isFront) {
@@ -328,7 +329,7 @@ private:
 		REQ_UTF8_ARG(0, name);
 		REQ_FUN_ARG(1, cb);
 		
-		Nan::Persistent<v8::Function> persistentCb;
+		V8_STORE_FUNC persistentCb;
 		persistentCb.Reset(cb);
 		
 		_addListener(info, *name, persistentCb, isFront);
@@ -339,12 +340,12 @@ private:
 	static inline void _addOnceListener(
 		const Nan::FunctionCallbackInfo<v8::Value> &info,
 		const std::string &name,
-		Nan::Persistent<v8::Function> &raw,
-		Nan::Persistent<v8::Function> &cb,
+		V8_STORE_FUNC &raw,
+		V8_STORE_FUNC &cb,
 		bool isFront
 	) { THIS_EVENT_EMITTER;
 		
-		v8::Local<v8::Value> args[] = { info[0], info[1] };
+		V8_VAR_VAL args[] = { info[0], info[1] };
 		eventEmitter->emit("newListener", 2, args);
 		
 		if (isFront) {
@@ -397,17 +398,17 @@ private:
 			})"
 		);
 		
-		v8::Local<v8::Function> decor = v8::Local<v8::Function>::Cast(v8::Script::Compile(code)->Run());
+		V8_VAR_FUNC decor = V8_VAR_FUNC::Cast(v8::Script::Compile(code)->Run());
 		Nan::Callback decorCb(decor);
-		v8::Local<v8::Value> argv[] = { info.This(), info[0], raw };
+		V8_VAR_VAL argv[] = { info.This(), info[0], raw };
 		Nan::AsyncResource async("EventEmitter::js_once()");
-		v8::Local<v8::Value> wrapValue = decorCb.Call(3, argv, &async).ToLocalChecked();
-		v8::Local<v8::Function> wrap = v8::Local<v8::Function>::Cast(wrapValue);
+		V8_VAR_VAL wrapValue = decorCb.Call(3, argv, &async).ToLocalChecked();
+		V8_VAR_FUNC wrap = V8_VAR_FUNC::Cast(wrapValue);
 		
-		Nan::Persistent<v8::Function> persistentWrap;
+		V8_STORE_FUNC persistentWrap;
 		persistentWrap.Reset(wrap);
 		
-		Nan::Persistent<v8::Function> persistentRaw;
+		V8_STORE_FUNC persistentRaw;
 		persistentRaw.Reset(raw);
 		
 		_addOnceListener(info, *name, persistentRaw, persistentWrap, isFront);
@@ -442,7 +443,7 @@ private:
 				
 				for (IT_TYPE it = list.begin(); it != list.end(); ++it) {
 					
-					v8::Local<v8::Value> args[] = { JS_STR(current.c_str()), Nan::New(*it) };
+					V8_VAR_VAL args[] = { JS_STR(current.c_str()), Nan::New(*it) };
 					eventEmitter->emit("removeListener", 2, args);
 					
 				}
@@ -497,7 +498,7 @@ private:
 		
 		for (IT_TYPE it = tmpVec.begin(); it != tmpVec.end(); ++it) {
 			
-			v8::Local<v8::Value> args[] = { JS_STR(name.c_str()), Nan::New(*it) };
+			V8_VAR_VAL args[] = { JS_STR(name.c_str()), Nan::New(*it) };
 			eventEmitter->emit("removeListener", 2, args);
 			
 		}
@@ -510,7 +511,7 @@ private:
 		REQ_UTF8_ARG(0, n);
 		REQ_FUN_ARG(1, raw);
 		
-		Nan::Persistent<v8::Function> persistentRaw;
+		V8_STORE_FUNC persistentRaw;
 		persistentRaw.Reset(raw);
 		
 		std::string name = std::string(*n);
@@ -521,7 +522,7 @@ private:
 			return;
 		}
 		
-		v8::Local<v8::Value> args[] = { info[0], info[1] };
+		V8_VAR_VAL args[] = { info[0], info[1] };
 		
 		for (IT_TYPE it = rawList.begin(); it != rawList.end(); ++it) {
 			

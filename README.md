@@ -352,6 +352,21 @@ glfwSetWindowFocusCallback(window, windowFocusCB);
 * `RET_UNDEFINED` - set method return value as undefined
 
 
+#### Shortcut types
+
+* `V8_VAR_VAL` = `v8::Local<v8::Value>`
+* `V8_VAR_OBJ` = `v8::Local<v8::Object>`
+* `V8_VAR_ARR` = `v8::Local<v8::Array>`
+* `V8_VAR_STR` = `v8::Local<v8::String>`
+* `V8_VAR_FUNC` = `v8::Local<v8::Function>`
+* `V8_VAR_FT` = `v8::Local<v8::FunctionTemplate>`
+* `V8_VAR_OT` = `v8::Local<v8::ObjectTemplate>`
+* `V8_STORE_FT` = `Nan::Persistent<v8::FunctionTemplate>`
+* `V8_STORE_FUNC` = `Nan::Persistent<v8::Function>`
+* `V8_STORE_OBJ` = `Nan::Persistent<v8::Object>`
+* `V8_STORE_VAL` = `Nan::Persistent<v8::Value>`
+
+
 #### New JS value
 
 * `JS_STR(...)` - create a string value

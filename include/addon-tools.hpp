@@ -12,6 +12,20 @@
 #define RET_UNDEFINED RET_VALUE(Nan::Undefined());
 
 
+typedef v8::Local<v8::Value> V8_VAR_VAL;
+typedef v8::Local<v8::Object> V8_VAR_OBJ;
+typedef v8::Local<v8::Array> V8_VAR_ARR;
+typedef v8::Local<v8::String> V8_VAR_STR;
+typedef v8::Local<v8::Function> V8_VAR_FUNC;
+typedef v8::Local<v8::FunctionTemplate> V8_VAR_FT;
+typedef v8::Local<v8::ObjectTemplate> V8_VAR_OT;
+
+typedef Nan::Persistent<v8::FunctionTemplate> V8_STORE_FT;
+typedef Nan::Persistent<v8::Function> V8_STORE_FUNC;
+typedef Nan::Persistent<v8::Object> V8_STORE_OBJ;
+typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
+
+
 #define JS_STR(...) Nan::New<v8::String>(__VA_ARGS__).ToLocalChecked()
 #define JS_UTF8(...) Nan::New<v8::String>(__VA_ARGS__).ToLocalChecked()
 #define JS_INT(val) Nan::New<v8::Integer>(val)
