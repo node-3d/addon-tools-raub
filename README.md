@@ -608,6 +608,10 @@ NOTE: This implementation has some minor deviations from the above standard.
 Specifically there is no static `EventEmitter.defaultMaxListeners` property.
 However the dynamic one persists and is infinite (`0`) by default.
 
+Also
+[EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget)
+is implemented. Not in full detail, but should be fine for callers.
+
 An example can be found in **examples/node-addon** directory.
 There is `Example` class, implemented in **cpp/example.cpp**, that inherits
 EventEmitter behavior and is exported to JS.
