@@ -57,16 +57,19 @@ public:
 		// -------- dynamic
 		
 		Nan::SetPrototypeMethod(proto, "listenerCount", jsListenerCount);
+		Nan::SetPrototypeMethod(proto, "addEventListener", jsAddListener);
 		Nan::SetPrototypeMethod(proto, "addListener", jsAddListener);
+		Nan::SetPrototypeMethod(proto, "dispatchEvent", jsDispatchEvent);
 		Nan::SetPrototypeMethod(proto, "emit", jsEmit);
 		Nan::SetPrototypeMethod(proto, "eventNames", jsEventNames);
 		Nan::SetPrototypeMethod(proto, "getMaxListeners", jsGetMaxListeners);
 		Nan::SetPrototypeMethod(proto, "listeners", jsListeners);
-		Nan::SetPrototypeMethod(proto, "on", jsOn);
-		Nan::SetPrototypeMethod(proto, "once", jsOnce);
+		Nan::SetPrototypeMethod(proto, "on", jsAddListener);
+		Nan::SetPrototypeMethod(proto, "once", jsAddListener);
 		Nan::SetPrototypeMethod(proto, "prependListener", jsPrependListener);
 		Nan::SetPrototypeMethod(proto, "prependOnceListener", jsPrependOnceListener);
 		Nan::SetPrototypeMethod(proto, "removeAllListeners", jsRemoveAllListeners);
+		Nan::SetPrototypeMethod(proto, "removeEventListener", jsRemoveListener);
 		Nan::SetPrototypeMethod(proto, "removeListener", jsRemoveListener);
 		Nan::SetPrototypeMethod(proto, "setMaxListeners", jsSetMaxListeners);
 		Nan::SetPrototypeMethod(proto, "rawListeners", jsRawListeners);
@@ -197,6 +200,23 @@ private:
 	
 	
 	static NAN_METHOD(jsAddListener) { _wrapListener(info); }
+	
+	
+	static NAN_METHOD(jsDispatchEvent) { THIS_EVENT_EMITTER;
+		
+		REQ_OBJ_ARG(0, event);
+		
+		if (!event->Has(JS_STR("type"))) {
+			return Nan::ThrowError("Event must have the `type` property.");
+		}
+		
+		Nan::Utf8String name(event->Get(JS_STR("type")));
+		
+		V8_VAR_VAL args = event;
+		
+		eventEmitter->emit(*name, 1, &args);
+		
+	}
 	
 	
 	static NAN_METHOD(jsEmit) { THIS_EVENT_EMITTER;
@@ -415,8 +435,6 @@ private:
 		
 	}
 	
-	
-	static NAN_METHOD(jsOn) { _wrapListener(info); }
 	
 	static NAN_METHOD(jsOnce) { _wrapOnceListener(info); }
 	
