@@ -140,10 +140,13 @@ public:
 	}
 	
 	
-	virtual void _destroy() { DES_CHECK;
+	void _destroy() { DES_CHECK;
 		_isDestroyed = true;
-		emit("destroy");
+		// emit("destroy");
 	}
+	
+	
+	~EventEmitter () { _destroy(); }
 	
 	
 protected:
@@ -153,8 +156,6 @@ protected:
 		_maxListeners = 0;
 		_freeId = 0;
 	}
-	
-	virtual ~EventEmitter () { _destroy(); }
 	
 	
 private:
