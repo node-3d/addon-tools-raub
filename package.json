@@ -1,7 +1,7 @@
 {
 	"author": "Luis Blanco <luisblanco1337@gmail.com>",
 	"name": "addon-tools-raub",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"description": "A set of extra tools for Node.js addons",
 	"license": "MIT",
 	"main": "index.js",
