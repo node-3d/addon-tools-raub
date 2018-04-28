@@ -8,6 +8,9 @@ using namespace v8;
 using namespace node;
 using namespace std;
 
+
+// ------ Aux macros
+
 #define THIS_EXAMPLE                                                          \
 	Example *example = ObjectWrap::Unwrap<Example>(info.This());
 
@@ -15,15 +18,33 @@ using namespace std;
 	if (example->_isDestroyed) return;
 
 
-Nan::Persistent<v8::Function> Example::_ctorExample;
+// ------ Constructor and Destructor
+
+Example::Example() : EventEmitter() {
+	
+	_isDestroyed = false;
+	
+}
 
 
-void Example::init(Handle<Object> target) {
+Example::~Example() {
 	
-	Local<FunctionTemplate> proto = Nan::New<FunctionTemplate>(newCtor);
+	_destroy();
 	
-	// class Example extends EventEmitter
-	Local<FunctionTemplate> parent = Nan::New(EventEmitter::_protoEventEmitter);
+}
+
+// ------ System methods and props for ObjectWrap
+
+V8_STORE_FT Example::_protoExample;
+V8_STORE_FUNC Example::_ctorExample;
+
+
+void Example::init(V8_VAR_OBJ target) {
+	
+	V8_VAR_FT proto = Nan::New<FunctionTemplate>(newCtor);
+	
+	// class AudioBufferSourceNode inherits AudioScheduledSourceNode
+	V8_VAR_FT parent = Nan::New(EventEmitter::_protoEventEmitter);
 	proto->Inherit(parent);
 	
 	proto->InstanceTemplate()->SetInternalFieldCount(1);
@@ -33,8 +54,9 @@ void Example::init(Handle<Object> target) {
 	Nan::SetPrototypeMethod(proto, "destroy", destroy);
 	
 	// -------- static
-	Local<Function> ctor = Nan::GetFunction(proto).ToLocalChecked();
+	V8_VAR_FUNC ctor = Nan::GetFunction(proto).ToLocalChecked();
 	
+	_protoExample.Reset(proto);
 	_ctorExample.Reset(ctor);
 	
 	Nan::Set(target, JS_STR("Example"), ctor);
@@ -54,20 +76,6 @@ NAN_METHOD(Example::newCtor) {
 }
 
 
-Example::Example() : EventEmitter() {
-	
-	_isDestroyed = false;
-	
-}
-
-
-Example::~Example() {
-	
-	_destroy();
-	
-}
-
-
 void Example::_destroy() { DES_CHECK;
 	
 	_isDestroyed = true;
@@ -78,6 +86,8 @@ void Example::_destroy() { DES_CHECK;
 
 
 NAN_METHOD(Example::destroy) { THIS_EXAMPLE; THIS_CHECK;
+	
+	example->emit("destroy");
 	
 	example->_destroy();
 	

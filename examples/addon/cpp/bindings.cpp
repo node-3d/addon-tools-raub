@@ -12,7 +12,7 @@ using namespace std;
 extern "C" {
 
 
-void init(Handle<Object> target) {
+void init(V8_VAR_OBJ target) {
 	
 	EventEmitter::init(target);
 	Example::init(target);
@@ -20,7 +20,7 @@ void init(Handle<Object> target) {
 }
 
 
-NODE_MODULE(NODE_GYP_MODULE_NAME, init);
+NODE_MODULE(example, init);
 
 
 } // extern "C"

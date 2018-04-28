@@ -9,13 +9,15 @@ class Example : public EventEmitter {
 	
 public:
 	
-	static void init(v8::Handle<v8::Object> target);
+	~Example();
+	
+	static void init(V8_VAR_OBJ target);
 	
 	
 protected:
 	
 	Example();
-	~Example();
+	
 	void _destroy();
 	
 	
@@ -28,7 +30,8 @@ private:
 	
 private:
 	
-	static Nan::Persistent<v8::Function> _ctorExample;
+	static V8_STORE_FT _protoExample;
+	static V8_STORE_FUNC _ctorExample;
 	
 	bool _isDestroyed;
 	
