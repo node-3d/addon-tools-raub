@@ -180,7 +180,7 @@ private:
 	}
 	
 	
-	static NAN_GETTER(isDestroyedGetter) { THIS_EVENT_EMITTER;
+	static NAN_GETTER(isDestroyedGetter) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		RET_VALUE(JS_BOOL(eventEmitter->_isDestroyed));
 		
@@ -211,7 +211,7 @@ private:
 	static NAN_METHOD(jsAddListener) { _wrapListener(info); }
 	
 	
-	static NAN_METHOD(jsDispatchEvent) { THIS_EVENT_EMITTER;
+	static NAN_METHOD(jsDispatchEvent) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		REQ_OBJ_ARG(0, event);
 		
@@ -228,7 +228,7 @@ private:
 	}
 	
 	
-	static NAN_METHOD(jsEmit) { THIS_EVENT_EMITTER;
+	static NAN_METHOD(jsEmit) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		REQ_UTF8_ARG(0, name);
 		
@@ -245,7 +245,7 @@ private:
 	}
 	
 	
-	static NAN_METHOD(jsEventNames) { THIS_EVENT_EMITTER;
+	static NAN_METHOD(jsEventNames) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		v8::Local<v8::Array> jsNames = Nan::New<v8::Array>(eventEmitter->_raw.size());
 		
@@ -266,14 +266,14 @@ private:
 	}
 	
 	
-	static NAN_METHOD(jsGetMaxListeners) { THIS_EVENT_EMITTER;
+	static NAN_METHOD(jsGetMaxListeners) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		RET_VALUE(JS_INT(eventEmitter->_maxListeners));
 		
 	}
 	
 	
-	static NAN_METHOD(jsListenerCount) { THIS_EVENT_EMITTER;
+	static NAN_METHOD(jsListenerCount) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		REQ_UTF8_ARG(0, name);
 		
@@ -284,7 +284,7 @@ private:
 	}
 	
 	
-	static NAN_METHOD(jsListeners) { THIS_EVENT_EMITTER;
+	static NAN_METHOD(jsListeners) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		REQ_UTF8_ARG(0, name);
 		
@@ -314,7 +314,7 @@ private:
 		const std::string &name,
 		V8_STORE_FUNC &cb,
 		bool isFront
-	) { THIS_EVENT_EMITTER;
+	) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		V8_VAR_VAL args[] = { info[0], info[1] };
 		eventEmitter->emit("newListener", 2, args);
@@ -372,7 +372,7 @@ private:
 		V8_STORE_FUNC &raw,
 		V8_STORE_FUNC &cb,
 		bool isFront
-	) { THIS_EVENT_EMITTER;
+	) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		V8_VAR_VAL args[] = { info[0], info[1] };
 		eventEmitter->emit("newListener", 2, args);
@@ -452,7 +452,7 @@ private:
 	static NAN_METHOD(jsPrependOnceListener) { _wrapOnceListener(info, true); }
 	
 	
-	static NAN_METHOD(jsRemoveAllListeners) { THIS_EVENT_EMITTER;
+	static NAN_METHOD(jsRemoveAllListeners) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		if (info.Length() > 0 && info[0]->IsString()) {
 			
@@ -533,7 +533,7 @@ private:
 	}
 	
 	
-	static NAN_METHOD(jsRemoveListener) { THIS_EVENT_EMITTER;
+	static NAN_METHOD(jsRemoveListener) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		REQ_UTF8_ARG(0, n);
 		REQ_FUN_ARG(1, raw);
@@ -618,7 +618,7 @@ private:
 	}
 	
 	
-	static NAN_METHOD(jsSetMaxListeners) { THIS_EVENT_EMITTER;
+	static NAN_METHOD(jsSetMaxListeners) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		REQ_INT32_ARG(0, value);
 		
@@ -627,7 +627,7 @@ private:
 	}
 	
 	
-	static NAN_METHOD(jsRawListeners) { THIS_EVENT_EMITTER;
+	static NAN_METHOD(jsRawListeners) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		REQ_UTF8_ARG(0, name);
 		
@@ -652,7 +652,7 @@ private:
 	}
 	
 	
-	static NAN_METHOD(jsDestroy) { THIS_AUDIO_NODE; THIS_CHECK;
+	static NAN_METHOD(jsDestroy) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
 		eventEmitter->emit("destroy");
 		
