@@ -1,37 +1,31 @@
 {
+	"author": "Luis Blanco <luisblanco1337@gmail.com>",
 	"name": "addon-tools-raub",
 	"version": "0.1.7",
-	"author": "Luis Blanco <raubtierxxx@gmail.com>",
 	"description": "A set of extra tools for Node.js addons",
+	"license": "MIT",
 	"main": "index.js",
 	"keywords": [
-		"node",
-		"addon",
-		"header",
+		"support",
+		"headers",
 		"include",
-		"platform",
-		"build",
-		"paths",
-		"events",
 		"eventemitter",
-		"emitter",
-		"cpp",
-		"compile",
-		"macros",
-		"helpers",
 		"utils"
 	],
+	"engines": {
+		"node": ">=8.11.1",
+		"npm": ">=5.6.0"
+	},
 	"maintainers": [
 		{
 			"name": "Luis Blanco",
-			"email": "raubtierxxx@gmail.com",
+			"email": "luisblanco1337@gmail.com",
 			"skype": "rauber666"
 		}
 	],
-	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/raub/node-addon-tools.git"
+		"url": "https://github.com/node-3d/node-addon-tools.git"
 	},
 	"dependencies": {
 		"nan": "2.10.0"

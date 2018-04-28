@@ -74,6 +74,8 @@ public:
 		Nan::SetPrototypeMethod(proto, "setMaxListeners", jsSetMaxListeners);
 		Nan::SetPrototypeMethod(proto, "rawListeners", jsRawListeners);
 		
+		Nan::SetPrototypeMethod(proto, "destroy", jsDestroy);
+		
 		// -------- static
 		
 		V8_VAR_FUNC ctor = Nan::GetFunction(proto).ToLocalChecked();
@@ -141,8 +143,14 @@ public:
 	
 	
 	void _destroy() { DES_CHECK;
+		
 		_isDestroyed = true;
-		// emit("destroy");
+		
+		_listeners.clear();
+		_raw.clear();
+		_wrappedIds.clear();
+		_rawIds.clear();
+		
 	}
 	
 	
@@ -640,6 +648,15 @@ private:
 		}
 		
 		RET_VALUE(jsListeners);
+		
+	}
+	
+	
+	static NAN_METHOD(jsDestroy) { THIS_AUDIO_NODE; THIS_CHECK;
+		
+		eventEmitter->emit("destroy");
+		
+		eventEmitter->_destroy();
 		
 	}
 	

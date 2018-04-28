@@ -36,7 +36,7 @@ const paths = dir => {
 	const binPath = `${dir}/${currentDir}`;
 	
 	if (isWindows) {
-		process.env.path = `${process.env.path ? `${process.env.path};` : ''}${binPath}`;
+		process.env.path = `${binPath};${process.env.path ? `${process.env.path}` : ''}`;
 	}
 	
 	const remPath = remDirs.map(k => `${dir}/${k}`).join(' ');
