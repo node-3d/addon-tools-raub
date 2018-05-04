@@ -63,6 +63,7 @@ const mkdirPath = isWindows ? `${rootPath}/_mkdir.bat` : 'mkdir';
 const rmPath    = isWindows ? `${rootPath}/_rm.bat` : 'rm';
 const cpPath    = isWindows ? `${rootPath}/_cp.bat` : 'cp';
 
+
 module.exports = {
 	
 	paths,

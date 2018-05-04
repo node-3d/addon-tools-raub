@@ -1,15 +1,18 @@
 # Addon Tools
 
+This is a part of [Node3D](https://github.com/node-3d) project.
+
 
 ## Synopsis
 
-This is a set of helpers for simplification and standardization of addons and
-dependency packages.
+Helpers for Node.js addons and dependency packages:
 
-* EventEmitter C++ implementation.
-* Contains helpers of following types: GYP, C++, JS, BAT (Windows).
-* Platforms: win x32/x64, linux x32/x64, mac x64.
-* Useful links: [V8 Ref](https://v8docs.nodesource.com/node-0.8/d2/dc3/namespacev8.html),
+* `EventEmitter` C++ implementation.
+* C++ macros and shortcuts.
+* Crossplatform commands for GYP: `cp`, `rm`, `mkdir`.
+* Regarded platforms: win x32/x64, linux x32/x64, mac x64.
+
+Useful links: [V8 Ref](https://v8docs.nodesource.com/node-0.8/d2/dc3/namespacev8.html),
 [Nan Docs](https://github.com/nodejs/nan#api),
 [GYP Docs](https://gyp.gsrc.io/docs/UserDocumentation.md).
 
@@ -29,7 +32,7 @@ dependency packages.
 
 [index.js](#indexjs)
 
-[Cross-platform commands](#cross-platform-commands)
+[Crossplatform commands](#crossplatform-commands)
 
 [Class EventEmitter](#class-eventemitter)
 
@@ -38,9 +41,10 @@ dependency packages.
 
 ## Snippets
 
+
 ### binding.gyp
 
-* Cross-platform file/folder removers/creators are present, you can put them into variables for later use.
+* Crossplatform commands can be put into the variables for later use.
 
 ```
 'variables': {
@@ -59,7 +63,11 @@ are accessible as shown below.
 	],
 ```
 
-* Intermediate files can be removed in a separate build-step with `<(rm)`.
+* Intermediate build-files can be removed in a separate build-step with `<(rm)`.
+
+<details>
+
+<summary>Show Snippet</summary>
 
 ```
 	[ 'OS=="linux"', { 'action' : [
@@ -78,6 +86,8 @@ are accessible as shown below.
 		'<(module_root_dir)/build/Release/obj/addon/*.*'
 	] } ],
 ```
+
+</details>
 
 
 ### Binary dependencies
@@ -101,36 +111,52 @@ module.exports = require('addon-tools-raub').paths(__dirname);
 
 * Your whole `binding.gyp`:
 
+<details>
+
+<summary>Show Snippet</summary>
+
 ```
 {
 	'variables': {
-		'rm'  : '<!(node -e "require(\'addon-tools-raub\').rm()")',
-		'rem' : '<!(node -e "require(\'.\').rem()")',
+		'rm'   : '<!(node -e "require(\'addon-tools-raub\').rm()")',
+		'rem'  : '<!(node -e "require(\'.\').rem()")',
+		'XALL%': 'false',
 	},
 	'targets': [
 		{
 			'target_name' : 'remove_extras',
 			'type'        : 'none',
-			'actions'     : [
+			'conditions'  : [['XALL=="false"', {'actions': [
 				{
 					'action_name' : 'Unnecessary binaries removed.',
 					'inputs'      : [],
 					'outputs'     : ['build'],
 					'action'      : ['<(rm)', '-rf', '<@(rem)'],
 				}
-			],
+			]}]],
 		}
 	]
 }
 
 ```
 
+Notice the `XALL` variable here. If the package is installed with `npm i`, then
+quite expectedly all but the required arch directories are removed. But with
+`npm i --XALL` you can keep all the binaries. It might be useful when debugging
+multiple archs and switching Node.js versions with
+[NVM](https://github.com/creationix/nvm).
+
+</details>
 
 
 ### Compiled addon
 
 If you always copy your compiled addon to the `binary` directory, it will be easy to
 `require()` it without any hesitation. For copying, you can use the following snippet:
+
+<details>
+
+<summary>Show Snippet</summary>
 
 ```
 {
@@ -156,6 +182,8 @@ If you always copy your compiled addon to the `binary` directory, it will be eas
 	}],
 },
 ```
+
+</details>
 
 Here `MY_ADDON` should be replaced by any name you like. Then require like
 this:
@@ -315,7 +343,7 @@ so that you can replace:
 with
 
 ```
-#include <addon-tools.hpp>
+#include <addon-tools.hpp> // or event-emitter.hpp
 ```
 
 In gyp, the include directory should be set for your addon to know where to get it.
@@ -327,10 +355,12 @@ require('addon-tools-raub').include() // implicit console.log()
 require('addon-tools-raub').includePath // just a string
 ```
 
-In the file, currently there are following helpers:
+Currently, there are following helpers in **addon-tools.hpp**:
 
 
-#### Handle scope
+<details>
+
+<summary>Handle scope</summary>
 
 * `NAN_HS` - creates a HandleScope. Also, you do not need them within `NAN_METHOD`,
 `NAN_SETTER`, and `NAN_GETTER`, as it is stated in
@@ -345,14 +375,22 @@ void windowFocusCB(GLFWwindow *window, int focused) { NAN_HS;
 glfwSetWindowFocusCallback(window, windowFocusCB);
 ```
 
+</details>
 
-#### Method return
+
+<details>
+
+<summary>Method return</summary>
 
 * `RET_VALUE(VAL)` - set method return value
 * `RET_UNDEFINED` - set method return value as undefined
 
+</details>
 
-#### Shortcut types
+
+<details>
+
+<summary>Shortcut types</summary>
 
 * `V8_VAR_VAL` = `v8::Local<v8::Value>`
 * `V8_VAR_OBJ` = `v8::Local<v8::Object>`
@@ -366,8 +404,12 @@ glfwSetWindowFocusCallback(window, windowFocusCB);
 * `V8_STORE_OBJ` = `Nan::Persistent<v8::Object>`
 * `V8_STORE_VAL` = `Nan::Persistent<v8::Value>`
 
+</details>
 
-#### New JS value
+
+<details>
+
+<summary>New JS value</summary>
 
 * `JS_STR(...)` - create a string value
 * `JS_UTF8(...)` - same as JS_STR
@@ -383,8 +425,12 @@ glfwSetWindowFocusCallback(window, windowFocusCB);
 * `JS_FUN(val)` - get a function from persistent.
 * `JS_OBJ(val)` - get an object from persistent.
 
+</details>
 
-#### Method check
+
+<details>
+
+<summary>Method check</summary>
 
 These checks throw JS TypeError if not passed. Here `T` is always used as a typename
 in error messages. `C` is
@@ -395,13 +441,17 @@ starting from `0`.
 * `REQ_ARGS(N)` - check if at least `N` arguments passed
 * `IS_ARG_EMPTY(I)` - check if argument `I` is `undefined` or `null`
 * `CHECK_REQ_ARG(I, C, T)` - check if argument `I` is approved by `C` check.
-* `CHECK_LET_ARG(I, C, T) - check if argument `I` is approved by `C` check or empty.
+* `CHECK_LET_ARG(I, C, T)` - check if argument `I` is approved by `C` check or empty.
 * `CTOR_CHECK(T)` - check if method is called as a constructor
 * `SETTER_CHECK(C, T)` - check if setter `value` is approved by `C` check.
 * `DES_CHECK` - within dynamic method check if the instance wasn't destroyed by `_destroy()`.
 
+</details>
 
-#### Method arguments
+
+<details>
+
+<summary>Method arguments</summary>
 
 Two types of argument retrieval are supported: `REQ_` and `LET_`. The difference
 is that `LET_` allows the argument to be empty, using some zero-default in this case.
@@ -444,8 +494,12 @@ NAN_METHOD(test) {
 
 NOTE: The conversion from `Nan::Utf8String` to `std::string` (via `char *`) is possible with unary `*` operator.
 
+</details>
 
-#### Set properties
+
+<details>
+
+<summary>Set properties</summary>
 
 Set-helpers for string and numeric keys. String keys are converted to JS strings
 automatically.
@@ -453,8 +507,12 @@ automatically.
 * `SET_PROP(OBJ, KEY, VAL)`
 * `SET_I(ARR, I, VAL)`
 
+</details>
 
-#### Set object accessors
+
+<details>
+
+<summary>Set object accessors</summary>
 
 Simplified accessor assignment, adds accessors of NAME for OBJ. Read accessor is
 assumed to have the name `NAME+'Getter'` and write accessor is `NAME+'Setter'`.
@@ -473,8 +531,12 @@ NAN_GETTER(MyClass::messageGetter) { ...
 NAN_SETTER(MyClass::messageSetter) { ...
 ```
 
+</details>
 
-#### Setter argument
+
+<details>
+
+<summary>Setter argument</summary>
 
 Useful addition to NAN_SETTER macro. Works similar to method arguments. But there
 is always only one required argument stored in `v`.
@@ -499,8 +561,12 @@ NAN_SETTER(MyClass::messageSetter) { SETTER_UTF8_ARG;
 	...
 ```
 
+</details>
 
-#### Data retrieval
+
+<details>
+
+<summary>Data retrieval</summary>
 
 * `T *getArrayData(value, num = NULL)` - extracts TypedArray data of any type from
 the given JS value. Does not accept Array, checked with `IsArrayBufferView()`.
@@ -511,6 +577,8 @@ Returns `NULL` for empty JS values. For unacceptable values throws TypeError.
 `getArrayData(value)` is returned. Otherwise if value has `'data'` property, it's
 content is then returned as `node::Buffer`. Returns `NULL` for empty JS values.
 For unacceptable values throws TypeError.
+
+</details>
 
 
 ---
@@ -541,7 +609,7 @@ input `dir`.
 
 ---
 
-## Cross-platform commands
+## Crossplatform commands
 
 Because of the differences between Windows and Unix command shells, often a whole
 lot of conditions have to be introduced in **binding.gyp** file. Now some of
@@ -573,7 +641,7 @@ folder. This can possibly be bypassed by supplying `./-p` or something like this
 
 ### rm
 
-Disregard `del` vs `rd` aspect of Windows command line. Now the same command can
+Disregard `del` and `rd` on Windows command line. Now the same command can
 be used on all platforms to remove single and multiple files and directories.
 
 ```
@@ -627,7 +695,7 @@ subscribes `that[method]` to receive `name` events from this emitter, basically
 `emitter.on(name, that[method])`.
 
 * `virtual void _destroy()` - destroys the object, i.e. deactivates it and frees
-resources, also emitting a `'destroy'` event. This is what also called inside
+resources. This is what also called inside
 `~EventEmitter()`, but only the first call is effective anyway.
 
 
@@ -639,7 +707,6 @@ Be sure to add the include directory in **binding.gyp**:
 	],
 ```
 
-Though it is the same directory for all the **addon-tools**.
 Then include the **event-emitter.hpp**, it also includes **addon-tools.hpp**.
 Inherit from `EventEmitter`, it already inherits from `Nan::ObjectWrap`:
 
@@ -653,6 +720,9 @@ class Example : public EventEmitter {
 
 NOTE: Do not forget to call `EventEmitter::init()` once, in the module `init()`.
 
+<details>
+
+<summary>V8 Inheritance</summary>
 
 Now that everything is in place, consider providing **V8** with JS inheritance info:
 
@@ -678,3 +748,5 @@ void Example::init(Handle<Object> target) {
 	
 }
 ```
+
+</details>

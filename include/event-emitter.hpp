@@ -125,7 +125,7 @@ public:
 	// C++ side on() method
 	void on(const std::string &name, V8_VAR_VAL that, const std::string &method) {
 		
-		v8::Local<v8::String> code = JS_STR(
+		V8_VAR_STR code = JS_STR(
 			"((emitter, name, that, method) => emitter.on(name, that[method]))"
 		);
 		
@@ -247,7 +247,7 @@ private:
 	
 	static NAN_METHOD(jsEventNames) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
-		v8::Local<v8::Array> jsNames = Nan::New<v8::Array>(eventEmitter->_raw.size());
+		V8_VAR_ARR jsNames = Nan::New<v8::Array>(eventEmitter->_raw.size());
 		
 		if (eventEmitter->_raw.empty()) {
 			RET_VALUE(jsNames);
@@ -290,7 +290,7 @@ private:
 		
 		VEC_TYPE &list = eventEmitter->_listeners[*name];
 		
-		v8::Local<v8::Array> jsListeners = Nan::New<v8::Array>(list.size());
+		V8_VAR_ARR jsListeners = Nan::New<v8::Array>(list.size());
 		
 		if (list.empty()) {
 			RET_VALUE(jsListeners);
@@ -336,10 +336,10 @@ private:
 			std::cout << name << "' event, possible memory leak." << std::endl;
 			
 			// Some JS magic to retrieve the call stack
-			v8::Local<v8::String> code = JS_STR(
+			V8_VAR_STR code = JS_STR(
 				"(new Error()).stack.split('\\n').slice(1).join('\\n')"
 			);
-			v8::Local<v8::String> stack = v8::Local<v8::String>::Cast(
+			V8_VAR_STR stack = V8_VAR_STR::Cast(
 				v8::Script::Compile(code)->Run()
 			);
 			Nan::Utf8String stackStr(stack);
@@ -398,10 +398,10 @@ private:
 			std::cout << name << "' event, possible memory leak." << std::endl;
 			
 			// Some JS magic to retrieve the call stack
-			v8::Local<v8::String> code = JS_STR(
+			V8_VAR_STR code = JS_STR(
 				"(new Error()).stack.split('\\n').slice(1).join('\\n')"
 			);
-			v8::Local<v8::String> stack = v8::Local<v8::String>::Cast(
+			V8_VAR_STR stack = V8_VAR_STR::Cast(
 				v8::Script::Compile(code)->Run()
 			);
 			Nan::Utf8String stackStr(stack);
@@ -420,7 +420,7 @@ private:
 		REQ_UTF8_ARG(0, name);
 		REQ_FUN_ARG(1, raw);
 		
-		v8::Local<v8::String> code = JS_STR(
+		V8_VAR_STR code = JS_STR(
 			"((emitter, name, cb) => (...args) => {\n\
 				cb(...args);\n\
 				emitter.removeListener(name, cb);\n\
@@ -633,7 +633,7 @@ private:
 		
 		VEC_TYPE &list = eventEmitter->_raw[*name];
 		
-		v8::Local<v8::Array> jsListeners = Nan::New<v8::Array>(list.size());
+		V8_VAR_ARR jsListeners = Nan::New<v8::Array>(list.size());
 		
 		if (list.empty()) {
 			RET_VALUE(jsListeners);
