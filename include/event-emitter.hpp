@@ -312,7 +312,7 @@ private:
 	static inline void _addListener(
 		const Nan::FunctionCallbackInfo<v8::Value> &info,
 		const std::string &name,
-		V8_STORE_FUNC &cb,
+		V8_STORE_FUNC *cb,
 		bool isFront
 	) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
@@ -320,11 +320,11 @@ private:
 		eventEmitter->emit("newListener", 2, args);
 		
 		if (isFront) {
-			eventEmitter->_listeners[name].push_front(cb);
-			eventEmitter->_raw[name].push_front(cb);
+			eventEmitter->_listeners[name].push_front(*cb);
+			eventEmitter->_raw[name].push_front(*cb);
 		} else {
-			eventEmitter->_listeners[name].push_back(cb);
-			eventEmitter->_raw[name].push_back(cb);
+			eventEmitter->_listeners[name].push_back(*cb);
+			eventEmitter->_raw[name].push_back(*cb);
 		}
 		
 		int count = eventEmitter->_raw[name].size();
@@ -361,7 +361,7 @@ private:
 		V8_STORE_FUNC persistentCb;
 		persistentCb.Reset(cb);
 		
-		_addListener(info, *name, persistentCb, isFront);
+		_addListener(info, *name, &persistentCb, isFront);
 		
 	}
 	
@@ -369,8 +369,8 @@ private:
 	static inline void _addOnceListener(
 		const Nan::FunctionCallbackInfo<v8::Value> &info,
 		const std::string &name,
-		V8_STORE_FUNC &raw,
-		V8_STORE_FUNC &cb,
+		V8_STORE_FUNC *raw,
+		V8_STORE_FUNC *cb,
 		bool isFront
 	) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
@@ -378,16 +378,16 @@ private:
 		eventEmitter->emit("newListener", 2, args);
 		
 		if (isFront) {
-			eventEmitter->_listeners[name].push_front(cb);
-			eventEmitter->_raw[name].push_front(raw);
+			eventEmitter->_listeners[name].push_front(*cb);
+			eventEmitter->_raw[name].push_front(*raw);
 		} else {
-			eventEmitter->_listeners[name].push_back(cb);
-			eventEmitter->_raw[name].push_back(raw);
+			eventEmitter->_listeners[name].push_back(*cb);
+			eventEmitter->_raw[name].push_back(*raw);
 		}
 		
 		int nextId = eventEmitter->_freeId++;
-		eventEmitter->_wrappedIds[nextId] = cb;
-		eventEmitter->_rawIds[nextId] = raw;
+		eventEmitter->_wrappedIds[nextId] = *cb;
+		eventEmitter->_rawIds[nextId] = *raw;
 		
 		int count = eventEmitter->_raw[name].size();
 		
@@ -420,12 +420,12 @@ private:
 		REQ_UTF8_ARG(0, name);
 		REQ_FUN_ARG(1, raw);
 		
-		V8_VAR_STR code = JS_STR(
-			"((emitter, name, cb) => (...args) => {\n\
-				cb(...args);\n\
-				emitter.removeListener(name, cb);\n\
-			})"
-		);
+		V8_VAR_STR code = JS_STR(R"(
+			((emitter, name, cb) => (...args) => {
+				cb(...args);
+				emitter.removeListener(name, cb);
+			})
+		)");
 		
 		V8_VAR_FUNC decor = V8_VAR_FUNC::Cast(v8::Script::Compile(code)->Run());
 		Nan::Callback decorCb(decor);
@@ -440,7 +440,7 @@ private:
 		V8_STORE_FUNC persistentRaw;
 		persistentRaw.Reset(raw);
 		
-		_addOnceListener(info, *name, persistentRaw, persistentWrap, isFront);
+		_addOnceListener(info, *name, &persistentRaw, &persistentWrap, isFront);
 		
 	}
 	
