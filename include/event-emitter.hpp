@@ -7,7 +7,6 @@
 #include <string>
 #include <map>
 #include <deque>
-#include <iostream> // -> std::cout << "..." << std::endl;
 
 
 #define THIS_EVENT_EMITTER                                                    \
@@ -308,6 +307,33 @@ private:
 		
 	}
 	
+	static inline void _reportListeners(
+		const std::string &name,
+		int numListeners,
+		int maxListeners
+	) {
+		
+		std::string msg = "EventEmitter Warning: too many listeners (";
+		msg += std::to_string(numListeners);
+		msg += " > ";
+		msg += std::to_string(maxListeners);
+		msg += ") on '";
+		msg += name;
+		msg += "' event, possible memory leak.\n";
+		
+		// Some JS magic to retrieve the call stack
+		V8_VAR_STR code = JS_STR(
+			"(new Error()).stack.split('\\n').slice(2).join('\\n')"
+		);
+		V8_VAR_STR stack = V8_VAR_STR::Cast(
+			v8::Script::Compile(code)->Run()
+		);
+		Nan::Utf8String stackStr(stack);
+		msg += *stackStr;
+		
+		consoleLog(msg);
+		
+	}
 	
 	static inline void _addListener(
 		const Nan::FunctionCallbackInfo<v8::Value> &info,
@@ -331,19 +357,7 @@ private:
 		
 		if (eventEmitter->_maxListeners > 0 && count > eventEmitter->_maxListeners) {
 			
-			std::cout << "EventEmitter Warning: too many listeners (";
-			std::cout << count << " > " << eventEmitter->_maxListeners << ") on '";
-			std::cout << name << "' event, possible memory leak." << std::endl;
-			
-			// Some JS magic to retrieve the call stack
-			V8_VAR_STR code = JS_STR(
-				"(new Error()).stack.split('\\n').slice(1).join('\\n')"
-			);
-			V8_VAR_STR stack = V8_VAR_STR::Cast(
-				v8::Script::Compile(code)->Run()
-			);
-			Nan::Utf8String stackStr(stack);
-			std::cout << *stackStr << std::endl;
+			_reportListeners(name, count, eventEmitter->_maxListeners);
 			
 		}
 		
@@ -393,19 +407,7 @@ private:
 		
 		if (eventEmitter->_maxListeners > 0 && count > eventEmitter->_maxListeners) {
 			
-			std::cout << "EventEmitter Warning: too many listeners (";
-			std::cout << count << " > " << eventEmitter->_maxListeners << ") on '";
-			std::cout << name << "' event, possible memory leak." << std::endl;
-			
-			// Some JS magic to retrieve the call stack
-			V8_VAR_STR code = JS_STR(
-				"(new Error()).stack.split('\\n').slice(1).join('\\n')"
-			);
-			V8_VAR_STR stack = V8_VAR_STR::Cast(
-				v8::Script::Compile(code)->Run()
-			);
-			Nan::Utf8String stackStr(stack);
-			std::cout << *stackStr << std::endl;
+			_reportListeners(name, count, eventEmitter->_maxListeners);
 			
 		}
 		

@@ -287,4 +287,24 @@ inline void *getImageData(v8::Local<v8::Value> arg) {
 }
 
 
+inline void consoleLog(int argc, V8_VAR_VAL *argv) {
+	
+	V8_VAR_STR code = JS_STR("((...args) => console.log(...args))");
+	
+	V8_VAR_FUNC log = V8_VAR_FUNC::Cast(v8::Script::Compile(code)->Run());
+	Nan::Callback logCb(log);
+	Nan::AsyncResource async("consoleLog()");
+	logCb.Call(argc, argv, &async);
+	
+}
+
+
+inline void consoleLog(const std::string &message) {
+	
+	V8_VAR_VAL arg = JS_STR(message);
+	consoleLog(1, &arg);
+	
+}
+
+
 #endif // _ADDON_TOOLS_HPP_

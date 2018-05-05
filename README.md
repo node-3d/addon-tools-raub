@@ -7,6 +7,7 @@ This is a part of [Node3D](https://github.com/node-3d) project.
 
 Helpers for Node.js addons and dependency packages:
 
+* `consoleLog()` C++ implementation.
 * `EventEmitter` C++ implementation.
 * C++ macros and shortcuts.
 * Crossplatform commands for GYP: `cp`, `rm`, `mkdir`.
@@ -35,6 +36,8 @@ Useful links: [V8 Ref](https://v8docs.nodesource.com/node-0.8/d2/dc3/namespacev8
 [Crossplatform commands](#crossplatform-commands)
 
 [Class EventEmitter](#class-eventemitter)
+
+[Function consoleLog](#function-consolelog)
 
 ---
 
@@ -668,7 +671,7 @@ For Windows the `/y` flag was embedded.
 ---
 
 
-## class EventEmitter
+## Class EventEmitter
 
 A C++ implementation of [Events API](https://nodejs.org/api/events.html).
 
@@ -750,3 +753,23 @@ void Example::init(Handle<Object> target) {
 ```
 
 </details>
+
+---
+
+
+## Function consoleLog
+
+In C++ addons, the use of **iostream** is discouraged because **Node.js** has its own
+perspective on **stdout** behavior.
+At first it may look as if `cout << "msg" << endl;` works nice, but it doesn't.
+After a while, it just ceases on a midword, and you end up thinking something has
+broken really hard in your addon.
+
+To overcome this, we can use some V8 `eval` magic to make a real `console.log`
+call from C++ land. And this is where `consoleLog` comes into play.
+
+* `inline void consoleLog(int argc, V8_VAR_VAL *argv)` - a generic logger,
+receives any set of arguments.
+
+* `inline void consoleLog(const std::string &message)` - an alias to log a single
+string.
