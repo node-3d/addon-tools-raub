@@ -58,7 +58,7 @@ const paths = dir => {
 
 
 const includePath = `${nanInclude} ${thisInclude}`;
-const binPath = `${rootPath}/${currentDir}`;
+const binPath = currentDir;
 
 const mkdirPath = isWindows ? `${rootPath}/_mkdir.bat` : 'mkdir';
 const rmPath    = isWindows ? `${rootPath}/_rm.bat` : 'rm';
