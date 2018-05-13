@@ -128,7 +128,7 @@ typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
 
 #define LET_EXT_ARG(I, VAR)                                                   \
 	CHECK_LET_ARG(I, IsExternal(), "number");                                 \
-	v8::Local<v8::External> VAR = IS_ARG_EMPTY(I) ? JS_EXT(NULL) :            \
+	v8::Local<v8::External> VAR = IS_ARG_EMPTY(I) ? JS_EXT(nullptr) :         \
 		v8::Local<v8::External>::Cast(info[I]);
 
 
@@ -226,21 +226,12 @@ typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
 
 
 template<typename Type>
-inline Type* getArrayData(v8::Local<v8::Value> arg, int *num = NULL) {
+inline Type* getArrayData(V8_VAR_OBJ obj, int *num = nullptr) {
 	
-	Type *data = NULL;
+	Type *data = nullptr;
 	
 	if (num) {
 		*num = 0;
-	}
-	
-	if (arg->IsNull() || arg->IsUndefined()) {
-		return data;
-	}
-	
-	if (arg->IsArray()) {
-		Nan::ThrowError("JS Array is not supported here.");
-		return data;
 	}
 	
 	if ( ! arg->IsArrayBufferView() ) {
@@ -259,27 +250,16 @@ inline Type* getArrayData(v8::Local<v8::Value> arg, int *num = NULL) {
 }
 
 
-inline void *getImageData(v8::Local<v8::Value> arg) {
+inline void *getData(V8_VAR_OBJ obj) {
 	
-	void *pixels = NULL;
-	
-	if (arg->IsNull() || arg->IsUndefined()) {
-		return pixels;
-	}
-	
-	v8::Local<v8::Object> obj = v8::Local<v8::Object>::Cast(arg);
-	
-	if ( ! obj->IsObject() ) {
-		Nan::ThrowError("Bad Image argument");
-		return pixels;
-	}
+	void *pixels = nullptr;
 	
 	if (obj->IsArrayBufferView()) {
-		pixels = getArrayData<unsigned char>(obj, NULL);
+		pixels = getArrayData<unsigned char>(obj);
 	} else if (obj->Has(JS_STR("data"))) {
 		pixels = node::Buffer::Data(Nan::Get(obj, JS_STR("data")).ToLocalChecked());
 	} else {
-		Nan::ThrowError("Bad Image argument");
+		Nan::ThrowError("Bad argument");
 	}
 	
 	return pixels;
