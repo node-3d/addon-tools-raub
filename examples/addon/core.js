@@ -2,7 +2,8 @@
 
 const util = require('util');
 
-const core = require('./binary/addon');
+const { binPath } = require('addon-tools-raub').paths(__dirname);
+const core = require(`${binPath}/addon`);
 
 
 const { Example } = core;

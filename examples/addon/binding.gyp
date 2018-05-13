@@ -1,8 +1,9 @@
 {
 	'variables': {
-		'rm'             : '<!(node -e "require(\'addon-tools-raub\').rm()")',
-		'cp'             : '<!(node -e "require(\'addon-tools-raub\').cp()")',
-		'mkdir'          : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
+		'rm'     : '<!(node -e "require(\'addon-tools-raub\').rm()")',
+		'cp'     : '<!(node -e "require(\'addon-tools-raub\').cp()")',
+		'mkdir'  : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
+		'binary' : '<!(node -e "require(\'addon-tools-raub\').bin()")',
 	},
 	'targets': [
 		{
@@ -41,7 +42,7 @@
 				'action_name' : 'Directory created.',
 				'inputs'      : [],
 				'outputs'     : ['build'],
-				'action': ['<(mkdir)', '-p', 'binary']
+				'action': ['<(mkdir)', '-p', '<(binary)']
 			}],
 		},
 		{
@@ -52,7 +53,7 @@
 				'action_name' : 'Module copied.',
 				'inputs'      : [],
 				'outputs'     : ['binary'],
-				'action'      : ['<(cp)', 'build/Release/addon.node', 'binary/addon.node'],
+				'action'      : ['<(cp)', 'build/Release/addon.node', '<(binary)/addon.node'],
 			}],
 		},
 		{
