@@ -234,12 +234,12 @@ inline Type* getArrayData(V8_VAR_OBJ obj, int *num = nullptr) {
 		*num = 0;
 	}
 	
-	if ( ! arg->IsArrayBufferView() ) {
+	if ( ! obj->IsArrayBufferView() ) {
 		Nan::ThrowError("Argument must be a TypedArray.");
 		return data;
 	}
 	
-	v8::Local<v8::ArrayBufferView> arr = v8::Local<v8::ArrayBufferView>::Cast(arg);
+	v8::Local<v8::ArrayBufferView> arr = v8::Local<v8::ArrayBufferView>::Cast(obj);
 	if (num) {
 		*num = arr->ByteLength() / sizeof(Type);
 	}
