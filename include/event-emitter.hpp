@@ -113,7 +113,7 @@ public:
 			
 			if ( ! callback.IsEmpty() ) {
 				Nan::AsyncResource async("EventEmitter::cpp_emit()");
-				callback.Call(argc, argv, &async);
+				callback.Call(handle(), argc, argv, &async);
 			}
 			
 		}
