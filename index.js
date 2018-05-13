@@ -58,6 +58,7 @@ const paths = dir => {
 
 
 const includePath = `${nanInclude} ${thisInclude}`;
+const binPath = `${rootPath}/${currentDir}`;
 
 const mkdirPath = isWindows ? `${rootPath}/_mkdir.bat` : 'mkdir';
 const rmPath    = isWindows ? `${rootPath}/_rm.bat` : 'rm';
@@ -68,12 +69,14 @@ module.exports = {
 	
 	paths,
 	
+	binPath,
 	rootPath,
 	includePath,
 	mkdirPath,
 	rmPath,
 	cpPath,
 	
+	bin() { return console.log(binPath); },
 	root() { return console.log(rootPath); },
 	include() { console.log(includePath); },
 	
