@@ -699,13 +699,13 @@ EventEmitter behavior and is exported to JS.
 
 For the C++ side `EventEmitter` has following public methods:
 
-* `void emit(const std::string &name, int argc = 0, v8::Local<v8::Value> *argv = NULL)`
+* `void emit(const std::string &name, int argc = 0, v8::Local<v8::Value> *argv = NULL)` -
 emits an event with the given `name` and, optionally, some additional arguments where
 `argc` is the number of arguments and `argv` is a pointer to the arguments array.
 
-* `void on(const std::string &name, v8::Local<v8::Value> that, const std::string &method)`
-subscribes `that[method]` to receive `name` events from this emitter, basically
-`emitter.on(name, that[method])`.
+* `void on(const std::string &name, V8_VAR_FUNC cb)` -
+subscribes `cb` to receive `name` events from this emitter, basically
+`emitter.on(name, cb)`.
 
 * `virtual void _destroy()` - destroys the object, i.e. deactivates it and frees
 resources. This is what also called inside
@@ -784,3 +784,5 @@ receives any set of arguments.
 
 * `inline void consoleLog(const std::string &message)` - an alias to log a single
 string.
+
+> Note: Don't do it in GC-accessible code: sometimes it works, sometimes it crashes.
