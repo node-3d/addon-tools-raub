@@ -193,7 +193,7 @@ It is easy to build a C++ addon with **Addon Tools**. To have a full picture, yo
 can view the
 [official example](https://github.com/node-3d/addon-tools-raub/tree/master/examples/addon).
 
-The main file for an addon is **binding.gyp**. Here's 
+The main file for an addon is **binding.gyp**. Here's a snippet with most of the features.
 
 <details>
 
