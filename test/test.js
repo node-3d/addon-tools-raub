@@ -10,7 +10,7 @@ const tools = require('addon-tools-raub');
 
 
 const toolsDir = path.dirname(require.resolve('addon-tools-raub')).replace(/\\/g, '/');
-const allMethods = ['paths', 'root', 'include', 'mkdir', 'rm', 'cp'];
+const allMethods = ['paths', 'bin', 'root', 'include', 'mkdir', 'rm', 'cp'];
 const ownMethods = allMethods.slice(1);
 const cmdMethods = allMethods.slice(3);
 const pathsMethods = ['bin', 'rem', 'include'];
@@ -44,6 +44,12 @@ describe('Tools', () => {
 				expect(log.getCall(0).args[0], 'writes string').to.be.a('string');
 			})
 		);
+		
+		
+		it('#bin() is correct', () => {
+			tools.bin();
+			expect(log.getCall(0).args[0]).to.equal(path.basename(tools.paths(__dirname).binPath));
+		});
 		
 		
 		it('#root() is correct', () => {
