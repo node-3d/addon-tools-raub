@@ -47,155 +47,153 @@ Useful links: [V8 Ref](https://v8docs.nodesource.com/node-0.8/d2/dc3/namespacev8
 
 ### binding.gyp
 
-* Crossplatform commands can be put into the variables for later use.
-
-```
-'variables': {
-	'rm'    : '<!(node -e "require(\'addon-tools-raub\').rm()")',
-	'cp'    : '<!(node -e "require(\'addon-tools-raub\').cp()")',
-	'mkdir' : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
-},
-```
-
-* Include directories for Addon Tools and Nan (which is preinstalled with Addon Tools)
-are accessible as shown below.
-
-```
-	'include_dirs': [
-		'<!@(node -e "require(\'addon-tools-raub\').include()")',
-	],
-```
-
-* Intermediate build-files can be removed in a separate build-step with `<(rm)`.
-
 <details>
 
-<summary>Show Snippet</summary>
-
-```
-	[ 'OS=="linux"', { 'action' : [
-		'<(rm)',
-		'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
-		'<(module_root_dir)/build/Release/addon.node'
-	] } ],
-	[ 'OS=="mac"', { 'action' : [
-		'<(rm)',
-		'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
-		'<(module_root_dir)/build/Release/addon.node'
-	] } ],
-	[ 'OS=="win"', { 'action' : [
-		'<(rm)',
-		'<(module_root_dir)/build/Release/addon.*',
-		'<(module_root_dir)/build/Release/obj/addon/*.*'
-	] } ],
-```
-
+<summary>Crossplatform commands</summary>
+	
+	```
+	'variables': {
+		'rm'    : '<!(node -e "require(\'addon-tools-raub\').rm()")',
+		'cp'    : '<!(node -e "require(\'addon-tools-raub\').cp()")',
+		'mkdir' : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
+	},
+	```
+	
+	On both Windows and Unix those are the console commands for various
+	file system operations. No need for GYP conditions, yay!
+	
 </details>
 
 
-### Binary dependencies
+<details>
 
-If you design a module with binary dependencies for several platforms, Addon Tools
+<summary>Addon binary directory</summary>
+	
+	```
+	'variables': {
+		'binary' : '<!(node -e "require(\'addon-tools-raub\').bin()")',
+	},
+	```
+	
+	In some cases, you'd like to have your addon installed for multiple architectures
+	simultaneously. For example, when using NVM to fluently switch environments.
+	Because the target directory is different for each arch, you only have to do
+	`npm rebuild` after the first switch.
+	
+</details>
+
+
+<details>
+
+<summary>Include directories</summary>
+	
+	```
+		'include_dirs': [
+			'<!@(node -e "require(\'addon-tools-raub\').include()")',
+		],
+	```
+	
+	Those are the directory paths to C++ include files for Addon Tools and Nan
+	(which is preinstalled with Addon Tools)
+	
+</details>
+
+
+<details>
+
+<summary>Remove intermediates</summary>
+	
+	```
+		[ 'OS=="linux"', { 'action' : [
+			'<(rm)',
+			'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
+			'<(module_root_dir)/build/Release/addon.node'
+		] } ],
+		[ 'OS=="mac"', { 'action' : [
+			'<(rm)',
+			'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
+			'<(module_root_dir)/build/Release/addon.node'
+		] } ],
+		[ 'OS=="win"', { 'action' : [
+			'<(rm)',
+			'<(module_root_dir)/build/Release/addon.*',
+			'<(module_root_dir)/build/Release/obj/addon/*.*'
+		] } ],
+	```
+	
+	Build-files can be removed in a separate build-step with `<(rm)`. Those are
+	usually PDB and OBJ files, which are rather big. However, in case of a hardcore
+	debug session you might want to comment this out.
+	
+</details>
+
+
+### Binary dependency package
+
+If you design a module with binary dependencies for several platforms, **Addon Tools**
 would encourage you to abide by the following rules:
 
 * Your binary directories are:
+	
 	* bin-win32
 	* bin-win64
 	* bin-linux32
 	* bin-linux64
 	* bin-mac64
-
+	
 * The following piece of code in your `index.js` without changes. Method `paths()`
 is described [here](#indexjs).
-
-```
-module.exports = require('addon-tools-raub').paths(__dirname);
-```
-
-* Your whole `binding.gyp`:
-
-<details>
-
-<summary>Show Snippet</summary>
-
-```
-{
-	'variables': {
-		'rm'   : '<!(node -e "require(\'addon-tools-raub\').rm()")',
-		'rem'  : '<!(node -e "require(\'.\').rem()")',
-		'XALL%': 'false',
-	},
-	'targets': [
-		{
-			'target_name' : 'remove_extras',
-			'type'        : 'none',
-			'conditions'  : [['XALL=="false"', {'actions': [
-				{
-					'action_name' : 'Unnecessary binaries removed.',
-					'inputs'      : [],
-					'outputs'     : ['build'],
-					'action'      : ['<(rm)', '-rf', '<@(rem)'],
-				}
-			]}]],
-		}
-	]
-}
-
-```
-
-Notice the `XALL` variable here. If the package is installed with `npm i`, then
-quite expectedly all but the required arch directories are removed. But with
-`npm i --XALL` you can keep all the binaries. It might be useful when debugging
-multiple archs and switching Node.js versions with
-[NVM](https://github.com/creationix/nvm).
-
-</details>
+	
+	```
+	module.exports = require('addon-tools-raub').paths(__dirname);
+	```
+	
+* Your whole **binding.gyp**:
+	
+	<details>
+	
+	<summary>Show binding.gyp</summary>
+	
+	```
+	{
+		'variables': {
+			'rm'   : '<!(node -e "require(\'addon-tools-raub\').rm()")',
+			'rem'  : '<!(node -e "require(\'.\').rem()")',
+			'XALL%': 'false',
+		},
+		'targets': [
+			{
+				'target_name' : 'remove_extras',
+				'type'        : 'none',
+				'conditions'  : [['XALL=="false"', {'actions': [
+					{
+						'action_name' : 'Unnecessary binaries removed.',
+						'inputs'      : [],
+						'outputs'     : ['build'],
+						'action'      : ['<(rm)', '-rf', '<@(rem)'],
+					}
+				]}]],
+			}
+		]
+	}
+	```
+	
+	Notice the `XALL` variable here. If the package is installed with `npm i`, then
+	quite expectedly all but the required arch directories are removed. But with
+	`npm i --XALL` you can keep all the binaries. It might be useful when debugging
+	multiple archs and switching Node.js versions with
+	[NVM](https://github.com/creationix/nvm).
+	
+	</details>
 
 
 ### Compiled addon
 
-If you always copy your compiled addon to the `binary` directory, it will be easy to
-`require()` it without any hesitation. For copying, you can use the following snippet:
+It is easy to build a C++ addon with **Addon Tools**. To have a full picture, you
+can view the
+[official example](https://github.com/node-3d/addon-tools-raub/tree/master/examples/addon).
 
-<details>
-
-<summary>Show Snippet</summary>
-
-```
-{
-	'target_name'  : 'make_directory',
-	'type'         : 'none',
-	'dependencies' : ['MY_ADDON'],
-	'actions'      : [{
-		'action_name' : 'Directory created.',
-		'inputs'      : [],
-		'outputs'     : ['build'],
-		'action': ['<(mkdir)', '-p', 'binary']
-	}],
-},
-{
-	'target_name'  : 'copy_binary',
-	'type'         : 'none',
-	'dependencies' : ['make_directory'],
-	'actions'      : [{
-		'action_name' : 'Module copied.',
-		'inputs'      : [],
-		'outputs'     : ['binary'],
-		'action'      : ['<(cp)', 'build/Release/MY_ADDON.node', 'binary/MY_ADDON.node'],
-	}],
-},
-```
-
-</details>
-
-Here `MY_ADDON` should be replaced by any name you like. Then require like
-this:
-
-```
-module.exports = require('./binary/MY_ADDON');
-```
-
-#### Generic addon snippet
+The main file for an addon is **binding.gyp**. Here's 
 
 <details>
 
@@ -211,6 +209,7 @@ module.exports = require('./binary/MY_ADDON');
 		'rm'              : '<!(node -e "require(\'addon-tools-raub\').rm()")',
 		'cp'              : '<!(node -e "require(\'addon-tools-raub\').cp()")',
 		'mkdir'           : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
+		'binary'          : '<!(node -e "require(\'addon-tools-raub\').bin()")',
 		'EXT_LIB_include' : '<!(node -e "require(\'node-deps-EXT_LIB-raub\').include()")',
 		'EXT_LIB_bin'     : '<!(node -e "require(\'node-deps-EXT_LIB-raub\').bin()")',
 	},
@@ -257,7 +256,9 @@ module.exports = require('./binary/MY_ADDON');
 						'msvs_settings' : {
 							'VCCLCompilerTool' : {
 								'AdditionalOptions' : [
-									'/O2','/Oy','/GL','/GF','/Gm-','/EHsc',
+									'/O2','/Oy', # Comment this for debugging
+									# '/Z7', # Unomment this for debugging
+									'/GL','/GF','/Gm-','/EHsc',
 									'/MT','/GS','/Gy','/GR-','/Gd',
 								]
 							},
@@ -278,7 +279,7 @@ module.exports = require('./binary/MY_ADDON');
 				'action_name' : 'Directory created.',
 				'inputs'      : [],
 				'outputs'     : ['build'],
-				'action': ['<(mkdir)', '-p', 'binary']
+				'action': ['<(mkdir)', '-p', '<(binary)']
 			}],
 		},
 		{
@@ -289,7 +290,7 @@ module.exports = require('./binary/MY_ADDON');
 				'action_name' : 'Module copied.',
 				'inputs'      : [],
 				'outputs'     : ['binary'],
-				'action'      : ['<(cp)', 'build/Release/MY_ADDON.node', 'binary/MY_ADDON.node'],
+				'action'      : ['<(cp)', 'build/Release/MY_ADDON.node', '<(binary)/MY_ADDON.node'],
 			}],
 		},
 		
@@ -326,6 +327,13 @@ module.exports = require('./binary/MY_ADDON');
 }
 ```
 
+Then require the built module like this:
+
+```
+const { binPath } = require('addon-tools-raub');
+const core = require(`./${binPath}/MY_ADDON`);
+```
+
 </details>
 
 
@@ -336,18 +344,18 @@ module.exports = require('./binary/MY_ADDON');
 There is a C++ header file, `addon-tools.hpp`, shipped with this package. It
 introduces several useful macros and utilities. Also it includes Nan automatically,
 so that you can replace:
-
-```
-// #include <v8.h> // node.h includes it
-// #include <node.h> // nan.h includes it
-#include <nan.h>
-```
-
-with
-
-```
-#include <addon-tools.hpp> // or event-emitter.hpp
-```
+	
+	```
+	// #include <v8.h> // already in node.h
+	// #include <node.h> // already in nan.h
+	#include <nan.h>
+	```
+	
+	with
+	
+	```
+	#include <addon-tools.hpp> // or event-emitter.hpp
+	```
 
 In gyp, the include directory should be set for your addon to know where to get it.
 As it was mentioned above, this can be done automatically. Also an actual path to the
@@ -495,7 +503,8 @@ NAN_METHOD(test) {
 	...
 ```
 
-NOTE: The conversion from `Nan::Utf8String` to `std::string` (via `char *`) is possible with unary `*` operator.
+NOTE: The conversion from `Nan::Utf8String` to `std::string` (via `char *`)
+is possible with unary `*` operator.
 
 </details>
 
@@ -576,10 +585,9 @@ the given JS value. Does not accept Array, checked with `IsArrayBufferView()`.
 Returns `NULL` for empty JS values. For unacceptable values throws TypeError.
 
 
-* `void *getImageData(value)` - if value is a TypedArray, then the result of
+* `void *getData(value)` - if value is a TypedArray, then the result of
 `getArrayData(value)` is returned. Otherwise if value has `'data'` property, it's
-content is then returned as `node::Buffer`. Returns `NULL` for empty JS values.
-For unacceptable values throws TypeError.
+content is then returned as `node::Buffer`. Returns `nullptr` in other cases.
 
 </details>
 
@@ -591,10 +599,10 @@ For unacceptable values throws TypeError.
 Exports:
 * `paths(dir)` - function. Returns a set of platform dependent paths depending on
 input `dir`.
-	* `bin()` - prints platform binary path.
+	* `bin()` - prints platform binary directory absolute path.
 	* `rem()` - prints a space-separated list of binary paths to be cleaned on this platform.
 	* `include()` - prints include directory for this `dir`.
-	* `binPath` - platform binary path.
+	* `binPath` - platform binary directory absolute path.
 	* `remPath` - a space-separated list of binary paths to be cleaned on this platform.
 	* `includePath` - include directory for this `dir`.
 * `root()` - prints where `'addon-tools-raub'` module is situated.
@@ -603,6 +611,8 @@ input `dir`.
 * `rm()` - prints the location of `'_rm.bat'` file on Windows and plain `rm` on Unix.
 * `cp()` - prints the location of `'_cp.bat'` file on Windows and plain `cp` on Unix.
 * `mkdir()` - prints the location of `'_mkdir.bat'` file on Windows and plain `mkdir` on Unix.
+* `bin()` - prints platform binary directory name.
+* `binPath` - platform binary directory name.
 * `rootPath` - where `'addon-tools-raub'` module is situated.
 * `includePath` - both `'addon-tools-raub'` and `'nan'` include paths.
 * `rmPath` - the location of `'_rm.bat'` file on Windows and plain `rm` on Unix.
@@ -675,7 +685,7 @@ For Windows the `/y` flag was embedded.
 
 A C++ implementation of [Events API](https://nodejs.org/api/events.html).
 
-NOTE: This implementation has some minor deviations from the above standard.
+> Note: This implementation has some minor deviations from the above standard.
 Specifically there is no static `EventEmitter.defaultMaxListeners` property.
 However the dynamic one persists and is infinite (`0`) by default.
 
@@ -721,7 +731,8 @@ class Example : public EventEmitter {
 }
 ```
 
-NOTE: Do not forget to call `EventEmitter::init()` once, in the module `init()`.
+> Note: Do not forget to call `EventEmitter::init()` once, in the module `init()`.
+
 
 <details>
 
