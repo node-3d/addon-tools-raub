@@ -27,6 +27,8 @@ private:
 	
 	static NAN_METHOD(destroy);
 	
+	static NAN_METHOD(cppOn);
+	
 	
 private:
 	

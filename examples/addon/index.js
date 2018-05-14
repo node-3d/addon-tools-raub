@@ -57,4 +57,9 @@ example.on('max1', () => {});
 example.on('max1', () => {});
 example.on('max1', () => {});
 
+example.on('cpp-on', (arg1, arg2) => {
+	console.log('CPP_ON', arg1, arg2, example.eventNames());
+});
+example.emit('cpp-on', 555, 'abc');
+
 module.exports = Example;

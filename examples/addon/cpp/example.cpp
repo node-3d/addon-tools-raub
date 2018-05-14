@@ -33,6 +33,17 @@ Example::~Example() {
 	
 }
 
+
+NAN_METHOD(Example::cppOn) { THIS_EXAMPLE; THIS_CHECK;
+	
+	REQ_STR_ARG(0, name);
+	REQ_FUN_ARG(1, cb);
+	
+	example->on(*name, cb);
+	
+}
+
+
 // ------ System methods and props for ObjectWrap
 
 V8_STORE_FT Example::_protoExample;
@@ -52,6 +63,7 @@ void Example::init(V8_VAR_OBJ target) {
 	
 	// -------- dynamic
 	Nan::SetPrototypeMethod(proto, "destroy", destroy);
+	Nan::SetPrototypeMethod(proto, "cppOn", cppOn);
 	
 	// -------- static
 	V8_VAR_FUNC ctor = Nan::GetFunction(proto).ToLocalChecked();
