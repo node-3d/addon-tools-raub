@@ -122,21 +122,19 @@ public:
 	
 	
 	// C++ side on() method
-	void on(const std::string &name, V8_VAR_VAL that, const std::string &method) {
+	void on(const std::string &name, V8_VAR_FUNC cb) {
 		
-		V8_VAR_STR code = JS_STR(
-			"((emitter, name, that, method) => emitter.on(name, that[method]))"
-		);
+		V8_VAR_OBJ me = handle();
 		
-		V8_VAR_FUNC connector = V8_VAR_FUNC::Cast(v8::Script::Compile(code)->Run());
-		Nan::Callback connectorCb(connector);
+		V8_VAR_VAL onVal = Nan::Get(me, JS_STR("on")).ToLocalChecked();
+		V8_VAR_FUNC onFunc = V8_VAR_FUNC::Cast(onVal);
 		
-		V8_VAR_OBJ emitter = Nan::New<v8::Object>();
-		this->Wrap(emitter);
+		Nan::Callback onCb(onFunc);
 		
-		V8_VAR_VAL argv[] = { emitter, JS_STR(name.c_str()), that, JS_STR(method.c_str()) };
+		V8_VAR_VAL argv[] = { JS_STR(name.c_str()), cb };
 		Nan::AsyncResource async("EventEmitter::cpp_on()");
-		connectorCb.Call(4, argv, &async);
+		
+		onCb.Call(me, 2, argv, &async);
 		
 	}
 	
@@ -214,7 +212,7 @@ private:
 		
 		REQ_OBJ_ARG(0, event);
 		
-		if (!event->Has(JS_STR("type"))) {
+		if ( ! event->Has(JS_STR("type")) ) {
 			return Nan::ThrowError("Event must have the `type` property.");
 		}
 		
@@ -307,6 +305,7 @@ private:
 		
 	}
 	
+	
 	static inline void _reportListeners(
 		const std::string &name,
 		int numListeners,
@@ -325,15 +324,14 @@ private:
 		V8_VAR_STR code = JS_STR(
 			"(new Error()).stack.split('\\n').slice(2).join('\\n')"
 		);
-		V8_VAR_STR stack = V8_VAR_STR::Cast(
-			v8::Script::Compile(code)->Run()
-		);
+		V8_VAR_STR stack = V8_VAR_STR::Cast(v8::Script::Compile(code)->Run());
 		Nan::Utf8String stackStr(stack);
 		msg += *stackStr;
 		
 		consoleLog(msg);
 		
 	}
+	
 	
 	static inline void _addListener(
 		const Nan::FunctionCallbackInfo<v8::Value> &info,
