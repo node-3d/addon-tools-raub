@@ -13,7 +13,7 @@ Helpers for Node.js addons and dependency packages:
 * Crossplatform commands for GYP: `cp`, `rm`, `mkdir`.
 * Regarded platforms: win x32/x64, linux x32/x64, mac x64.
 
-Useful links: [V8 Ref](https://v8docs.nodesource.com/node-0.8/d2/dc3/namespacev8.html),
+Useful links: [V8 Ref](https://v8.paulfryzel.com/docs/master/),
 [Nan Docs](https://github.com/nodejs/nan#api),
 [GYP Docs](https://gyp.gsrc.io/docs/UserDocumentation.md).
 
