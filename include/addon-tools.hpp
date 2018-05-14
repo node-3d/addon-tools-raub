@@ -15,8 +15,10 @@
 typedef v8::Local<v8::Value> V8_VAR_VAL;
 typedef v8::Local<v8::Object> V8_VAR_OBJ;
 typedef v8::Local<v8::Array> V8_VAR_ARR;
+typedef v8::Local<v8::ArrayBufferView> V8_VAR_ABV;
 typedef v8::Local<v8::String> V8_VAR_STR;
 typedef v8::Local<v8::Function> V8_VAR_FUNC;
+typedef v8::Local<v8::External> V8_VAR_EXT;
 typedef v8::Local<v8::FunctionTemplate> V8_VAR_FT;
 typedef v8::Local<v8::ObjectTemplate> V8_VAR_OT;
 
@@ -124,29 +126,28 @@ typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
 
 #define REQ_EXT_ARG(I, VAR)                                                   \
 	CHECK_REQ_ARG(I, IsExternal(), "void*");                                  \
-	v8::Local<v8::External> VAR = v8::Local<v8::External>::Cast(info[I]);
+	V8_VAR_EXT VAR = V8_VAR_EXT::Cast(info[I]);
 
 #define LET_EXT_ARG(I, VAR)                                                   \
 	CHECK_LET_ARG(I, IsExternal(), "number");                                 \
-	v8::Local<v8::External> VAR = IS_ARG_EMPTY(I) ? JS_EXT(nullptr) :         \
-		v8::Local<v8::External>::Cast(info[I]);
+	V8_VAR_EXT VAR = IS_ARG_EMPTY(I) ? JS_EXT(nullptr) : V8_VAR_EXT::Cast(info[I]);
 
 
 #define REQ_FUN_ARG(I, VAR)                                                   \
 	CHECK_REQ_ARG(I, IsFunction(), "function");                               \
-	v8::Local<v8::Function> VAR = v8::Local<v8::Function>::Cast(info[I]);
+	V8_VAR_FUNC VAR = V8_VAR_FUNC::Cast(info[I]);
 
 
 #define REQ_OBJ_ARG(I, VAR)                                                   \
 	CHECK_REQ_ARG(I, IsObject(), "object");                                   \
-	v8::Local<v8::Object> VAR = v8::Local<v8::Object>::Cast(info[I]);
+	V8_VAR_OBJ VAR = V8_VAR_OBJ::Cast(info[I]);
 
 
 #define REQ_ARRV_ARG(I, VAR)                                                  \
 	REQ_OBJ_ARG(I, _obj_##VAR);                                               \
 	if( ! _obj_##VAR->IsArrayBufferView() )                                   \
 		return Nan::ThrowTypeError("Argument " #I " must be an array buffer");\
-	v8::Local<v8::ArrayBufferView> VAR = v8::Local<v8::ArrayBufferView>::Cast(_obj_##VAR);
+	V8_VAR_ABV VAR = V8_VAR_ABV::Cast(_obj_##VAR);
 
 
 #define SET_PROP(OBJ, KEY, VAL) OBJ->Set(JS_STR(KEY), VAL);
@@ -206,22 +207,22 @@ typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
 
 #define SETTER_EXT_ARG                                                        \
 	SETTER_CHECK(IsExternal(), "void*");                                      \
-	v8::Local<v8::External> v = v8::Local<v8::External>::Cast(value);
+	V8_VAR_EXT v = V8_VAR_EXT::Cast(value);
 
 #define SETTER_FUN_ARG                                                        \
 	SETTER_CHECK(IsFunction(), "function");                                   \
-	v8::Local<v8::Function> v = v8::Local<v8::Function>::Cast(value);
+	V8_VAR_FUNC v = V8_VAR_FUNC::Cast(value);
 
 #define SETTER_OBJ_ARG                                                        \
 	SETTER_CHECK(IsObject(), "object");                                       \
-	v8::Local<v8::Object> v = v8::Local<v8::Object>::Cast(value);
+	V8_VAR_OBJ v = V8_VAR_OBJ::Cast(value);
 
 #define SETTER_ARRV_ARG                                                       \
 	SETTER_CHECK(IsObject(), "object");                                       \
-	v8::Local<v8::Object> _obj_v = v8::Local<v8::Object>::Cast(value);        \
+	V8_VAR_OBJ _obj_v = V8_VAR_OBJ::Cast(value);                              \
 	if( ! _obj_v->IsArrayBufferView() )                                       \
 		return Nan::ThrowTypeError("The value must be an array buffer");      \
-	v8::Local<v8::ArrayBufferView> v = v8::Local<v8::ArrayBufferView>::Cast(_obj_v);
+	V8_VAR_ABV v = V8_VAR_ABV::Cast(_obj_v);
 	
 
 
@@ -239,7 +240,7 @@ inline Type* getArrayData(V8_VAR_OBJ obj, int *num = nullptr) {
 		return data;
 	}
 	
-	v8::Local<v8::ArrayBufferView> arr = v8::Local<v8::ArrayBufferView>::Cast(obj);
+	V8_VAR_ABV arr = V8_VAR_ABV::Cast(obj);
 	if (num) {
 		*num = arr->ByteLength() / sizeof(Type);
 	}
@@ -257,9 +258,10 @@ inline void *getData(V8_VAR_OBJ obj) {
 	if (obj->IsArrayBufferView()) {
 		pixels = getArrayData<unsigned char>(obj);
 	} else if (obj->Has(JS_STR("data"))) {
-		pixels = node::Buffer::Data(Nan::Get(obj, JS_STR("data")).ToLocalChecked());
-	} else {
-		Nan::ThrowError("Bad argument");
+		V8_VAR_VAL data = Nan::Get(obj, JS_STR("data")).ToLocalChecked();
+		if ( ! data->IsNullOrUndefined() ) {
+			pixels = node::Buffer::Data(data);
+		}
 	}
 	
 	return pixels;
