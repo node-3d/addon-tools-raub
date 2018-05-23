@@ -69,8 +69,8 @@
 				'conditions'  : [
 					[ 'OS=="linux"', { 'action' : [
 						'rm',
-						'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
-						'<(module_root_dir)/build/Release/obj.target/addon.node',
+						'<(module_root_dir)/build/Release/obj.target/addon/cpp/bindings.o',
+						'<(module_root_dir)/build/Release/obj.target/addon/cpp/example.o',
 						'<(module_root_dir)/build/Release/addon.node'
 					] } ],
 					[ 'OS=="mac"', { 'action' : [
