@@ -2,6 +2,9 @@
 
 This is a part of [Node3D](https://github.com/node-3d) project.
 
+[![NPM](https://nodei.co/npm/addon-tools-raub.png?compact=true)](https://nodei.co/npm/addon-tools-raub/)
+![Build Status](https://travis-ci.com/node-3d/addon-tools-raub.svg?branch=master)
+
 
 ## Synopsis
 
