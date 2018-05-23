@@ -35,7 +35,7 @@ install:
   - node .
   - cd test
   - npm i --clang=1
-  - node .
+  - npm test
 
 script:
   - cd examples/addon && npm i --clang=1 && node .
