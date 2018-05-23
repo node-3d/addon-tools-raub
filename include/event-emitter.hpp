@@ -241,7 +241,7 @@ private:
 		
 		eventEmitter->emit(*name, length - 1, &args[0]);
 		
-		if ( _listeners.find(name) == _listeners.end() ) {
+		if ( eventEmitter->_listeners.find(*name) == eventEmitter->_listeners.end() ) {
 			RET_BOOL(false);
 		} else {
 			RET_BOOL(true);
