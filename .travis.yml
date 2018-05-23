@@ -24,21 +24,16 @@ before_install:
 
 
 install:
-  - cd examples/addon
-  - npm i --clang=1
-  - node .
-  - cd ../deps
-  - npm i --clang=1
-  - node .
-  - cd ../..
-  - npm i --clang=1
-  - node .
-  - cd test
-  - npm i --clang=1
-  - npm test
+  - cd examples/addon && npm i --clang=1
+  - cd ../deps && npm i --clang=1
+  - cd ../.. && npm i --clang=1
+  - cd test && npm i --clang=1
+  - cd ..
+
 
 script:
-  - cd examples/addon && npm i --clang=1 && node .
-  - cd ../deps && npm i --clang=1 && node .
-  - cd ../.. && npm i --clang=1 && node .
-  - cd test && npm i --clang=1 && node .
+  - cd examples/addon && node .
+  - cd ../deps && node .
+  - cd ../.. && node .
+  - cd test && npm test
+  - cd ..
