@@ -2,7 +2,8 @@
 
 This is a part of [Node3D](https://github.com/node-3d) project.
 
-[![NPM](https://nodei.co/npm/addon-tools-raub.png?compact=true)](https://nodei.co/npm/addon-tools-raub/)
+![NPM](https://nodei.co/npm/addon-tools-raub.png?compact=true)
+
 ![Build Status](https://travis-ci.com/node-3d/addon-tools-raub.svg?branch=master)
 
 
@@ -20,13 +21,8 @@ Useful links: [V8 Ref](https://v8.paulfryzel.com/docs/master/),
 [Nan Docs](https://github.com/nodejs/nan#api),
 [GYP Docs](https://gyp.gsrc.io/docs/UserDocumentation.md).
 
-
-## Install
-
-`npm i -s addon-tools-raub`
-
-
 ---
+
 
 ## Contents
 
@@ -339,8 +335,8 @@ const core = require(`./${binPath}/MY_ADDON`);
 
 </details>
 
-
 ---
+
 
 ## include/addon-tools.hpp
 
@@ -607,8 +603,8 @@ content is then returned as `node::Buffer`. Returns `nullptr` in other cases.
 
 </details>
 
-
 ---
+
 
 ## index.js
 
@@ -635,8 +631,8 @@ input `dir`.
 * `cpPath` - the location of `'_cp.bat'` file on Windows and plain `cp` on Unix.
 * `mkdirPath` - the location of `'_mkdir.bat'` file on Windows and plain `mkdir` on Unix.
 
-
 ---
+
 
 ## Crossplatform commands
 
