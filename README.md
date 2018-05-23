@@ -393,8 +393,21 @@ glfwSetWindowFocusCallback(window, windowFocusCB);
 
 <summary>Method return</summary>
 
-* `RET_VALUE(VAL)` - set method return value
-* `RET_UNDEFINED` - set method return value as undefined
+* `RET_VALUE(VAL)` - set method return value, where `VAL` is `v8::Local<v8::Value>`.
+* `RET_UNDEFINED` - set method return value as `undefined`.
+* `RET_STR(VAL)` - set method return value, where `VAL` is `const char *`.
+* `RET_UTF8(VAL)` - set method return value, where `VAL` is `const char *`.
+* `RET_INT(VAL)` - set method return value, where `VAL` is `int32`.
+* `RET_INT32(VAL)` - set method return value, where `VAL` is `int32`.
+* `RET_UINT32(VAL)` - set method return value, where `VAL` is `uint32`.
+* `RET_NUM(VAL)` - set method return value, where `VAL` is `double`.
+* `RET_OFFS(VAL)` - set method return value, where `VAL` is `size_t`.
+* `RET_FLOAT(VAL)` - set method return value, where `VAL` is `float`.
+* `RET_DOUBLE(VAL)` - set method return value, where `VAL` is `double`.
+* `RET_EXT(VAL)` - set method return value, where `VAL` is `void *`.
+* `RET_BOOL(VAL)` - set method return value, where `VAL` is `bool`.
+* `RET_FUN(VAL)` - set method return value, where `VAL` is `Nan::Persistent<v8::Function>`.
+* `RET_OBJ(VAL)` - set method return value, where `VAL` is `Nan::Persistent<v8::Object>`.
 
 </details>
 
@@ -433,8 +446,8 @@ glfwSetWindowFocusCallback(window, windowFocusCB);
 * `JS_DOUBLE(val)` - same as `JS_NUM`
 * `JS_EXT(val)` - create an external (pointer) value
 * `JS_BOOL(val)` - create a boolean value
-* `JS_FUN(val)` - get a function from persistent.
-* `JS_OBJ(val)` - get an object from persistent.
+* `JS_FUN(val)` - get a function from persistent `Nan::Persistent<v8::Function>`.
+* `JS_OBJ(val)` - get an object from persistent `Nan::Persistent<v8::Object>`.
 
 </details>
 
