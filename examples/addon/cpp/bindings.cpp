@@ -4,10 +4,6 @@
 
 #include "example.hpp"
 
-using namespace v8;
-using namespace node;
-using namespace std;
-
 
 extern "C" {
 
@@ -15,6 +11,7 @@ extern "C" {
 void init(V8_VAR_OBJ target) {
 	
 	EventEmitter::init(target);
+	
 	Example::init(target);
 	
 }

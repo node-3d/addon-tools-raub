@@ -63,6 +63,7 @@ public:
 		Nan::SetPrototypeMethod(proto, "eventNames", jsEventNames);
 		Nan::SetPrototypeMethod(proto, "getMaxListeners", jsGetMaxListeners);
 		Nan::SetPrototypeMethod(proto, "listeners", jsListeners);
+		Nan::SetPrototypeMethod(proto, "off", jsRemoveListener);
 		Nan::SetPrototypeMethod(proto, "on", jsAddListener);
 		Nan::SetPrototypeMethod(proto, "once", jsAddListener);
 		Nan::SetPrototypeMethod(proto, "prependListener", jsPrependListener);
@@ -179,14 +180,7 @@ private:
 	
 	static NAN_GETTER(isDestroyedGetter) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
-		RET_VALUE(JS_BOOL(eventEmitter->_isDestroyed));
-		
-	}
-	
-	
-	NAN_METHOD(destroy) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
-		
-		eventEmitter->_destroy();
+		RET_BOOL(eventEmitter->_isDestroyed);
 		
 	}
 	
@@ -200,12 +194,18 @@ private:
 		
 		const VEC_TYPE &list = eventEmitter->_listeners[*name];
 		
-		RET_VALUE(JS_INT(static_cast<int>(list.size())));
+		RET_INT(static_cast<int>(list.size()));
 		
 	}
 	
 	
-	static NAN_METHOD(jsAddListener) { _wrapListener(info); }
+	static NAN_METHOD(jsAddListener) {
+		
+		_wrapListener(info);
+		
+		RET_VALUE(info.This());
+		
+	}
 	
 	
 	static NAN_METHOD(jsDispatchEvent) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
@@ -221,6 +221,8 @@ private:
 		V8_VAR_VAL args = event;
 		
 		eventEmitter->emit(*name, 1, &args);
+		
+		RET_BOOL(true);
 		
 	}
 	
@@ -238,6 +240,12 @@ private:
 		}
 		
 		eventEmitter->emit(*name, length - 1, &args[0]);
+		
+		if ( _listeners.find(name) == _listeners.end() ) {
+			RET_BOOL(false);
+		} else {
+			RET_BOOL(true);
+		}
 		
 	}
 	
@@ -265,7 +273,7 @@ private:
 	
 	static NAN_METHOD(jsGetMaxListeners) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
-		RET_VALUE(JS_INT(eventEmitter->_maxListeners));
+		RET_INT(eventEmitter->_maxListeners);
 		
 	}
 	
@@ -276,7 +284,7 @@ private:
 		
 		const VEC_TYPE &list = eventEmitter->_listeners[*name];
 		
-		RET_VALUE(JS_INT(static_cast<int>(list.size())));
+		RET_INT(static_cast<int>(list.size()));
 		
 	}
 	
@@ -445,16 +453,36 @@ private:
 	}
 	
 	
-	static NAN_METHOD(jsOnce) { _wrapOnceListener(info); }
+	static NAN_METHOD(jsOnce) {
+		
+		_wrapOnceListener(info);
+		
+		RET_VALUE(info.This());
+		
+	}
 	
-	static NAN_METHOD(jsPrependListener) { _wrapListener(info, true); }
+	static NAN_METHOD(jsPrependListener) {
+		
+		_wrapListener(info, true);
+		
+		RET_VALUE(info.This());
+		
+	}
 	
-	static NAN_METHOD(jsPrependOnceListener) { _wrapOnceListener(info, true); }
+	static NAN_METHOD(jsPrependOnceListener) {
+		
+		_wrapOnceListener(info, true);
+		
+		RET_VALUE(info.This());
+		
+	}
 	
 	
 	static NAN_METHOD(jsRemoveAllListeners) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
 		
-		if (info.Length() > 0 && info[0]->IsString()) {
+		RET_VALUE(info.This());
+		
+		if (info.Length() == 0) {
 			
 			MAP_TYPE tmpMap = eventEmitter->_raw;
 			
@@ -534,6 +562,8 @@ private:
 	
 	
 	static NAN_METHOD(jsRemoveListener) { THIS_EVENT_EMITTER; EVENT_EMITTER_THIS_CHECK;
+		
+		RET_VALUE(info.This());
 		
 		REQ_UTF8_ARG(0, n);
 		REQ_FUN_ARG(1, raw);
@@ -623,6 +653,8 @@ private:
 		REQ_INT32_ARG(0, value);
 		
 		eventEmitter->_maxListeners = value;
+		
+		RET_VALUE(info.This());
 		
 	}
 	

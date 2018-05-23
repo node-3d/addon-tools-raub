@@ -43,6 +43,21 @@ typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
 #define JS_OBJ(val) Nan::New<v8::Object>(val)
 
 
+#define RET_STR(...) RET_VALUE(JS_STR(__VA_ARGS__))
+#define RET_UTF8(...) RET_VALUE(JS_UTF8(__VA_ARGS__))
+#define RET_INT(val) RET_VALUE(JS_INT(val))
+#define RET_INT32(val) RET_VALUE(JS_INT32(val))
+#define RET_UINT32(val) RET_VALUE(JS_UINT32(val))
+#define RET_NUM(val) RET_VALUE(JS_NUM(val))
+#define RET_OFFS(val) RET_VALUE(JS_OFFS(val))
+#define RET_FLOAT(val) RET_VALUE(JS_FLOAT(val))
+#define RET_DOUBLE(val) RET_VALUE(JS_DOUBLE(val))
+#define RET_EXT(val) RET_VALUE(JS_EXT(val))
+#define RET_BOOL(val) RET_VALUE(JS_BOOL(val))
+#define RET_FUN(val) RET_VALUE(JS_FUN(val))
+#define RET_OBJ(val) RET_VALUE(JS_OBJ(val))
+
+
 #define REQ_ARGS(N)                                                           \
 	if (info.Length() < (N))                                                  \
 		return Nan::ThrowTypeError("Expected at least " #N " arguments");

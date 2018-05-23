@@ -20,22 +20,18 @@ protected:
 	
 	void _destroy();
 	
-	
-private:
-	
-	static NAN_METHOD(newCtor);
-	
-	static NAN_METHOD(destroy);
-	
-	static NAN_METHOD(cppOn);
-	
-	
-private:
-	
 	static V8_STORE_FT _protoExample;
 	static V8_STORE_FUNC _ctorExample;
 	
 	bool _isDestroyed;
+	
+	
+private:
+	
+	static NAN_METHOD(newCtor);
+	static NAN_METHOD(destroy);
+	
+	static NAN_METHOD(cppOn);
 	
 };
 
