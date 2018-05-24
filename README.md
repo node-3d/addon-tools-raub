@@ -343,18 +343,18 @@ const core = require(`./${binPath}/MY_ADDON`);
 There is a C++ header file, `addon-tools.hpp`, shipped with this package. It
 introduces several useful macros and utilities. Also it includes Nan automatically,
 so that you can replace:
-	
-	```
-	// #include <v8.h> // already in node.h
-	// #include <node.h> // already in nan.h
-	#include <nan.h>
-	```
-	
-	with
-	
-	```
-	#include <addon-tools.hpp> // or event-emitter.hpp
-	```
+
+```
+// #include <v8.h> // already in node.h
+// #include <node.h> // already in nan.h
+#include <nan.h>
+```
+
+with
+
+```
+#include <addon-tools.hpp> // or event-emitter.hpp
+```
 
 In gyp, the include directory should be set for your addon to know where to get it.
 As it was mentioned above, this can be done automatically. Also an actual path to the
@@ -467,7 +467,7 @@ starting from `0`.
 * `CHECK_LET_ARG(I, C, T)` - check if argument `I` is approved by `C` check or empty.
 * `CTOR_CHECK(T)` - check if method is called as a constructor
 * `SETTER_CHECK(C, T)` - check if setter `value` is approved by `C` check.
-* `DES_CHECK` - within dynamic method check if the instance wasn't destroyed by `_destroy()`.
+* `DES_CHECK` - within dynamic method check if the instance wasn't destroyed by `destroy()`.
 
 </details>
 
@@ -719,7 +719,7 @@ emits an event with the given `name` and, optionally, some additional arguments 
 subscribes `cb` to receive `name` events from this emitter, basically
 `emitter.on(name, cb)`.
 
-* `virtual void _destroy()` - destroys the object, i.e. deactivates it and frees
+* `void destroy()` - destroys the object, i.e. deactivates it and frees
 resources. This is what also called inside
 `~EventEmitter()`, but only the first call is effective anyway.
 
