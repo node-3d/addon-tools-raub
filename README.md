@@ -6,6 +6,8 @@ This is a part of [Node3D](https://github.com/node-3d) project.
 
 ![Build Status](https://api.travis-ci.org/node-3d/addon-tools-raub.svg?branch=master)
 
+> npm i -s addon-tools-raub
+
 
 ## Synopsis
 
@@ -15,7 +17,7 @@ Helpers for Node.js addons and dependency packages:
 * `EventEmitter` C++ implementation.
 * C++ macros and shortcuts.
 * Crossplatform commands for GYP: `cp`, `rm`, `mkdir`.
-* Regarded platforms: win x32/x64, linux x32/x64, mac x64.
+* Regarded platforms: win x32/x64, linux x64, mac x64.
 
 Useful links: [V8 Ref](https://v8.paulfryzel.com/docs/master/),
 [Nan Docs](https://github.com/nodejs/nan#api),
@@ -136,7 +138,6 @@ would encourage you to abide by the following rules:
 	
 	* bin-win32
 	* bin-win64
-	* bin-linux32
 	* bin-linux64
 	* bin-mac64
 	
@@ -515,7 +516,7 @@ NAN_METHOD(test) {
 	...
 ```
 
-NOTE: The conversion from `Nan::Utf8String` to `std::string` (via `char *`)
+> Note: The conversion from `Nan::Utf8String` to `std::string` (via `char *`)
 is possible with unary `*` operator.
 
 </details>

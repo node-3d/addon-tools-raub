@@ -18,8 +18,16 @@ const prefixName = name => `bin-${name}`;
 const getPlatformDir = platform => {
 	switch (platform) {
 		case 'win32' : return process.arch === 'x64' ? 'win64' : 'win32';
-		case 'linux' : return process.arch === 'x64' ? 'linux64' : 'linux32';
-		case 'darwin' : return 'mac64';
+		case 'linux' :
+			if (process.arch === 'x32') {
+				throw new Error('Linux x32 not supported since 4.0.0.');
+			}
+			return 'linux64';
+		case 'darwin' :
+			if (process.arch === 'x32') {
+				throw new Error('Mac x32 not supported.');
+			}
+			return 'mac64';
 		default : throw new Error(`Platform "${platform}" is not supported.`);
 	}
 };
