@@ -291,9 +291,14 @@ inline void *getData(V8_VAR_OBJ obj) {
 inline void consoleLog(int argc, V8_VAR_VAL *argv) {
 	
 	V8_VAR_STR code = JS_STR("((...args) => console.log(...args))");
-	V8_VAR_FUNC log = V8_VAR_FUNC::Cast(v8::Script::Compile(code)->Run());
 	
-	Nan::Callback logCb(log);
+	v8::Local<v8::Value> log = v8::Script::Compile(
+		Nan::GetCurrentContext(), code
+	).ToLocalChecked()->Run(
+		Nan::GetCurrentContext()
+	).ToLocalChecked();
+	Nan::Callback logCb(Nan::To<v8::Function>(log).ToLocalChecked());
+	
 	Nan::AsyncResource async("consoleLog()");
 	
 	logCb.Call(argc, argv, &async);

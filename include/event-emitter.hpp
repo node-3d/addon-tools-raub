@@ -333,13 +333,13 @@ private:
 			"(new Error()).stack.split('\\n').slice(2).join('\\n')"
 		);
 		
-		V8_VAR_STR stack = Nan::To<v8::String>(
-			v8::Script::Compile(code)->Run(
-				Nan::GetCurrentContext()
-			).ToLocalChecked()
-		);
-		
+		v8::Local<v8::Value> stack = v8::Script::Compile(
+			Nan::GetCurrentContext(), code
+		).ToLocalChecked()->Run(
+			Nan::GetCurrentContext()
+		).ToLocalChecked();
 		Nan::Utf8String stackStr(stack);
+		
 		msg += *stackStr;
 		
 		consoleLog(msg);
@@ -441,13 +441,13 @@ private:
 			})
 		)");
 		
-		V8_VAR_FUNC decor = Nan::To<v8::Function>(
-			v8::Script::Compile(code)->Run(
-				Nan::GetCurrentContext()
-			).ToLocalChecked()
-		);
+		v8::Local<v8::Value> decor = v8::Script::Compile(
+			Nan::GetCurrentContext(), code
+		).ToLocalChecked()->Run(
+			Nan::GetCurrentContext()
+		).ToLocalChecked();
+		Nan::Callback decorCb(Nan::To<v8::Function>(decor).ToLocalChecked());
 		
-		Nan::Callback decorCb(decor);
 		V8_VAR_VAL argv[] = { info.This(), info[0], raw };
 		Nan::AsyncResource async("EventEmitter::js_once()");
 		V8_VAR_VAL wrapValue = decorCb.Call(3, argv, &async).ToLocalChecked();
