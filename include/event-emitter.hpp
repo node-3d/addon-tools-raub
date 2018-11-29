@@ -335,7 +335,7 @@ private:
 		
 		V8_VAR_STR stack = v8::Script::Compile(code)->Run(
 			Nan::GetCurrentContext()
-		).As<v8::String>()->Value();
+		).ToLocalChecked();
 		
 		Nan::Utf8String stackStr(stack);
 		msg += *stackStr;
@@ -441,7 +441,7 @@ private:
 		
 		V8_VAR_FUNC decor = v8::Script::Compile(code)->Run(
 			Nan::GetCurrentContext()
-		).As<v8::Function>()->Value();
+		).ToLocalChecked();
 		
 		Nan::Callback decorCb(decor);
 		V8_VAR_VAL argv[] = { info.This(), info[0], raw };
