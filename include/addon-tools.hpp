@@ -87,38 +87,40 @@ typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
 
 #define REQ_INT32_ARG(I, VAR)                                                 \
 	CHECK_REQ_ARG(I, IsInt32(), "int32");                                     \
-	int VAR = info[I]->Int32Value();
+	int VAR = info[I].As<v8::Int32>()->Value();
 
 #define LET_INT32_ARG(I, VAR)                                                 \
 	CHECK_LET_ARG(I, IsInt32(), "int32");                                     \
-	int VAR = IS_ARG_EMPTY(I) ? 0 : info[I]->Int32Value();
+	int VAR = IS_ARG_EMPTY(I) ? 0 : info[I].As<v8::Int32>()->Value();
 	
 #define REQ_UINT32_ARG(I, VAR)                                                \
 	CHECK_REQ_ARG(I, IsUint32(), "uint32");                                   \
-	unsigned int VAR = info[I]->Uint32Value();
+	unsigned int VAR = info[I].As<v8::Uint32>()->Value();
 
 #define LET_UINT32_ARG(I, VAR)                                                \
 	CHECK_LET_ARG(I, IsUint32(), "uint32");                                   \
-	unsigned int VAR = IS_ARG_EMPTY(I) ? 0 : info[I]->Uint32Value();
+	unsigned int VAR = IS_ARG_EMPTY(I) ? 0 : info[I].As<v8::Uint32>()->Value();
 
 #define REQ_INT_ARG(I, VAR) LET_INT32_ARG(I, VAR)
 #define LET_INT_ARG(I, VAR) REQ_UINT32_ARG(I, VAR)
 
 #define REQ_BOOL_ARG(I, VAR)                                                  \
 	CHECK_REQ_ARG(I, IsBoolean(), "bool");                                    \
-	bool VAR = info[I]->BooleanValue();
+	bool VAR = info[I].As<v8::Boolean>()->Value();
 
 #define LET_BOOL_ARG(I, VAR)                                                  \
 	CHECK_LET_ARG(I, IsBoolean(), "bool");                                    \
-	bool VAR = IS_ARG_EMPTY(I) ? false : info[I]->BooleanValue();
+	bool VAR = IS_ARG_EMPTY(I) ? false : info[I].As<v8::Boolean>()->Value();
 
 #define REQ_OFFS_ARG(I, VAR)                                                  \
 	CHECK_REQ_ARG(I, IsNumber(), "number");                                   \
-	size_t VAR = static_cast<size_t>(info[I]->IntegerValue());
+	size_t VAR = static_cast<size_t>(info[I].As<v8::Integer>()->Value());
 
 #define LET_OFFS_ARG(I, VAR)                                                  \
 	CHECK_LET_ARG(I, IsNumber(), "number");                                   \
-	size_t VAR = IS_ARG_EMPTY(I) ? 0 : static_cast<size_t>(info[I]->IntegerValue());
+	size_t VAR = IS_ARG_EMPTY(I) ? 0 : static_cast<size_t>(                   \
+		info[I].As<v8::Integer>()->Value()                                        \
+	);
 
 
 #define REQ_DOUBLE_ARG(I, VAR)                                                \
@@ -127,16 +129,18 @@ typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
 
 #define LET_DOUBLE_ARG(I, VAR)                                                \
 	CHECK_LET_ARG(I, IsNumber(), "number");                                   \
-	double VAR = IS_ARG_EMPTY(I) ? 0.0 : info[I]->NumberValue();
+	double VAR = IS_ARG_EMPTY(I) ? 0.0 : info[I].As<v8::Number>()->Value();
 
 
 #define REQ_FLOAT_ARG(I, VAR)                                                 \
 	CHECK_REQ_ARG(I, IsNumber(), "number");                                   \
-	float VAR = static_cast<float>(info[I]->NumberValue());
+	float VAR = static_cast<float>(info[I].As<v8::Number>()->Value());
 
 #define LET_FLOAT_ARG(I, VAR)                                                 \
 	CHECK_LET_ARG(I, IsNumber(), "number");                                   \
-	float VAR = IS_ARG_EMPTY(I) ? 0.f : static_cast<float>(info[I]->NumberValue());
+	float VAR = IS_ARG_EMPTY(I) ? 0.f : static_cast<float>(                   \
+		info[I].As<v8::Number>()->Value()                                         \
+	);
 
 
 #define REQ_EXT_ARG(I, VAR)                                                   \
@@ -196,29 +200,29 @@ typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
 
 #define SETTER_INT32_ARG                                                      \
 	SETTER_CHECK(IsInt32(), "int32");                                         \
-	int v = value->Int32Value();
+	int v = value.As<v8::Int32>()->Value();
 
 #define SETTER_INT_ARG SETTER_INT32_ARG
 
 #define SETTER_BOOL_ARG                                                       \
 	SETTER_CHECK(IsBoolean(), "bool");                                        \
-	bool v = value->BooleanValue();
+	bool v = value.As<v8::Boolean>()->Value();
 
 #define SETTER_UINT32_ARG                                                     \
 	SETTER_CHECK(IsUint32(), "uint32");                                       \
-	unsigned int v = value->Uint32Value();
+	unsigned int v = value.As<v8::Uint32>()->Value();
 
 #define SETTER_OFFS_ARG                                                       \
 	SETTER_CHECK(IsNumber(), "number");                                       \
-	size_t v = static_cast<size_t>(value->IntegerValue());
+	size_t v = static_cast<size_t>(value.As<v8::Integer>()->Value());
 
 #define SETTER_DOUBLE_ARG                                                     \
 	SETTER_CHECK(IsNumber(), "number");                                       \
-	double v = value->NumberValue();
+	double v = value.As<v8::Number>()->Value();
 
 #define SETTER_FLOAT_ARG                                                      \
 	SETTER_CHECK(IsNumber(), "number");                                       \
-	float v = static_cast<float>(value->NumberValue());
+	float v = static_cast<float>(value.As<v8::Number>()->Value());
 
 #define SETTER_EXT_ARG                                                        \
 	SETTER_CHECK(IsExternal(), "void*");                                      \
