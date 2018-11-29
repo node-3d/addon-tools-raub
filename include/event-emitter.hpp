@@ -333,9 +333,11 @@ private:
 			"(new Error()).stack.split('\\n').slice(2).join('\\n')"
 		);
 		
-		V8_VAR_STR stack = v8::Script::Compile(code)->Run(
-			Nan::GetCurrentContext()
-		).ToLocalChecked();
+		V8_VAR_STR stack = Nan::To<v8::String>(
+			v8::Script::Compile(code)->Run(
+				Nan::GetCurrentContext()
+			).ToLocalChecked()
+		);
 		
 		Nan::Utf8String stackStr(stack);
 		msg += *stackStr;
@@ -439,9 +441,11 @@ private:
 			})
 		)");
 		
-		V8_VAR_FUNC decor = v8::Script::Compile(code)->Run(
-			Nan::GetCurrentContext()
-		).ToLocalChecked();
+		V8_VAR_FUNC decor = Nan::To<v8::Function>(
+			v8::Script::Compile(code)->Run(
+				Nan::GetCurrentContext()
+			).ToLocalChecked()
+		);
 		
 		Nan::Callback decorCb(decor);
 		V8_VAR_VAL argv[] = { info.This(), info[0], raw };
