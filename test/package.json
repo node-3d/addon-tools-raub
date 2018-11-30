@@ -9,9 +9,9 @@
 		"preinstall": "cd .. && npm i"
 	},
 	"dependencies": {
-		"addon-tools-raub": "file:../",
-		"chai": "^4.1.2",
-		"mocha": "^5.0.0",
-		"sinon": "^4.2.2"
+		"addon-tools-raub": "https://github.com/node-3d/addon-tools-raub.git",
+		"chai": "^4.2.0",
+		"mocha": "^5.2.0",
+		"sinon": "^7.1.1"
 	}
 }
