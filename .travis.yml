@@ -14,13 +14,6 @@ matrix:
     os: osx
 
 
-before_install:
-  - npm conf set strict-ssl false
-  - npm install -g npm@6.4.1
-
-
-script:
+install:
   - cd test
   - npm i
-  - npm test
-  - cd ..
