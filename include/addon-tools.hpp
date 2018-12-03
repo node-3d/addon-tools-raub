@@ -125,7 +125,7 @@ typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
 
 #define REQ_DOUBLE_ARG(I, VAR)                                                \
 	CHECK_REQ_ARG(I, IsNumber(), "number");                                   \
-	double VAR = info[I]->NumberValue();
+	double VAR = info[I].As<v8::Number>()->Value();
 
 #define LET_DOUBLE_ARG(I, VAR)                                                \
 	CHECK_LET_ARG(I, IsNumber(), "number");                                   \
