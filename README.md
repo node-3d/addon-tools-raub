@@ -199,8 +199,9 @@ The main file for an addon is **binding.gyp**. Here's a snippet with most of the
 
 <summary>binding.gyp</summary>
 
-* Assume `EXT_LIB` is the name of an Addon Tools compliant binary dependency module.
-* Assume `MY_ADDON` is the name of this addon.
+* Assume `EXT_LIB` is the name of a binary dependency.
+* Assume `deps-EXT_LIB` is the name of an Addon Tools compliant dependency module.
+* Assume `MY_ADDON` is the name of this addon's resulting binary.
 * Assume C++ code goes to `cpp` directory.
 
 ```
@@ -210,8 +211,8 @@ The main file for an addon is **binding.gyp**. Here's a snippet with most of the
 		'cp'              : '<!(node -e "require(\'addon-tools-raub\').cp()")',
 		'mkdir'           : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
 		'binary'          : '<!(node -e "require(\'addon-tools-raub\').bin()")',
-		'EXT_LIB_include' : '<!(node -e "require(\'node-deps-EXT_LIB-raub\').include()")',
-		'EXT_LIB_bin'     : '<!(node -e "require(\'node-deps-EXT_LIB-raub\').bin()")',
+		'EXT_LIB_include' : '<!(node -e "require(\'deps-EXT_LIB\').include()")',
+		'EXT_LIB_bin'     : '<!(node -e "require(\'deps-EXT_LIB\').bin()")',
 	},
 	'targets': [
 		{
