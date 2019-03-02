@@ -11,8 +11,8 @@ const prefixName = name => `bin-${name}`;
 
 const getPlatformDir = () => {
 	switch (process.platform) {
-		case 'win32'  : return process.arch === 'x64' ? 'win64' : 'win32';
-		case 'linux'  : return 'linux64';
+		case 'win32' : return process.arch === 'x64' ? 'win64' : 'win32';
+		case 'linux' : return 'linux64';
 		case 'darwin' : return 'mac64';
 		default : throw new Error(`Platform "${process.platform}" is not supported.`);
 	}
@@ -79,5 +79,7 @@ module.exports = {
 	mkdir() { return console.log(mkdirPath); },
 	rm() { return console.log(rmPath); },
 	cp() { return console.log(cpPath); },
+	
+	download,
 	
 };
