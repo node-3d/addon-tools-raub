@@ -14,14 +14,15 @@ This is a part of [Node3D](https://github.com/node-3d) project.
 
 Helpers for Node.js addons and dependency packages:
 
-* `consoleLog()` C++ implementation.
-* `EventEmitter` C++ implementation.
 * C++ macros and shortcuts.
+* `consoleLog()` C++ helper.
+* `eventEmit()` C++ helper.
+* `getData()` C++ helper.
 * Crossplatform commands for GYP: `cp`, `rm`, `mkdir`.
-* Regarded platforms: win x32/x64, linux x64, mac x64.
+* Supported platforms (x64): Windows, Linux, OSX.
 
-Useful links: [V8 Ref](https://v8.paulfryzel.com/docs/master/),
-[Nan Docs](https://github.com/nodejs/nan#api),
+Useful links: [N-API Docs](https://nodejs.org/api/n-api.html),
+[Napi Docs](https://github.com/nodejs/node-addon-api/blob/master/doc/setup.md),
 [GYP Docs](https://gyp.gsrc.io/docs/UserDocumentation.md).
 
 ---
@@ -37,9 +38,9 @@ Useful links: [V8 Ref](https://v8.paulfryzel.com/docs/master/),
 
 [Crossplatform commands](#crossplatform-commands)
 
-[Class EventEmitter](#class-eventemitter)
-
 [Function consoleLog](#function-consolelog)
+
+[Function eventEmit](#function-eventEmit)
 
 ---
 
@@ -49,85 +50,39 @@ Useful links: [V8 Ref](https://v8.paulfryzel.com/docs/master/),
 
 ### binding.gyp
 
-<details>
+### Crossplatform commands
 
-<summary>Crossplatform commands</summary>
-	
-	```
-	'variables': {
-		'rm'    : '<!(node -e "require(\'addon-tools-raub\').rm()")',
-		'cp'    : '<!(node -e "require(\'addon-tools-raub\').cp()")',
-		'mkdir' : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
-	},
-	```
-	
-	On both Windows and Unix those are the console commands for various
-	file system operations. No need for GYP conditions, yay!
-	
-</details>
+```
+'variables': {
+	'rm'    : '<!(node -e "require(\'addon-tools-raub\').rm()")',
+	'cp'    : '<!(node -e "require(\'addon-tools-raub\').cp()")',
+	'mkdir' : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
+},
+```
+
+On both Windows and Unix those are the console commands for various
+file system operations. No need for GYP conditions, yay!
 
 
-<details>
+### Addon binary directory
 
-<summary>Addon binary directory</summary>
-	
-	```
-	'variables': {
-		'binary' : '<!(node -e "require(\'addon-tools-raub\').bin()")',
-	},
-	```
-	
-	In some cases, you'd like to have your addon installed for multiple architectures
-	simultaneously. For example, when using NVM to fluently switch environments.
-	Because the target directory is different for each arch, you only have to do
-	`npm rebuild` after the first switch.
-	
-</details>
+```
+'variables': {
+	'binary' : '<!(node -e "require(\'addon-tools-raub\').bin()")',
+},
+```
 
 
-<details>
+### Include directories
 
-<summary>Include directories</summary>
-	
-	```
-		'include_dirs': [
-			'<!@(node -e "require(\'addon-tools-raub\').include()")',
-		],
-	```
-	
-	Those are the directory paths to C++ include files for Addon Tools and Nan
-	(which is preinstalled with Addon Tools)
-	
-</details>
+```
+	'include_dirs': [
+		'<!@(node -p "require(\'addon-tools-raub\').include")',
+	],
+```
 
-
-<details>
-
-<summary>Remove intermediates</summary>
-	
-	```
-		[ 'OS=="linux"', { 'action' : [
-			'<(rm)',
-			'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
-			'<(module_root_dir)/build/Release/addon.node'
-		] } ],
-		[ 'OS=="mac"', { 'action' : [
-			'<(rm)',
-			'<(module_root_dir)/build/Release/obj.target/addon/cpp/addon.o',
-			'<(module_root_dir)/build/Release/addon.node'
-		] } ],
-		[ 'OS=="win"', { 'action' : [
-			'<(rm)',
-			'<(module_root_dir)/build/Release/addon.*',
-			'<(module_root_dir)/build/Release/obj/addon/*.*'
-		] } ],
-	```
-	
-	Build-files can be removed in a separate build-step with `<(rm)`. Those are
-	usually PDB and OBJ files, which are rather big. However, in case of a hardcore
-	debug session you might want to comment this out.
-	
-</details>
+Those are the directory paths to C++ include files for Addon Tools and Napi
+(which is preinstalled with Addon Tools)
 
 
 ### Binary dependency package
@@ -137,7 +92,6 @@ would encourage you to abide by the following rules:
 
 * Your binary directories are:
 	
-	* bin-win32
 	* bin-win64
 	* bin-linux64
 	* bin-mac64
