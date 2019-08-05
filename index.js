@@ -3,43 +3,41 @@
 const path = require('path');
 
 const platformNames = {
-	win32  : 'win',
-	linux  : 'lin',
+	win32  : 'windows',
+	linux  : 'linux',
 	darwin : 'osx',
 };
 
 const platformName = platformNames[process.platform];
+const isWindows = process.platform === 'win32';
 
 if ( ! platformName ) {
 	console.log(`Error: UNKNOWN PLATFORM "${process.platform}"`);
 }
 
-const isWindows = process.platform === 'win32';
-
 const rootPath = __dirname.replace(/\\/g, '/');
+
 
 const napiInclude = require('node-addon-api').include.replace(/\\/g, '/');
 const thisInclude = `${rootPath}/include`;
+const includePath = `${napiInclude} ${thisInclude}`;
+
 
 const paths = dir => {
 	
 	dir = dir.replace(/\\/g, '/');
 	
-	const binPath = `${dir}/${platformName}`;
+	const bin     = `${dir}/bin-${platformName}`;
+	const include = `${dir}/include`;
 	
 	if (isWindows) {
-		process.env.path = `${binPath};${process.env.path ? `${process.env.path}` : ''}`;
+		process.env.path = `${bin};${process.env.path ? `${process.env.path}` : ''}`;
 	}
-	
-	const includePath = `${dir}/include`;
 	
 	return { bin, include };
 	
 };
 
-
-const includePath = `${napiInclude} ${thisInclude}`;
-const binPath = currentDir;
 
 const mkdirPath = isWindows ? `${rootPath}/bat/mkdir.bat` : 'mkdir';
 const rmPath    = isWindows ? `${rootPath}/bat/rm.bat` : 'rm';
@@ -50,11 +48,12 @@ module.exports = {
 	
 	paths,
 	
-	platform: platformName,
-	include: includePath,
+	bin      : `bin-${platformName}`,
+	platform : platformName,
+	include  : includePath,
 	
-	mkdir: mkdirPath,
-	rm: rmPath,
-	cp: cpPath,
+	mkdir : mkdirPath,
+	rm    : rmPath,
+	cp    : cpPath,
 	
 };
