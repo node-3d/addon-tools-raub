@@ -212,7 +212,7 @@ private:
 		
 		REQ_OBJ_ARG(0, event);
 		
-		if ( ! event->Has(JS_STR("type")) ) {
+		if ( ! event->Has(Nan::GetCurrentContext(), JS_STR("type")).ToChecked() ) {
 			return Nan::ThrowError("Event must have the `type` property.");
 		}
 		

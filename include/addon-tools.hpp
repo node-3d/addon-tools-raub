@@ -276,7 +276,7 @@ inline void *getData(V8_VAR_OBJ obj) {
 	
 	if (obj->IsArrayBufferView()) {
 		pixels = getArrayData<unsigned char>(obj);
-	} else if (obj->Has(JS_STR("data"))) {
+	} else if (obj->Has(Nan::GetCurrentContext(), JS_STR("data")).ToChecked()) {
 		V8_VAR_VAL data = Nan::Get(obj, JS_STR("data")).ToLocalChecked();
 		if ( ! data->IsNullOrUndefined() ) {
 			pixels = node::Buffer::Data(data);
