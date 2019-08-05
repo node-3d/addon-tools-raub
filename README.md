@@ -92,9 +92,9 @@ would encourage you to abide by the following rules:
 
 * Your binary directories are:
 	
-	* bin-win64
-	* bin-linux64
-	* bin-mac64
+	* bin-windows
+	* bin-linux
+	* bin-osx
 	
 * The following piece of code in your `index.js` without changes. Method `paths()`
 is described [here](#indexjs).
@@ -102,8 +102,6 @@ is described [here](#indexjs).
 	```
 	module.exports = require('addon-tools-raub').paths(__dirname);
 	```
-	
-* Your whole **binding.gyp**:
 	
 	<details>
 	
@@ -298,13 +296,11 @@ const core = require(`./${binPath}/MY_ADDON`);
 ## include/addon-tools.hpp
 
 There is a C++ header file, `addon-tools.hpp`, shipped with this package. It
-introduces several useful macros and utilities. Also it includes Nan automatically,
+introduces several useful macros and utilities. Also it includes Napi automatically,
 so that you can replace:
 
 ```
-// #include <v8.h> // already in node.h
-// #include <node.h> // already in nan.h
-#include <nan.h>
+#include <napi.h>
 ```
 
 with
@@ -318,8 +314,7 @@ As it was mentioned above, this can be done automatically. Also an actual path t
 directory is exported from the module and is accessible like this:
 
 ```
-require('addon-tools-raub').include() // implicit console.log()
-require('addon-tools-raub').includePath // just a string
+require('addon-tools-raub').include // a string
 ```
 
 Currently, there are following helpers in **addon-tools.hpp**:
