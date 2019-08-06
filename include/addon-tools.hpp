@@ -9,27 +9,27 @@
 #define NAPI_HS Napi::HandleScope scope(env);
 
 
-#define JS_STR(val) Napi::String::New(env, val)
-#define JS_NUM(val) Napi::Number::New(env, static_cast<double>(val))
-#define JS_EXT(val) Napi::External::New(env, reinterpret_cast<void*>(val))
-#define JS_BOOL(val) Napi::Boolean::New(env, val)
-#define JS_FUN(val) Napi::Function::Function(env, val)
-#define JS_OBJ(val) Napi::Object::Object(env, val)
+#define JS_STR(VAL) Napi::String::New(env, VAL)
+#define JS_NUM(VAL) Napi::Number::New(env, static_cast<double>(VAL))
+#define JS_EXT(VAL) Napi::External::New(env, reinterpret_cast<void*>(VAL))
+#define JS_BOOL(VAL) Napi::Boolean::New(env, VAL)
+#define JS_FUN(VAL) Napi::Function::Function(env, VAL)
+#define JS_OBJ(VAL) Napi::Object::Object(env, VAL)
 
 
 #define RET_VALUE(VAL) return VAL;
 #define RET_UNDEFINED RET_VALUE(env.Undefined())
 #define RET_NULL RET_VALUE(env.Null())
-#define RET_STR(val) RET_VALUE(JS_STR(val))
-#define RET_NUM(val) RET_VALUE(JS_NUM(val))
-#define RET_EXT(val) RET_VALUE(JS_EXT(val))
-#define RET_BOOL(val) RET_VALUE(JS_BOOL(val))
-#define RET_FUN(val) RET_VALUE(JS_FUN(val))
-#define RET_OBJ(val) RET_VALUE(JS_OBJ(val))
+#define RET_STR(VAL) RET_VALUE(JS_STR(VAL))
+#define RET_NUM(VAL) RET_VALUE(JS_NUM(VAL))
+#define RET_EXT(VAL) RET_VALUE(JS_EXT(VAL))
+#define RET_BOOL(VAL) RET_VALUE(JS_BOOL(VAL))
+#define RET_FUN(VAL) RET_VALUE(JS_FUN(VAL))
+#define RET_OBJ(VAL) RET_VALUE(JS_OBJ(VAL))
 
 
-#define JS_THROW(val)                                                         \
-	Napi::Error::New(env, val).ThrowAsJavaScriptException();
+#define JS_THROW(VAL)                                                         \
+	Napi::Error::New(env, VAL).ThrowAsJavaScriptException();
 
 
 #define REQ_ARGS(N)                                                           \
@@ -38,7 +38,7 @@
 	}
 
 
-#define IS_EMPTY(val) (val.IsNull() || val.IsUndefined())
+#define IS_EMPTY(VAL) (VAL.IsNull() || VAL.IsUndefined())
 #define IS_ARG_EMPTY(I) IS_EMPTY(info[I])
 
 
@@ -173,17 +173,6 @@
 #define LET_OBJ_ARG(I, VAR) USE_OBJ_ARG(I, VAR, info[I].As<Napi::Object>())
 
 
-#define REQ_OBJ_ARG(I, VAR)                                                   \
-	CHECK_REQ_ARG(I, IsObject(), "Object");                                   \
-	Napi::Object VAR = info[I].As<Napi::Object>();
-
-#define USE_OBJ_ARG(I, VAR, DEF)                                              \
-	CHECK_LET_ARG(I, IsObject(), "Object");                                   \
-	Napi::Object VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As<Napi::Object>();
-
-#define LET_OBJ_ARG(I, VAR) USE_OBJ_ARG(I, VAR, info[I].As<Napi::Object>())
-
-
 #define REQ_ARRV_ARG(I, VAR)                                                  \
 	CHECK_REQ_ARG(I, IsArrayBuffer(), "Object");                              \
 	Napi::ArrayBuffer VAR = info[I].As<Napi::ArrayBuffer>();
@@ -224,6 +213,8 @@
 #define ACCESSOR_M(CLASS, NAME)                                               \
 	InstanceMethod(#NAME, &CLASS::NAME)
 
+#define THIS_OBJ(VAR)                                                         \
+	Napi::Object VAR = info.This().As<Napi::Object>();
 
 #define SETTER_STR_ARG                                                        \
 	SETTER_CHECK(IsNumber(), "String");                                       \

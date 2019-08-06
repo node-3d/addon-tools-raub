@@ -12,23 +12,24 @@ This is a part of [Node3D](https://github.com/node-3d) project.
 
 ## Synopsis
 
-Helpers for Node.js addons and dependency packages:
+Helpers for Node.js **NAPI** addons and dependency packages:
 
-* C++ macros and shortcuts.
-* `consoleLog()` C++ helper.
-* `eventEmit()` C++ helper.
-* `getData()` C++ helper.
-* Crossplatform commands for GYP: `cp`, `rm`, `mkdir`.
 * Supported platforms (x64): Windows, Linux, OSX.
+* C++ helpers:
+	* Macro shortcuts for NAPI.
+	* `consoleLog()` function.
+	* `eventEmit()` function.
+	* `getData()` function.
+* Module helpers:
+	* Crossplatform commands for GYP: `cp`, `rm`, `mkdir`.
+	* Deps unzip installer.
+	* Url-to-buffer downloader.
 
 Useful links: [N-API Docs](https://nodejs.org/api/n-api.html),
 [Napi Docs](https://github.com/nodejs/node-addon-api/blob/master/doc/setup.md),
 [GYP Docs](https://gyp.gsrc.io/docs/UserDocumentation.md).
 
----
-
-
-## Contents
+**Jump to**:
 
 [Snippets](#snippets)
 
@@ -107,16 +108,41 @@ On both Windows and Unix those commands now have the same result:
 	],
 ```
 
-Those are the directory paths to C++ include files for Addon Tools and Napi
-(which is preinstalled with Addon Tools)
+Those are the directory paths to C++ include files for **Addon Tools** and
+**Napi** (which is preinstalled with Addon Tools).
 
 
 ### Binary dependency package
 
-If you design a module with binary dependencies for several platforms, **Addon Tools**
-would encourage you to abide by the following rules:
+If you design a module with binary dependencies for several platforms,
+**Addon Tools** may help within the following guidelines:
 
-* Your binary directories are:
+* In **package.json** use a `"postinstall"` script to download the libraries.
+For example the following structure might work. Note that **Addon Tools** will
+append any given URL with ``/${platform}.zip``
+	
+	```
+	"config" : {
+		"install" : "v1.0.0"
+	},
+	"scripts": {
+		"postinstall": "install",
+	},
+	```
+	
+	where `config.install` is  **YOUR install.js** is:
+	
+	```
+	const install = require('addon-tools-raub/install');
+	const prefix = 'https://github.com/user/addon/releases/download';
+	const tag = process.env.npm_package_config_install;
+	install(`${prefix}/${tag}`);
+	```
+	
+	**Addon Tools** will unzip the downloaded file into the platform binary
+	directory. E.g. on Windows it will be **bin-windows**.
+	
+* Per platform binary directories:
 	
 	* bin-windows
 	* bin-linux
@@ -129,69 +155,73 @@ is described [here](#indexjs).
 	module.exports = require('addon-tools-raub').paths(__dirname);
 	```
 	
-	<details>
+* Publishing is done by attaching a zipped platform folder to the Github
+release. Zip file must NOT contain platform folder as a subfolder, but rather
+contain the final binaries. The tag of the release should be the same as in
+`npm_package_config_install` - that is the way installer will find it.
 	
-	<summary>Show binding.gyp</summary>
-	
-	```
-	{
-		'variables': {
-			'rm'   : '<!(node -e "require(\'addon-tools-raub\').rm()")',
-			'rem'  : '<!(node -e "require(\'.\').rem()")',
-			'XALL%': 'false',
-		},
-		'targets': [
-			{
-				'target_name' : 'remove_extras',
-				'type'        : 'none',
-				'conditions'  : [['XALL=="false"', {'actions': [
-					{
-						'action_name' : 'Unnecessary binaries removed.',
-						'inputs'      : [],
-						'outputs'     : ['build'],
-						'action'      : ['<(rm)', '-rf', '<@(rem)'],
-					}
-				]}]],
-			}
-		]
-	}
-	```
-	
-	Notice the `XALL` variable here. If the package is installed with `npm i`, then
-	quite expectedly all but the required arch directories are removed. But with
-	`npm i --XALL` you can keep all the binaries. It might be useful when debugging
-	multiple archs and switching Node.js versions with
-	[NVM](https://github.com/creationix/nvm).
-	
-	</details>
+* NOTE: You can publish your binaries to anywhere, not necessarily Github.
+Just tweak the **install.js** script as appropriate. The only limitation
+from **Addon Tools** is that it should be a zipped set of files/folders.
 
 
 ### Compiled addon
 
-It is easy to build a C++ addon with **Addon Tools**. To have a full picture, you
-can view the
-[official example](https://github.com/node-3d/addon-tools-raub/tree/master/examples/addon).
+With the advent of N-API the focus of compiled addons shifted towards the
+word "addons". Since ABI is now compatible across Node.js versions, now addons
+are just plain DLLs. Therefore distribution of the binaries is covered in the
+previous section. But for an addon you have to provide a GYP compilation step.
+N-API changes it's role to out-of-install compilation, so we can't/shouldnt
+put the file **binding.gyp** to the module root anymore.
 
-The main file for an addon is **binding.gyp**. Here's a snippet with most of the features.
+The workaround would be to have a separate directory within your project
+(with simplified package.json) for the sake of addon compilation.
 
-<details>
-
-<summary>binding.gyp</summary>
+```
+{
+	"name": "build",
+	"version": "0.0.0",
+	"private": true,
+	"dependencies": {
+		"addon-tools-raub": "5.0.0",
+		"deps-EXT_LIB": "1.0.0"
+	}
+}
+```
 
 * Assume `EXT_LIB` is the name of a binary dependency.
 * Assume `deps-EXT_LIB` is the name of an Addon Tools compliant dependency module.
 * Assume `MY_ADDON` is the name of this addon's resulting binary.
-* Assume C++ code goes to `cpp` directory.
+* Assume C++ code goes to `cpp` subdirectory.
+
+That together with **binding.gyp**, this would be enough to get the addon compiled.
+Then the binaries are published to the Github release. When the addon
+is installed, its **index.js** is responsible for reexport of the binary.
+Just require the built module like this:
+
+```
+const { bin } = require('addon-tools-raub');
+const core = require(`./${bin}/MY_ADDON`);
+```
+
+<details>
+
+<summary>See a snipped for binding.gyp here</summary>
+
+* Assume `EXT_LIB` is the name of a binary dependency.
+* Assume `deps-EXT_LIB` is the name of an Addon Tools compliant dependency module.
+* Assume `MY_ADDON` is the name of this addon's resulting binary.
+* Assume C++ code goes to `cpp` subdirectory.
 
 ```
 {
 	'variables': {
-		'rm'              : '<!(node -e "require(\'addon-tools-raub\').rm()")',
-		'cp'              : '<!(node -e "require(\'addon-tools-raub\').cp()")',
-		'mkdir'           : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
-		'binary'          : '<!(node -e "require(\'addon-tools-raub\').bin()")',
-		'EXT_LIB_include' : '<!(node -e "require(\'deps-EXT_LIB\').include()")',
-		'EXT_LIB_bin'     : '<!(node -e "require(\'deps-EXT_LIB\').bin()")',
+		'rm'              : '<!(node -e "require(\'addon-tools-raub\').rm")',
+		'cp'              : '<!(node -e "require(\'addon-tools-raub\').cp")',
+		'mkdir'           : '<!(node -e "require(\'addon-tools-raub\').mkdir")',
+		'binary'          : '<!(node -e "require(\'addon-tools-raub\').bin")',
+		'EXT_LIB_include' : '<!(node -e "require(\'deps-EXT_LIB\').include")',
+		'EXT_LIB_bin'     : '<!(node -e "require(\'deps-EXT_LIB\').bin")',
 	},
 	'targets': [
 		{
@@ -200,7 +230,7 @@ The main file for an addon is **binding.gyp**. Here's a snippet with most of the
 				'cpp/MY_ADDON.cpp',
 			],
 			'include_dirs': [
-				'<!(node -e "require(\'addon-tools-raub\').include()")',
+				'<!(node -e "require(\'addon-tools-raub\').include")',
 				'<(EXT_LIB_include)',
 				'<(module_root_dir)/include',
 			],
@@ -222,6 +252,9 @@ The main file for an addon is **binding.gyp**. Here's a snippet with most of the
 							'-Wl,-rpath,<(EXT_LIB_bin)',
 							'<(EXT_LIB_bin)/EXT_LIB.dylib',
 						],
+						'xcode_settings': {
+							'DYLIB_INSTALL_NAME_BASE': '@rpath',
+						},
 					}
 				],
 				[
@@ -270,48 +303,16 @@ The main file for an addon is **binding.gyp**. Here's a snippet with most of the
 				'action_name' : 'Module copied.',
 				'inputs'      : [],
 				'outputs'     : ['binary'],
-				'action'      : ['<(cp)', 'build/Release/MY_ADDON.node', '<(binary)/MY_ADDON.node'],
-			}],
-		},
-		
-		{
-			'target_name'  : 'remove_extras',
-			'type'         : 'none',
-			'dependencies' : ['copy_binary'],
-			'actions'      : [{
-				'action_name' : 'Build intermediates removed.',
-				'inputs'      : [],
-				'outputs'     : ['cpp'],
-				'conditions'  : [
-					[ 'OS=="linux"', { 'action' : [
-						'rm',
-						'<(module_root_dir)/build/Release/obj.target/MY_ADDON/cpp/MY_ADDON.o',
-						'<(module_root_dir)/build/Release/obj.target/MY_ADDON.node',
-						'<(module_root_dir)/build/Release/MY_ADDON.node'
-					] } ],
-					[ 'OS=="mac"', { 'action' : [
-						'rm',
-						'<(module_root_dir)/build/Release/obj.target/MY_ADDON/cpp/MY_ADDON.o',
-						'<(module_root_dir)/build/Release/MY_ADDON.node'
-					] } ],
-					[ 'OS=="win"', { 'action' : [
-						'<(_del)',
-						'<(module_root_dir)/build/Release/MY_ADDON.*',
-						'<(module_root_dir)/build/Release/obj/MY_ADDON/*.*'
-					] } ],
+				'action'      : [
+					'<(cp)',
+					'build/Release/MY_ADDON.node',
+					'<(binary)/MY_ADDON.node',
 				],
 			}],
 		},
 		
 	]
 }
-```
-
-Then require the built module like this:
-
-```
-const { binPath } = require('addon-tools-raub');
-const core = require(`./${binPath}/MY_ADDON`);
 ```
 
 </details>
@@ -332,99 +333,55 @@ so that you can replace:
 with
 
 ```
-#include <addon-tools.hpp> // or event-emitter.hpp
+#include <addon-tools.hpp>
 ```
 
-In gyp, the include directory should be set for your addon to know where to get it.
-As it was mentioned above, this can be done automatically. Also an actual path to the
-directory is exported from the module and is accessible like this:
+In gyp, the include directory should be set for your addon to know where
+to get it. An actual path to the directory is exported from the module
+and is accessible like this:
 
 ```
 require('addon-tools-raub').include // a string
 ```
 
-Currently, there are following helpers in **addon-tools.hpp**:
+### Helpers in **addon-tools.hpp**:
 
-
-<details>
-
-<summary>Handle scope</summary>
-
-* `NAN_HS` - creates a HandleScope. Also, you do not need them within `NAN_METHOD`,
-`NAN_SETTER`, and `NAN_GETTER`, as it is stated in
-[Nan doc](https://github.com/nodejs/nan/blob/master/doc/methods.md#api_nan_method).
-So it is most likely to be used in parts of code called from C++ land.
+Usually all the helpers work within the context of JS call. In this case we
+have `CallbackInfo info` passed as an argument.
 
 ```
-void windowFocusCB(GLFWwindow *window, int focused) { NAN_HS;
-	...
-}
-...
-glfwSetWindowFocusCallback(window, windowFocusCB);
+#define NAPI_ENV Napi::Env env = info.Env();
+#define NAPI_HS Napi::HandleScope scope(env);
 ```
 
-</details>
-
-
 <details>
 
-<summary>Method return</summary>
+<summary>Return value</summary>
 
-* `RET_VALUE(VAL)` - set method return value, where `VAL` is `v8::Local<v8::Value>`.
-* `RET_UNDEFINED` - set method return value as `undefined`.
-* `RET_STR(VAL)` - set method return value, where `VAL` is `const char *`.
-* `RET_UTF8(VAL)` - set method return value, where `VAL` is `const char *`.
-* `RET_INT(VAL)` - set method return value, where `VAL` is `int32`.
-* `RET_INT32(VAL)` - set method return value, where `VAL` is `int32`.
-* `RET_UINT32(VAL)` - set method return value, where `VAL` is `uint32`.
-* `RET_NUM(VAL)` - set method return value, where `VAL` is `double`.
-* `RET_OFFS(VAL)` - set method return value, where `VAL` is `size_t`.
-* `RET_FLOAT(VAL)` - set method return value, where `VAL` is `float`.
-* `RET_DOUBLE(VAL)` - set method return value, where `VAL` is `double`.
-* `RET_EXT(VAL)` - set method return value, where `VAL` is `void *`.
-* `RET_BOOL(VAL)` - set method return value, where `VAL` is `bool`.
-* `RET_FUN(VAL)` - set method return value, where `VAL` is `Nan::Persistent<v8::Function>`.
-* `RET_OBJ(VAL)` - set method return value, where `VAL` is `Nan::Persistent<v8::Object>`.
+* `RET_VALUE(VAL)`- return a given Napi::Value.
+* `RET_UNDEFINED`- return `undefined`.
+* `RET_NULL` - return `null`.
+* `RET_STR(VAL)` - return `Napi::String`, expected `VAL` is `const char *`.
+* `RET_NUM(VAL)` - return `Napi::Number`, expected `VAL` is `double`.
+* `RET_EXT(VAL)` - return `Napi::External`, expected `VAL` is `void *`.
+* `RET_BOOL(VAL)` - return `Napi::Boolean`, expected `VAL` is `bool`.
+* `RET_FUN(VAL)` - return `Napi::Function`, expected `VAL` is a `napi_value`.
+* `RET_OBJ(VAL)` - return `Napi::Object`, expected `VAL` is a `napi_value`.
 
 </details>
 
-
-<details>
-
-<summary>Shortcut types</summary>
-
-* `V8_VAR_VAL` = `v8::Local<v8::Value>`
-* `V8_VAR_OBJ` = `v8::Local<v8::Object>`
-* `V8_VAR_ARR` = `v8::Local<v8::Array>`
-* `V8_VAR_STR` = `v8::Local<v8::String>`
-* `V8_VAR_FUNC` = `v8::Local<v8::Function>`
-* `V8_VAR_FT` = `v8::Local<v8::FunctionTemplate>`
-* `V8_VAR_OT` = `v8::Local<v8::ObjectTemplate>`
-* `V8_STORE_FT` = `Nan::Persistent<v8::FunctionTemplate>`
-* `V8_STORE_FUNC` = `Nan::Persistent<v8::Function>`
-* `V8_STORE_OBJ` = `Nan::Persistent<v8::Object>`
-* `V8_STORE_VAL` = `Nan::Persistent<v8::Value>`
-
-</details>
 
 
 <details>
 
 <summary>New JS value</summary>
 
-* `JS_STR(...)` - create a string value
-* `JS_UTF8(...)` - same as JS_STR
-* `JS_INT(val)` - create an integer value
-* `JS_INT32(val)` - same as `JS_INT`
-* `JS_UINT32(val)` - same as `JS_INT`
-* `JS_NUM(val)` - create a numeric value
-* `JS_OFFS(val)` - same as `JS_NUM`, but has a cast designed to avoid `size_t -> double` warning
-* `JS_FLOAT(val)` - same as `JS_NUM`
-* `JS_DOUBLE(val)` - same as `JS_NUM`
-* `JS_EXT(val)` - create an external (pointer) value
-* `JS_BOOL(val)` - create a boolean value
-* `JS_FUN(val)` - get a function from persistent `Nan::Persistent<v8::Function>`.
-* `JS_OBJ(val)` - get an object from persistent `Nan::Persistent<v8::Object>`.
+* `JS_STR(VAL)` - create a `Napi::String` value.
+* `JS_NUM(VAL)` - create a `Napi::Number` value.
+* `JS_EXT(VAL)` - create a `Napi::External` (from pointer) value.
+* `JS_BOOL(VAL)` - create a `Napi::Boolean` value.
+* `JS_FUN(VAL)` - create a `Napi::Function` value.
+* `JS_OBJ(VAL)` - create a `Napi::Object` value.
 
 </details>
 
@@ -434,8 +391,8 @@ glfwSetWindowFocusCallback(window, windowFocusCB);
 <summary>Method check</summary>
 
 These checks throw JS TypeError if not passed. Here `T` is always used as a typename
-in error messages. `C` is
-[v8::Value](https://v8docs.nodesource.com/node-0.8/dc/d0a/classv8_1_1_value.html)
+in error messages. `C` is a
+[Napi::Value](https://github.com/nodejs/node-addon-api/blob/master/doc/value.md#isboolean)
 check method, like `IsObject()`. `I` is the index of argument as in `info[I]`,
 starting from `0`.
 
@@ -445,7 +402,8 @@ starting from `0`.
 * `CHECK_LET_ARG(I, C, T)` - check if argument `I` is approved by `C` check or empty.
 * `CTOR_CHECK(T)` - check if method is called as a constructor
 * `SETTER_CHECK(C, T)` - check if setter `value` is approved by `C` check.
-* `DES_CHECK` - within dynamic method check if the instance wasn't destroyed by `destroy()`.
+* `DES_CHECK` - within dynamic method check if the instance wasn't
+destroyed by `destroy()`.
 
 </details>
 
@@ -454,34 +412,64 @@ starting from `0`.
 
 <summary>Method arguments</summary>
 
-Two types of argument retrieval are supported: `REQ_` and `LET_`. The difference
-is that `LET_` allows the argument to be empty, using some zero-default in this case.
-`I` is the index of argument as in `info[I]`,
-starting from `0`. `VAR` is the name of the variable to be created.
+The idea is to ease the transition from what inside the `CallbackInfo` to
+what you work with in C++.
+Three types of argument retrieval are supported: `REQ_`, `USE_` and `LET_`.
+The difference:
+* `REQ_` - 2 params, requires an argument to have a value
+* `USE_` - 3 params, allows the argument to be empty and have a default
+* `LET_` - 2 params, is `USE_` with a preset zero-default.
 
-* `REQ_UTF8_ARG(I, VAR)` - require `I`'th argument to be a `string`. Stored at `Nan::Utf8String VAR`.
-* `LET_UTF8_ARG(I, VAR)` - let optional `I`'th argument to be a `string`, the default is `""`. Stored at `Nan::Utf8String VAR`.
-* `REQ_STR_ARG(I, VAR)` - require `I`'th argument to be a `string`. Stored at `Nan::Utf8String VAR`.
-* `LET_STR_ARG(I, VAR)` - let optional `I`'th argument to be a `string`, the default is `""`. Stored at `Nan::Utf8String VAR`.
-* `REQ_INT32_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `int VAR`.
-* `LET_INT32_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0`. Stored at `int VAR`.
-* `REQ_INT32_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `int VAR`.
-* `LET_INT32_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0`. Stored at `int VAR`.
-* `REQ_UINT32_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `unsigned VAR`.
-* `LET_UINT32_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0`. Stored at `unsigned VAR`.
-* `REQ_BOOL_ARG(I, VAR)` - require `I`'th argument to be a `boolean`. Stored at `bool VAR`.
-* `LET_BOOL_ARG(I, VAR)` - let optional `I`'th argument to be a `boolean`, the default is `false`. Stored at `Nan::Utf8String VAR`.
-* `REQ_OFFS_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `size_t VAR`.
-* `LET_OFFS_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0`. Stored at `Nan::Utf8String VAR`.
-* `REQ_DOUBLE_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `double VAR`.
-* `LET_DOUBLE_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0.0`. Stored at `Nan::Utf8String VAR`.
-* `REQ_FLOAT_ARG(I, VAR)` - require `I`'th argument to be a `number`. Stored at `float VAR`.
-* `LET_FLOAT_ARG(I, VAR)` - let optional `I`'th argument to be a `number`, the default is `0.0f`. Stored at `Nan::Utf8String VAR`.
-* `REQ_EXT_ARG(I, VAR)` - require `I`'th argument to be an `external`. Stored at `Local<External> VAR`.
-* `LET_EXT_ARG(I, VAR)` - let optional `I`'th argument to be an `external`, the default is `nullptr`. Stored at `Nan::Utf8String VAR`.
-* `REQ_FUN_ARG(I, VAR)` - require `I`'th argument to be a `function`. Stored at `Local<Function> VAR`.
-* `REQ_OBJ_ARG(I, VAR)` - require `I`'th argument to be an `object`. Stored at `Local<Object> VAR`.
-* `REQ_ARRV_ARG(I, VAR)` - require `I`'th argument to be a `TypedArray`. Stored at `Local<ArrayBufferView> VAR`.
+What it does, basically:
+```
+// REQ_DOUBLE_ARG(0, x)
+double x = info[0].ToNumber().DoubleValue();
+
+// USE_DOUBLE_ARG(0, x, 5.7)
+double x = IS_ARG_EMPTY(0) ? 5.7 : info[0].ToNumber().DoubleValue();
+
+// LET_DOUBLE_ARG(0, x)
+double x = IS_ARG_EMPTY(0) ? 0.0 : info[0].ToNumber().DoubleValue();
+```
+
+That extrapolates well to all the helpers below:
+* `REQ_STR_ARG` - JS `string` => C++ `std::string`.
+* `USE_STR_ARG`
+* `LET_STR_ARG` - default: `""`.
+* `REQ_INT32_ARG` - JS `number` => C++ `int32_t`.
+* `USE_INT32_ARG`
+* `LET_INT32_ARG` - default: `0`.
+* `REQ_INT_ARG` - JS `number` => C++ `int32_t`.
+* `USE_INT_ARG`
+* `LET_INT_ARG` - default: `0`.
+* `REQ_UINT32_ARG` - JS `number` => C++ `uint32_t`.
+* `USE_UINT32_ARG`
+* `LET_UINT32_ARG` - default: `0`.
+* `REQ_UINT_ARG` - JS `number` => C++ `uint32_t`.
+* `USE_UINT_ARG`
+* `LET_UINT_ARG` - default: `0`.
+* `REQ_BOOL_ARG` - JS `Boolean` => C++ `bool`.
+* `USE_BOOL_ARG`
+* `LET_BOOL_ARG` - default: `false`.
+* `REQ_OFFS_ARG` - JS `number` => C++ `size_t`.
+* `USE_OFFS_ARG`
+* `LET_OFFS_ARG` - default: `0`.
+* `REQ_DOUBLE_ARG` - JS `number` => C++ `double`.
+* `USE_DOUBLE_ARG`
+* `LET_DOUBLE_ARG` - default: `0.0`.
+* `REQ_FLOAT_ARG` - JS `number` => C++ `float`.
+* `USE_FLOAT_ARG`
+* `LET_FLOAT_ARG` - default: `0.f`.
+* `REQ_EXT_ARG` - JS `native` => C++ `void*`.
+* `USE_EXT_ARG`
+* `LET_EXT_ARG` - default: `nullptr`.
+* `REQ_FUN_ARG` - JS `function` => C++ `Napi::Function`.
+* `REQ_OBJ_ARG` - JS `object` => C++ `Napi::Object`.
+* `USE_OBJ_ARG`
+* `LET_OBJ_ARG` - default: `{}`.
+* `REQ_ARRV_ARG` - JS `ArrayBuffer` => C++ `Napi::ArrayBuffer`.
+* `REQ_BUF_ARG` - JS `Buffer` => C++ `Napi::Buffer<uint8_t>`.
+
 
 ```
 NAN_METHOD(test) {
@@ -493,22 +481,6 @@ NAN_METHOD(test) {
 	...
 ```
 
-> Note: The conversion from `Nan::Utf8String` to `std::string` (via `char *`)
-is possible with unary `*` operator.
-
-</details>
-
-
-<details>
-
-<summary>Set properties</summary>
-
-Set-helpers for string and numeric keys. String keys are converted to JS strings
-automatically.
-
-* `SET_PROP(OBJ, KEY, VAL)`
-* `SET_I(ARR, I, VAL)`
-
 </details>
 
 
@@ -519,18 +491,25 @@ automatically.
 Simplified accessor assignment, adds accessors of NAME for OBJ. Read accessor is
 assumed to have the name `NAME+'Getter'` and write accessor is `NAME+'Setter'`.
 
-* `ACCESSOR_RW(OBJ, NAME)` - add read and write accessors of NAME for OBJ.
-* `ACCESSOR_R(OBJ, NAME)` - read-only property.
+* `ACCESSOR_RW(CLASS, NAME)` - add read and write accessors NAME of CLASS.
+* `ACCESSOR_R(CLASS, NAME)` - add read accessor NAME of CLASS.
+* `ACCESSOR_M(CLASS, NAME)` - add method NAME of CLASS.
+
 
 ```
-void MyClass::init(Handle<Object> target) {
+void MyClass::init(Napi::Env env, Napi::Object exports) {
 	...
-	Local<ObjectTemplate> proto = ctor->PrototypeTemplate();
-	ACCESSOR_RW(proto, message);
+	Napi::Function ctor = DefineClass(env, "MyClass", {
+		ACCESSOR_R(MyClass, isDestroyed),
+		ACCESSOR_RW(MyClass, x),
+		ACCESSOR_M(MyClass, reset),
+	});
 	...
 }
-NAN_GETTER(MyClass::messageGetter) { ...
-NAN_SETTER(MyClass::messageSetter) { ...
+JS_GETTER(MyClass::isDestroyedGetter) { ...
+JS_GETTER(MyClass::xGetter) { ...
+JS_SETTER(MyClass::xSetter) { ...
+JS_METHOD(MyClass::save) { ...
 ```
 
 </details>
@@ -540,26 +519,26 @@ NAN_SETTER(MyClass::messageSetter) { ...
 
 <summary>Setter argument</summary>
 
-Useful addition to NAN_SETTER macro. Works similar to method arguments. But there
-is always only one required argument stored in `v`.
+Works similar to method arguments. But there is always `value`
+argument, from which a C++ value is extracted.
 
-* `SETTER_UTF8_ARG` - require the value to be a `string`. Stored at `Nan::Utf8String v`.
-* `SETTER_STR_ARG` - require the value to be a `string`. Stored at `Nan::Utf8String v`.
-* `SETTER_INT32_ARG` - require the value to be a `number`. Stored at `int v`.
-* `SETTER_INT_ARG` - require the value to be a `number`. Stored at `int v`.
-* `SETTER_UINT32_ARG` - require the value to be a `number`. Stored at `unsigned v`.
-* `SETTER_BOOL_ARG` - require the value to be a `boolean`. Stored at `bool v`.
-* `SETTER_OFFS_ARG` - require the value to be a `number`. Stored at `size_t v`.
-* `SETTER_DOUBLE_ARG` - require the value to be a `number`. Stored at `double v`.
-* `SETTER_FLOAT_ARG` - require the value to be a `number`. Stored at `float v`.
-* `SETTER_EXT_ARG` - require the value to be an `external`. Stored at `Local<External> v`.
-* `SETTER_FUN_ARG` - require the value to be a `function`. Stored at `Local<Function> v`.
-* `SETTER_OBJ_ARG` - require the value to be an `object`. Stored at `Local<Object> v`.
-* `SETTER_ARRV_ARG` - require the value to be a `TypedArray`. Stored at `Local<ArrayBufferView> v`.
+* `SETTER_STR_ARG`
+* `SETTER_INT32_ARG`
+* `SETTER_INT_ARG`
+* `SETTER_BOOL_ARG`
+* `SETTER_UINT32_ARG`
+* `SETTER_UINT_ARG`
+* `SETTER_OFFS_ARG`
+* `SETTER_DOUBLE_ARG`
+* `SETTER_FLOAT_ARG`
+* `SETTER_EXT_ARG`
+* `SETTER_FUN_ARG`
+* `SETTER_OBJ_ARG`
+* `SETTER_ARRV_ARG`
 
 ```
-NAN_SETTER(MyClass::messageSetter) { SETTER_UTF8_ARG;
-	// Variable created: Nan::Utf8String v;
+JS_SETTER(MyClass::x) { SETTER_STR_ARG;
+	// Variable created: std::string v;
 	...
 ```
 
@@ -571,9 +550,8 @@ NAN_SETTER(MyClass::messageSetter) { SETTER_UTF8_ARG;
 <summary>Data retrieval</summary>
 
 * `T *getArrayData(value, num = NULL)` - extracts TypedArray data of any type from
-the given JS value. Does not accept Array, checked with `IsArrayBufferView()`.
-Returns `NULL` for empty JS values. For unacceptable values throws TypeError.
-
+the given JS value. Does not accept `Array`. Checks with `IsArrayBuffer()`.
+Returns `nullptr` for empty JS values. For unacceptable values throws TypeError.
 
 * `void *getData(value)` - if value is a TypedArray, then the result of
 `getArrayData(value)` is returned. Otherwise if value has `'data'` property, it's
@@ -589,39 +567,16 @@ content is then returned as `node::Buffer`. Returns `nullptr` in other cases.
 Exports:
 * `paths(dir)` - function. Returns a set of platform dependent paths depending on
 input `dir`.
-	* `bin()` - prints platform binary directory absolute path.
-	* `rem()` - prints a space-separated list of binary paths to be cleaned on this platform.
-	* `include()` - prints include directory for this `dir`.
-	* `binPath` - platform binary directory absolute path.
-	* `remPath` - a space-separated list of binary paths to be cleaned on this platform.
-	* `includePath` - include directory for this `dir`.
-* `root()` - prints where `'addon-tools-raub'` module is situated.
-* `include()` - prints both `'addon-tools-raub'` and `'nan'` include paths. Use with
-`node -e` through list context command expansion `<!@(...)`
-* `rm()` - prints the location of `'_rm.bat'` file on Windows and plain `rm` on Unix.
-* `cp()` - prints the location of `'_cp.bat'` file on Windows and plain `cp` on Unix.
-* `mkdir()` - prints the location of `'_mkdir.bat'` file on Windows and plain `mkdir` on Unix.
-* `bin()` - prints platform binary directory name.
-* `binPath` - platform binary directory name.
-* `rootPath` - where `'addon-tools-raub'` module is situated.
-* `includePath` - both `'addon-tools-raub'` and `'nan'` include paths.
-* `rmPath` - the location of `'_rm.bat'` file on Windows and plain `rm` on Unix.
-* `cpPath` - the location of `'_cp.bat'` file on Windows and plain `cp` on Unix.
-* `mkdirPath` - the location of `'_mkdir.bat'` file on Windows and plain `mkdir` on Unix.
+	* `bin` - platform binary directory absolute path.
+	* `include` - include directory for this `dir`.
+* `include` - both `'addon-tools-raub'` and `'node-addon-api'` include paths.
+Use with `node -p` through list context command expansion `<!@(...)`
+* `rm` - the location of `'_rm.bat'` file on Windows and plain `rm` on Unix.
+* `cp` - the location of `'_cp.bat'` file on Windows and plain `cp` on Unix.
+* `mkdir` - the location of `'_mkdir.bat'` file on Windows and plain `mkdir` on Unix.
+* `bin` - platform binary directory name.
 
 ---
-
-
-## Crossplatform commands
-
-Because of the differences between Windows and Unix command shells, often a whole
-lot of conditions have to be introduced in **binding.gyp** file. Now some of
-them can be easily omitted with the new crossplatform commands, supplied by this
-package.
-
-This comes especially handy together with GYP's executable list expansion. For
-example a list of files to be removed for cleaning. Or a list of unnecessary
-binaries to be removed upon installation of a binary-dependency package.
 
 
 ### mkdir
@@ -635,7 +590,7 @@ folder. This can possibly be bypassed by supplying `./-p` or something like this
 
 ```
 'variables': {
-	'mkdir' : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
+	'mkdir' : '<!(node -p "require(\'addon-tools-raub\').mkdir")',
 },
 ...
 'action' : ['<(mkdir)', '-p', 'binary'],
@@ -649,11 +604,10 @@ be used on all platforms to remove single and multiple files and directories.
 
 ```
 'variables': {
-	'rm'  : '<!(node -e "require(\'addon-tools-raub\').rm()")',
-	'rem' : '<!(node -e "require(\'.\').rem()")',
+	'rm'  : '<!(node -e "require(\'addon-tools-raub\').rm")',
 },
 ...
-'action' : ['<(rm)', '-rf', '<@(rem)'],
+'action' : ['<(rm)', '-rf', 'dirname'],
 ```
 
 ### cp
@@ -662,100 +616,11 @@ For Windows the `/y` flag was embedded.
 
 ```
 'variables': {
-	'cp'  : '<!(node -e "require(\'addon-tools-raub\').cp()")',
+	'cp'  : '<!(node -e "require(\'addon-tools-raub\').cp")',
 },
 ...
 'action' : ['<(cp)', 'a', 'b'],
 ```
-
----
-
-
-## Class EventEmitter
-
-A C++ implementation of [Events API](https://nodejs.org/api/events.html).
-
-> Note: This implementation has some minor deviations from the above standard.
-Specifically there is no static `EventEmitter.defaultMaxListeners` property.
-However the dynamic one persists and is infinite (`0`) by default.
-
-Also
-[EventTarget](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget)
-is implemented. Not in full detail, but should be fine for callers.
-
-An example can be found in **examples/node-addon** directory.
-There is `Example` class, implemented in **cpp/example.cpp**, that inherits
-EventEmitter behavior and is exported to JS.
-
-For the C++ side `EventEmitter` has following public methods:
-
-* `void emit(const std::string &name, int argc = 0, v8::Local<v8::Value> *argv = NULL)` -
-emits an event with the given `name` and, optionally, some additional arguments where
-`argc` is the number of arguments and `argv` is a pointer to the arguments array.
-
-* `void on(const std::string &name, V8_VAR_FUNC cb)` -
-subscribes `cb` to receive `name` events from this emitter, basically
-`emitter.on(name, cb)`.
-
-* `void destroy()` - destroys the object, i.e. deactivates it and frees
-resources. This is what also called inside
-`~EventEmitter()`, but only the first call is effective anyway.
-
-
-Be sure to add the include directory in **binding.gyp**:
-
-```
-	'include_dirs': [
-		'<!@(node -e "require(\'addon-tools-raub\').include()")',
-	],
-```
-
-Then include the **event-emitter.hpp**, it also includes **addon-tools.hpp**.
-Inherit from `EventEmitter`, it already inherits from `Nan::ObjectWrap`:
-
-```
-#include <event-emitter.hpp>
-
-class Example : public EventEmitter {
-	...
-}
-```
-
-> Note: Do not forget to call `EventEmitter::init()` once, in the module `init()`.
-
-
-<details>
-
-<summary>V8 Inheritance</summary>
-
-Now that everything is in place, consider providing **V8** with JS inheritance info:
-
-```
-void Example::init(Handle<Object> target) {
-	
-	Local<FunctionTemplate> proto = Nan::New<FunctionTemplate>(newCtor);
-	
-	// -------------------------- HERE!
-	// class Example extends EventEmitter
-	Local<FunctionTemplate> parent = Nan::New(EventEmitter::_prototype);
-	proto->Inherit(parent);
-	// --------------------------
-	
-	proto->InstanceTemplate()->SetInternalFieldCount(1);
-	proto->SetClassName(JS_STR("Example"));
-	
-	Local<Function> ctor = Nan::GetFunction(proto).ToLocalChecked();
-	
-	_constructor.Reset(ctor);
-	
-	Nan::Set(target, JS_STR("Example"), ctor);
-	
-}
-```
-
-</details>
-
----
 
 
 ## Function consoleLog
@@ -766,7 +631,7 @@ At first it may look as if `cout << "msg" << endl;` works nice, but it doesn't.
 After a while, it just ceases on a midword, and you end up thinking something has
 broken really hard in your addon.
 
-To overcome this, we can use some V8 `eval` magic to make a real `console.log`
+To overcome this, we can use some `eval` magic to make a real `console.log`
 call from C++ land. And this is where `consoleLog` comes into play.
 
 * `inline void consoleLog(int argc, V8_VAR_VAL *argv)` - a generic logger,
@@ -775,4 +640,39 @@ receives any set of arguments.
 * `inline void consoleLog(const std::string &message)` - an alias to log a single
 string.
 
-> Note: Don't do it in GC-accessible code: sometimes it works, sometimes it crashes.
+> Note: only use this within JS function stack
+
+
+## Function eventEmit
+
+In N-API there is no inheritance. And no `eval('require(...)')` possible at
+the time of module init. But `require('events')` is very tempting...
+The solution is:
+
+```
+// JS
+const EventEmitter = require('events');
+const { bin } = require('addon-tools-raub');
+const MyClass = require(`./${bin}/addon`);
+MyClass.prototype.__proto__ = EventEmitter.prototype;
+// Since now it is possible to call `emit` from instancess of MyClass
+```
+
+```
+// C++
+void MyClass::emit(const Napi::CallbackInfo& info, const char* name) {
+	NAPI_ENV;
+	eventEmit(env, info.This().As<Napi::Object>(), name);
+}
+```
+
+Signature:
+```
+inline void eventEmit(
+	Napi::Env env,
+	Napi::Object that,
+	const std::string &name,
+	int argc = 0,
+	Napi::Value *argv = nullptr
+)
+```
