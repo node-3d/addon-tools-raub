@@ -19,10 +19,9 @@ const onError = msg => {
 
 const install = (url, count = 1) => {
 	
-	url = url.toLowerCase();
 	const proto = protocols[url.match(/^https?/)[0]];
 	
-	const request = https.get(url, response => {
+	const request = proto.get(url, response => {
 		
 		// Handle redirects
 		if ([301, 302, 303, 307].includes(response.statusCode)) {

@@ -662,7 +662,8 @@ MyClass.prototype.__proto__ = EventEmitter.prototype;
 // C++
 void MyClass::emit(const Napi::CallbackInfo& info, const char* name) {
 	NAPI_ENV;
-	eventEmit(env, info.This().As<Napi::Object>(), name);
+	THIS_OBJ(that);
+	eventEmit(env, that, name);
 }
 ```
 
