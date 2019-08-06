@@ -48,27 +48,53 @@ Useful links: [N-API Docs](https://nodejs.org/api/n-api.html),
 ## Snippets
 
 
-### binding.gyp
-
 ### Crossplatform commands
 
 ```
 'variables': {
-	'rm'    : '<!(node -e "require(\'addon-tools-raub\').rm()")',
-	'cp'    : '<!(node -e "require(\'addon-tools-raub\').cp()")',
-	'mkdir' : '<!(node -e "require(\'addon-tools-raub\').mkdir()")',
+	'rm'    : '<!(node -p "require(\'addon-tools-raub\').rm")',
+	'cp'    : '<!(node -p "require(\'addon-tools-raub\').cp")',
+	'mkdir' : '<!(node -p "require(\'addon-tools-raub\').mkdir")',
 },
 ```
 
-On both Windows and Unix those are the console commands for various
-file system operations. No need for GYP conditions, yay!
+On both Windows and Unix those commands now have the same result:
+
+```
+{
+	'target_name'  : 'make_directory',
+	'type'         : 'none',
+	'dependencies' : ['addon'],
+	'actions'      : [{
+		'action_name' : 'Directory created.',
+		'inputs'      : [],
+		'outputs'     : ['build'],
+		'action': ['<(mkdir)', '-p', '<(binary)']
+	}],
+},
+{
+	'target_name'  : 'copy_binary',
+	'type'         : 'none',
+	'dependencies' : ['make_directory'],
+	'actions'      : [{
+		'action_name' : 'Module copied.',
+		'inputs'      : [],
+		'outputs'     : ['binary'],
+		'action'      : [
+			'<(cp)',
+			'build/Release/addon.node',
+			'<(binary)/addon.node'
+		],
+	}],
+},
+```
 
 
 ### Addon binary directory
 
 ```
 'variables': {
-	'binary' : '<!(node -e "require(\'addon-tools-raub\').bin()")',
+	'binary' : '<!(node -p "require(\'addon-tools-raub\').bin")',
 },
 ```
 
