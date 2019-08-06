@@ -29,11 +29,13 @@ const install = (url, count = 1) => {
 			if (count < 5) {
 				return install(response.headers.location, count + 1);
 			}
+			console.log(url);
 			return onError('Error: Too many redirects.');
 		}
 		
 		// Handle bad status
 		if (response.statusCode !== 200) {
+			console.log(url);
 			return onError(`Response status was ${response.statusCode}`);
 		}
 		
@@ -52,6 +54,6 @@ const install = (url, count = 1) => {
 
 
 module.exports = folder => {
-	const url = `${folder}/${platform}`;
+	const url = `${folder}/${platform}.zip`;
 	install(url);
 };
