@@ -16,4 +16,4 @@ matrix:
 
 install:
   - cd test
-  - npm i
+  - npm ci

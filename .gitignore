@@ -3,6 +3,8 @@
 .lock-wscript
 .DS_Store
 .project
+.DS_Store
+.eslintrc
 node_modules/
-package-lock.json
+bin-*/
 *.log
