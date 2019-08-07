@@ -11,15 +11,6 @@ const PROPS = ['bin', 'platform', 'include', 'mkdir', 'rm', 'cp'];
 
 describe('Tools', () => {
 	
-	let log;
-	let stubbed;
-	beforeEach(() => {
-		log = spy();
-		stubbed = stub(console, 'log').callsFake(log);
-	});
-	afterEach(() => stubbed.restore());
-	
-	
 	describe('Properties', () => {
 		
 		PROPS.forEach(
