@@ -1,7 +1,6 @@
 'use strict';
 
 const { expect } = require('chai');
-const { stub, spy } = require('sinon');
 
 const tools = require('..');
 
