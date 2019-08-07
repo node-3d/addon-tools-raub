@@ -3,7 +3,7 @@
 const { expect } = require('chai');
 const { stub, spy } = require('sinon');
 
-const tools = require('addon-tools-raub');
+const tools = require('..');
 
 
 const PROPS = ['bin', 'platform', 'include', 'mkdir', 'rm', 'cp'];
