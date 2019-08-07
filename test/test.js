@@ -1,24 +1,14 @@
 'use strict';
 
 const { expect } = require('chai');
-const { stub, spy } = require('sinon');
 
-const tools = require('addon-tools-raub');
+const tools = require('..');
 
 
 const PROPS = ['bin', 'platform', 'include', 'mkdir', 'rm', 'cp'];
 
 
 describe('Tools', () => {
-	
-	let log;
-	let stubbed;
-	beforeEach(() => {
-		log = spy();
-		stubbed = stub(console, 'log').callsFake(log);
-	});
-	afterEach(() => stubbed.restore());
-	
 	
 	describe('Properties', () => {
 		

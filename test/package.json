@@ -5,10 +5,9 @@
 	"main": "mocha",
 	"scripts": {
 		"test": "mocha",
-		"preinstall": "cd .. && npm i"
+		"preinstall": "cd .. && npm ci"
 	},
 	"dependencies": {
-		"addon-tools-raub": "..",
 		"chai": "4.2.0",
 		"mocha": "6.2.0",
 		"sinon": "7.3.2"

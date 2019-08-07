@@ -3,10 +3,11 @@
 .lock-wscript
 .DS_Store
 .project
+.DS_Store
+.eslintrc
+.gitignore
 node_modules/
 package-lock.json
-.gitignore
-CPPLINT.cfg
-.eslintrc
 test/
+examples/
 *.log
