@@ -1,7 +1,5 @@
 'use strict';
 
-const path = require('path');
-
 const platformNames = {
 	win32  : 'windows',
 	linux  : 'linux',
