@@ -12,9 +12,9 @@
 #define JS_STR(VAL) Napi::String::New(env, VAL)
 #define JS_NUM(VAL) Napi::Number::New(env, static_cast<double>(VAL))
 #define JS_EXT(VAL) Napi::External::New(env, reinterpret_cast<void*>(VAL))
-#define JS_BOOL(VAL) Napi::Boolean::New(env, VAL)
-#define JS_FUN(VAL) Napi::Function::Function(env, VAL)
-#define JS_OBJ(VAL) Napi::Object::Object(env, VAL)
+#define JS_BOOL(VAL) Napi::Boolean::New(env, static_cast<bool>(VAL))
+#define JS_FUN(VAL) Napi::Function::New(env, VAL)
+#define JS_OBJ(VAL) Napi::Object::New(env, VAL)
 
 
 #define RET_VALUE(VAL) return VAL;
@@ -74,7 +74,7 @@
 
 #define USE_INT32_ARG(I, VAR, DEF)                                            \
 	CHECK_LET_ARG(I, IsNumber(), "Int32");                                    \
-	int VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].Int32Value();
+	int VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].ToNumber().Int32Value();
 
 #define LET_INT32_ARG(I, VAR) USE_INT32_ARG(I, VAR, 0)
 
