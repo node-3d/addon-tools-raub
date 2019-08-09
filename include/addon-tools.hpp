@@ -306,11 +306,14 @@ inline Type* getArrayData(Napi::Env env, Napi::Object obj, int *num = nullptr) {
 	Type *data = nullptr;
 	
 	if (data.IsTypedArray()) {
-		Napi::ArrayBuffer arr = obj.As<Napi::TypedArray>().ArrayBuffer();
+		Napi::TypedArray ta = obj.As<Napi::TypedArray>();
+		size_t offset = ta.ByteOffset();
+		Napi::ArrayBuffer arr = ta.ArrayBuffer();
 		if (num) {
 			*num = arr.ByteLength() / sizeof(Type);
 		}
-		data = static_cast<Type *>(arr.Data());
+		uint8_t *base = arr.Data();
+		data = static_cast<Type *>(base + offset);
 	} else if (data.IsArrayBuffer()) {
 		Napi::ArrayBuffer arr = obj.As<Napi::ArrayBuffer>();
 		if (num) {
@@ -357,24 +360,14 @@ inline void *getData(Napi::Env env, Napi::Object obj) {
 	
 	void *pixels = nullptr;
 	
-	if (obj.IsArrayBuffer()) {
-		pixels = getArrayData<unsigned char>(env, obj);
-	} else if (obj.IsTypedArray()) {
-		pixels = getArrayData<unsigned char>(
-			env,
-			obj.As<Napi::TypedArray>().ArrayBuffer()
-		);
+	if (obj.IsTypedArray() || obj.IsArrayBuffer()) {
+		pixels = getArrayData<uint8_t>(env, obj);
 	} else if (obj.Has("data")) {
 		Napi::Object data = obj.Get("data").As<Napi::Object>();
-		if (data.IsArrayBuffer()) {
-			pixels = getArrayData<unsigned char>(env, data);
+		if (data.IsTypedArray() || data.IsArrayBuffer()) {
+			pixels = getArrayData<uint8_t>(env, data);
 		} else if (data.IsBuffer()) {
-			pixels = getBufferData<unsigned char>(env, data);
-		} else if (data.IsTypedArray()) {
-			pixels = getArrayData<unsigned char>(
-				env,
-				data.As<Napi::TypedArray>().ArrayBuffer()
-			);
+			pixels = getBufferData<uint8_t>(env, data);
 		}
 	}
 	
