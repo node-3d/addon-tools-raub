@@ -169,6 +169,23 @@ typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
 	V8_VAR_ABV VAR = V8_VAR_ABV::Cast(_obj_##VAR);
 
 
+#define REQ_ARRAY_ARG(I, VAR)                                                 \
+	REQ_OBJ_ARG(I, _obj_##VAR);                                               \
+  	if ( ! _obj_##VAR->IsArray() ) {                                          \
+  	  	return Nan::ThrowTypeError("Argument " #I " must be an array");       \
+  	}                                                                         \
+  	V8_VAR_ARR VAR = V8_VAR_ARR::Cast(_obj_##VAR)
+
+
+#define REQ_TYPED_ARRAY_ARG(I, VAR, ARR)                                         \
+	REQ_OBJ_ARG(I, _obj_##VAR);                                                  \
+  	if ( ! _obj_##VAR->IsArrayBufferView() ) {                                   \
+  	  	return Nan::ThrowTypeError("Argument " #I " must be an array buffer");   \
+  	}                                                                            \
+	v8::Local<v8::Object> obj = Nan::To<v8::Object>(_obj_##VAR).ToLocalChecked();\
+	v8::Local<v8::ARR> VAR = obj.As<ARR>();
+
+
 #define SET_PROP(OBJ, KEY, VAL) OBJ->Set(JS_STR(KEY), VAL);
 #define SET_I(ARR, I, VAL) ARR->Set(I, VAL);
 
