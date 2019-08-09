@@ -267,23 +267,20 @@ inline Type* getArrayData(V8_VAR_OBJ obj, int *num = nullptr) {
 	
 	Type *data = nullptr;
 	
-	if (num) {
-		*num = 0;
-	}
-	
-	if ( ! obj->IsArrayBufferView() ) {
+	if (obj->IsArrayBuffer()) {
+		v8::Local<v8::ArrayBuffer> ab = obj.As<v8::ArrayBuffer>();
+		data = reinterpret_cast<Type*>(ab->GetContents().Data());
+		if (num) { *num = ab->ByteLength() / sizeof(Type); }
+	} else if (obj->IsTypedArray()) {
+		v8::Local<v8::TypedArray> ta = obj.As<v8::TypedArray>();
+		data = static_cast<Type*>(ta->Buffer()->GetContents().Data()) + ta->ByteOffset();
+		if (num) { *num = ta->ByteLength() / sizeof(Type); }
+	} else {
+		if (num) { *num = 0; }
 		Nan::ThrowError("Argument must be a TypedArray.");
-		return data;
 	}
-	
-	V8_VAR_ABV arr = V8_VAR_ABV::Cast(obj);
-	if (num) {
-		*num = arr->ByteLength() / sizeof(Type);
-	}
-	data = reinterpret_cast<Type*>(arr->Buffer()->GetContents().Data());
-	
+
 	return data;
-	
 }
 
 
