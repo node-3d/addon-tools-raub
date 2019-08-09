@@ -305,20 +305,24 @@ inline Type* getArrayData(Napi::Env env, Napi::Object obj, int *num = nullptr) {
 	
 	Type *data = nullptr;
 	
-	if (num) {
-		*num = 0;
-	}
-	
-	if ( ! obj.IsArrayBuffer() ) {
+	if (data.IsTypedArray()) {
+		Napi::ArrayBuffer arr = obj.As<Napi::TypedArray>().ArrayBuffer();
+		if (num) {
+			*num = arr.ByteLength() / sizeof(Type);
+		}
+		data = static_cast<Type *>(arr.Data());
+	} else if (data.IsArrayBuffer()) {
+		Napi::ArrayBuffer arr = obj.As<Napi::ArrayBuffer>();
+		if (num) {
+			*num = arr.ByteLength() / sizeof(Type);
+		}
+		data = static_cast<Type *>(arr.Data());
+	} else {
+		if (num) {
+			*num = 0;
+		}
 		JS_THROW("Argument must be of type `TypedArray`.");
-		return data;
 	}
-	
-	Napi::ArrayBuffer arr = obj.As<Napi::ArrayBuffer>();
-	if (num) {
-		*num = arr.ByteLength() / sizeof(Type);
-	}
-	data = static_cast<Type *>(arr.Data());
 	
 	return data;
 	
