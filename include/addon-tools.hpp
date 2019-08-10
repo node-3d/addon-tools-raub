@@ -12,9 +12,9 @@
 #define JS_STR(VAL) Napi::String::New(env, VAL)
 #define JS_NUM(VAL) Napi::Number::New(env, static_cast<double>(VAL))
 #define JS_EXT(VAL) Napi::External::New(env, reinterpret_cast<void*>(VAL))
-#define JS_BOOL(VAL) Napi::Boolean::New(env, VAL)
-#define JS_FUN(VAL) Napi::Function::Function(env, VAL)
-#define JS_OBJ(VAL) Napi::Object::Object(env, VAL)
+#define JS_BOOL(VAL) Napi::Boolean::New(env, static_cast<bool>(VAL))
+#define JS_FUN(VAL) Napi::Function::New(env, VAL)
+#define JS_OBJ(VAL) Napi::Object::New(env, VAL)
 
 
 #define RET_VALUE(VAL) return VAL;
@@ -74,7 +74,7 @@
 
 #define USE_INT32_ARG(I, VAR, DEF)                                            \
 	CHECK_LET_ARG(I, IsNumber(), "Int32");                                    \
-	int VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].Int32Value();
+	int VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].ToNumber().Int32Value();
 
 #define LET_INT32_ARG(I, VAR) USE_INT32_ARG(I, VAR, 0)
 
@@ -305,20 +305,27 @@ inline Type* getArrayData(Napi::Env env, Napi::Object obj, int *num = nullptr) {
 	
 	Type *data = nullptr;
 	
-	if (num) {
-		*num = 0;
-	}
-	
-	if ( ! obj.IsArrayBuffer() ) {
+	if (data.IsTypedArray()) {
+		Napi::TypedArray ta = obj.As<Napi::TypedArray>();
+		size_t offset = ta.ByteOffset();
+		Napi::ArrayBuffer arr = ta.ArrayBuffer();
+		if (num) {
+			*num = arr.ByteLength() / sizeof(Type);
+		}
+		uint8_t *base = arr.Data();
+		data = static_cast<Type *>(base + offset);
+	} else if (data.IsArrayBuffer()) {
+		Napi::ArrayBuffer arr = obj.As<Napi::ArrayBuffer>();
+		if (num) {
+			*num = arr.ByteLength() / sizeof(Type);
+		}
+		data = static_cast<Type *>(arr.Data());
+	} else {
+		if (num) {
+			*num = 0;
+		}
 		JS_THROW("Argument must be of type `TypedArray`.");
-		return data;
 	}
-	
-	Napi::ArrayBuffer arr = obj.As<Napi::ArrayBuffer>();
-	if (num) {
-		*num = arr.ByteLength() / sizeof(Type);
-	}
-	data = static_cast<Type *>(arr.Data());
 	
 	return data;
 	
@@ -353,24 +360,14 @@ inline void *getData(Napi::Env env, Napi::Object obj) {
 	
 	void *pixels = nullptr;
 	
-	if (obj.IsArrayBuffer()) {
-		pixels = getArrayData<unsigned char>(env, obj);
-	} else if (obj.IsTypedArray()) {
-		pixels = getArrayData<unsigned char>(
-			env,
-			obj.As<Napi::TypedArray>().ArrayBuffer()
-		);
+	if (obj.IsTypedArray() || obj.IsArrayBuffer()) {
+		pixels = getArrayData<uint8_t>(env, obj);
 	} else if (obj.Has("data")) {
 		Napi::Object data = obj.Get("data").As<Napi::Object>();
-		if (data.IsArrayBuffer()) {
-			pixels = getArrayData<unsigned char>(env, data);
+		if (data.IsTypedArray() || data.IsArrayBuffer()) {
+			pixels = getArrayData<uint8_t>(env, data);
 		} else if (data.IsBuffer()) {
-			pixels = getBufferData<unsigned char>(env, data);
-		} else if (data.IsTypedArray()) {
-			pixels = getArrayData<unsigned char>(
-				env,
-				data.As<Napi::TypedArray>().ArrayBuffer()
-			);
+			pixels = getBufferData<uint8_t>(env, data);
 		}
 	}
 	
