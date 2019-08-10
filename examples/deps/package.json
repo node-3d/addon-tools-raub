@@ -4,6 +4,6 @@
 	"private": true,
 	"main": "index.js",
 	"dependencies": {
-		"addon-tools-raub": "1.0.0"
+		"addon-tools-raub": "4.2.0"
 	}
 }

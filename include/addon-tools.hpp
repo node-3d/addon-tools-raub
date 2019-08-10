@@ -177,15 +177,6 @@ typedef Nan::Persistent<v8::Value> V8_STORE_VAL;
   	V8_VAR_ARR VAR = V8_VAR_ARR::Cast(_obj_##VAR)
 
 
-#define REQ_TYPED_ARRAY_ARG(I, VAR, ARR)                                         \
-	REQ_OBJ_ARG(I, _obj_##VAR);                                                  \
-  	if ( ! _obj_##VAR->IsArrayBufferView() ) {                                   \
-  	  	return Nan::ThrowTypeError("Argument " #I " must be an array buffer");   \
-  	}                                                                            \
-	v8::Local<v8::Object> obj = Nan::To<v8::Object>(_obj_##VAR).ToLocalChecked();\
-	v8::Local<v8::ARR> VAR = obj.As<ARR>();
-
-
 #define SET_PROP(OBJ, KEY, VAL) OBJ->Set(JS_STR(KEY), VAL);
 #define SET_I(ARR, I, VAL) ARR->Set(I, VAL);
 
@@ -270,13 +261,20 @@ inline Type* getArrayData(V8_VAR_OBJ obj, int *num = nullptr) {
 	if (obj->IsArrayBuffer()) {
 		v8::Local<v8::ArrayBuffer> ab = obj.As<v8::ArrayBuffer>();
 		data = reinterpret_cast<Type*>(ab->GetContents().Data());
-		if (num) { *num = ab->ByteLength() / sizeof(Type); }
+		if (num) {
+			*num = ab->ByteLength() / sizeof(Type);
+		}
 	} else if (obj->IsTypedArray()) {
 		v8::Local<v8::TypedArray> ta = obj.As<v8::TypedArray>();
-		data = static_cast<Type*>(ta->Buffer()->GetContents().Data()) + ta->ByteOffset();
-		if (num) { *num = ta->ByteLength() / sizeof(Type); }
+		auto slice = static_cast<unsigned char*>(ta->Buffer()->GetContents().Data());
+		data = reinterpret_cast<Type*>(slice + ta->ByteOffset());
+		if (num) {
+			*num = ta->ByteLength() / sizeof(Type);
+		}
 	} else {
-		if (num) { *num = 0; }
+		if (num) {
+			*num = 0;
+		}
 		Nan::ThrowError("Argument must be a TypedArray.");
 	}
 
