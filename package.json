@@ -17,6 +17,17 @@
 		"napi",
 		"gyp"
 	],
+	"files": [
+		"bat",
+		"include",
+		"download.js",
+		"index.js",
+		"install.js",
+		"writable-buffer.js",
+		"LICENSE",
+		"package.json",
+		"README.md"
+	],
 	"engines": {
 		"node": ">=10.16.1",
 		"npm": ">=6.9.0"
