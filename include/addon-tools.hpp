@@ -5,6 +5,11 @@
 #include <napi.h>
 
 
+#ifdef _WIN32
+	#define	strcasestr(s, t) strstr(strupr(s), strupr(t))
+#endif
+
+
 #define NAPI_ENV Napi::Env env = info.Env();
 #define NAPI_HS Napi::HandleScope scope(env);
 
@@ -183,6 +188,23 @@
 	Napi::Buffer<uint8_t> VAR = info[I].As< Napi::Buffer<uint8_t> >();
 
 
+#define REQ_ARRAY_ARG(I, VAR)                                                 \
+	REQ_OBJ_ARG(I, _obj_##VAR);                                               \
+	if ( ! _obj_##VAR.IsArray() ) {                                           \
+		JS_THROW("Argument " #I " must  be of type `Array`");                 \
+	}                                                                         \
+	Napi::Array VAR = _obj_##VAR.As<Napi::Array>();
+
+
+#define REQ_TYPED_ARRAY_ARG(I, VAR)                                           \
+	REQ_OBJ_ARG(I, _obj_##VAR);                                               \
+	if ( ! _obj_##VAR.IsTypedArray() ) {                                      \
+		JS_THROW("Argument " #I " must be of type `TypedArray`");             \
+	}                                                                         \
+	Napi::TypedArray VAR = _obj_##VAR.As<Napi::TypedArray>();
+
+
+
 #define CTOR_CHECK(T)                                                         \
 	if ( ! info.IsConstructCall() )                                           \
 		JS_THROW(T " must be called with the 'new' keyword.");
@@ -300,26 +322,26 @@
 #define JS_RUN JS_RUN_3
 
 
-template<typename Type>
+template<typename Type = uint8_t>
 inline Type* getArrayData(Napi::Env env, Napi::Object obj, int *num = nullptr) {
 	
 	Type *data = nullptr;
 	
-	if (data.IsTypedArray()) {
+	if (obj.IsTypedArray()) {
 		Napi::TypedArray ta = obj.As<Napi::TypedArray>();
 		size_t offset = ta.ByteOffset();
 		Napi::ArrayBuffer arr = ta.ArrayBuffer();
 		if (num) {
 			*num = arr.ByteLength() / sizeof(Type);
 		}
-		uint8_t *base = arr.Data();
-		data = static_cast<Type *>(base + offset);
-	} else if (data.IsArrayBuffer()) {
+		uint8_t *base = reinterpret_cast<uint8_t *>(arr.Data());
+		data = reinterpret_cast<Type *>(base + offset);
+	} else if (obj.IsArrayBuffer()) {
 		Napi::ArrayBuffer arr = obj.As<Napi::ArrayBuffer>();
 		if (num) {
 			*num = arr.ByteLength() / sizeof(Type);
 		}
-		data = static_cast<Type *>(arr.Data());
+		data = reinterpret_cast<Type *>(arr.Data());
 	} else {
 		if (num) {
 			*num = 0;
@@ -331,7 +353,7 @@ inline Type* getArrayData(Napi::Env env, Napi::Object obj, int *num = nullptr) {
 	
 }
 
-template<typename Type>
+template<typename Type = uint8_t>
 inline Type* getBufferData(Napi::Env env, Napi::Object obj, int *num = nullptr) {
 	
 	Type *data = nullptr;
