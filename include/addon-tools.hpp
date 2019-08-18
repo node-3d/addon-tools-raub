@@ -212,8 +212,8 @@
 	if (_isDestroyed) return;
 
 #define THIS_CHECK                                                            \
-	if (_isDestroyed) RET_UNDEFINED;                                          \
-	NAPI_ENV;
+	NAPI_ENV;                                                                 \
+	if (_isDestroyed) RET_UNDEFINED;
 
 #define CACHE_CAS(CACHE, V)                                                   \
 	if (CACHE == V) {                                                         \
