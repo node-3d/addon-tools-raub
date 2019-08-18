@@ -204,7 +204,6 @@
 	Napi::TypedArray VAR = _obj_##VAR.As<Napi::TypedArray>();
 
 
-
 #define CTOR_CHECK(T)                                                         \
 	if ( ! info.IsConstructCall() )                                           \
 		JS_THROW(T " must be called with the 'new' keyword.");
@@ -213,8 +212,18 @@
 	if (_isDestroyed) return;
 
 #define THIS_CHECK                                                            \
-	NAPI_ENV;                                                                 \
-	if (_isDestroyed) RET_UNDEFINED;
+	if (_isDestroyed) RET_UNDEFINED;                                          \
+	NAPI_ENV;
+
+#define CACHE_CAS(CACHE, V)                                                   \
+	if (CACHE == V) {                                                         \
+		return;                                                               \
+	}                                                                         \
+	CACHE = V;
+
+#define THIS_SETTER_CHECK                                                     \
+	if (_isDestroyed) return;                                                 \
+	NAPI_ENV;
 
 #define SETTER_CHECK(C, T)                                                    \
 	if ( ! value.C )                                                          \
@@ -398,24 +407,15 @@ inline void *getData(Napi::Env env, Napi::Object obj) {
 }
 
 
-inline void consoleLog(Napi::Env env, int argc, Napi::Value *argv) {
-	
-	JS_RUN_2("((...args) => console.log(...args))", log);
-	std::vector<napi_value> args;
-	for (int i = 0; i < argc; i++) {
-		args.push_back(napi_value(argv[i]));
-	}
-	
-	log.As<Napi::Function>().Call(napi_value(env.Null()), args);
-	
+inline void consoleLog(Napi::Env env, int argc, const Napi::Value *argv) {
+	JS_RUN_2("console.log", log);
+	log.As<Napi::Function>().Call(argc, argv);
 }
 
 
 inline void consoleLog(Napi::Env env, const std::string &message) {
-	
 	Napi::Value arg = JS_STR(message);
 	consoleLog(env, 1, &arg);
-	
 }
 
 
@@ -424,7 +424,7 @@ inline void eventEmit(
 	Napi::Object that,
 	const std::string &name,
 	int argc = 0,
-	Napi::Value *argv = nullptr
+	const Napi::Value *argv = nullptr
 ) {
 	
 	if ( ! that.Has("emit") ) {
