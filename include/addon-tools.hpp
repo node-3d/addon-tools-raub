@@ -409,7 +409,11 @@ inline void *getData(Napi::Env env, Napi::Object obj) {
 
 inline void consoleLog(Napi::Env env, int argc, const Napi::Value *argv) {
 	JS_RUN_2("console.log", log);
-	log.As<Napi::Function>().Call(argc, argv);
+	std::vector<napi_value> args;
+	for (int i = 0; i < argc; i++) {
+		args.push_back(napi_value(argv[i]));
+	}
+	log.As<Napi::Function>().Call(args);
 }
 
 
