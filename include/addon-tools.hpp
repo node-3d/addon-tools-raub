@@ -16,7 +16,7 @@
 
 #define JS_STR(VAL) Napi::String::New(env, VAL)
 #define JS_NUM(VAL) Napi::Number::New(env, static_cast<double>(VAL))
-#define JS_EXT(VAL) Napi::External::New(env, reinterpret_cast<void*>(VAL))
+#define JS_EXT(VAL) Napi::External<void*>::New(env, reinterpret_cast<void*>(VAL))
 #define JS_BOOL(VAL) Napi::Boolean::New(env, static_cast<bool>(VAL))
 #define JS_FUN(VAL) Napi::Function::New(env, VAL)
 #define JS_OBJ(VAL) Napi::Object::New(env, VAL)
