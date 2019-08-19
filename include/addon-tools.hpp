@@ -153,11 +153,13 @@
 
 #define REQ_EXT_ARG(I, VAR)                                                   \
 	CHECK_REQ_ARG(I, IsExternal(), "Pointer");                                \
-	Napi::External VAR = info[I].As<Napi::External>();
+	Napi::External<void> VAR = info[I].As< Napi::External<void> >();
 
 #define USE_EXT_ARG(I, VAR, DEF)                                              \
 	CHECK_LET_ARG(I, IsExternal(), "Pointer");                                \
-	Napi::External VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As<Napi::External>();
+	Napi::External<void> VAR = IS_ARG_EMPTY(I)                                \
+		? (DEF)                                                               \
+		: info[I].As< Napi::External<void> >();
 
 #define LET_EXT_ARG(I, VAR) USE_EXT_ARG(I, VAR, JS_EXT(nullptr))
 
