@@ -426,7 +426,6 @@ inline void consoleLog(Napi::Env env, const std::string &message) {
 
 
 inline void eventEmit(
-	Napi::Env env,
 	Napi::Object that,
 	const std::string &name,
 	int argc = 0,
@@ -437,6 +436,8 @@ inline void eventEmit(
 		return;
 	}
 	
+	Napi::Env env = that.Env();
+	
 	Napi::String eventName = JS_STR(name);
 	Napi::Function thatEmit = that.Get("emit").As<Napi::Function>();
 	
@@ -446,7 +447,35 @@ inline void eventEmit(
 		args.push_back(napi_value(argv[i]));
 	}
 	
-	thatEmit.Call(napi_value(that), args);
+	thatEmit.Call(that, args);
+	
+}
+
+
+inline void eventEmitAsync(
+	Napi::Object that,
+	const std::string &name,
+	int argc = 0,
+	const Napi::Value *argv = nullptr,
+	Napi::AsyncContext ctx = nullptr
+) {
+	
+	if ( ! that.Has("emit") ) {
+		return;
+	}
+	
+	Napi::Env env = that.Env();
+	
+	Napi::String eventName = JS_STR(name);
+	Napi::Function thatEmit = that.Get("emit").As<Napi::Function>();
+	
+	std::vector<napi_value> args;
+	args.push_back(napi_value(eventName));
+	for (int i = 0; i < argc; i++) {
+		args.push_back(napi_value(argv[i]));
+	}
+	
+	thatEmit.MakeCallback(that, args, ctx);
 	
 }
 
