@@ -457,7 +457,7 @@ inline void eventEmitAsync(
 	const std::string &name,
 	int argc = 0,
 	const Napi::Value *argv = nullptr,
-	Napi::AsyncContext ctx = nullptr
+	napi_async_context context = nullptr
 ) {
 	
 	if ( ! that.Has("emit") ) {
@@ -475,7 +475,7 @@ inline void eventEmitAsync(
 		args.push_back(napi_value(argv[i]));
 	}
 	
-	thatEmit.MakeCallback(that, args, ctx);
+	thatEmit.MakeCallback(that, args, context);
 	
 }
 
