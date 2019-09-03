@@ -479,7 +479,9 @@ inline void eventEmitAsync(
 	
 }
 
+
 inline void inheritEs5(napi_env env, Napi::Function ctor, Napi::Function superCtor) {
+	
 	napi_value global, globalObject, setProto, ctorProtoProp, superCtorProtoProp;
 	napi_value argv[2];
 	
@@ -497,7 +499,8 @@ inline void inheritEs5(napi_env env, Napi::Function ctor, Napi::Function superCt
 	argv[1] = superCtor;
 	napi_call_function(env, global, setProto, 2, argv, nullptr);
 	
-	ctor.Set("super_", superCtor); \
+	ctor.Set("super_", superCtor);
+	
 }
 
 
