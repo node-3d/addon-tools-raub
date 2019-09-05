@@ -599,7 +599,7 @@ typedef void (*StaticSetterCallback)(const Napi::CallbackInfo& info);
 		const Napi::CallbackInfo &info \
 	) { \
 		JS_GET_THAT(CLASS); \
-		that->__i_##NAME(info, info[0]); \
+		that->__i_##NAME##Setter(info, info[0]); \
 	}; \
 	void __i_##NAME##Setter(const Napi::CallbackInfo &info, const Napi::Value &value);
 
