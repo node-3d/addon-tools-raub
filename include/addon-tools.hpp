@@ -504,9 +504,9 @@ inline void inheritEs5(napi_env env, Napi::Function ctor, Napi::Function superCt
 }
 
 
-typedef Napi::Value (*StaticMethodCallback)(const Napi::CallbackInfo& info);
-typedef Napi::Value (*StaticGetterCallback)(const Napi::CallbackInfo& info);
-typedef void (*StaticSetterCallback)(const Napi::CallbackInfo& info);
+typedef Napi::Value (*Es5MethodCallback)(const Napi::CallbackInfo& info);
+typedef Napi::Value (*Es5GetterCallback)(const Napi::CallbackInfo& info);
+typedef void (*Es5SetterCallback)(const Napi::CallbackInfo& info);
 
 
 #define DECLARE_ES5_CLASS(CLASS, NAME) \
@@ -547,7 +547,7 @@ typedef void (*StaticSetterCallback)(const Napi::CallbackInfo& info);
 	}; \
 	inline static void method( \
 		const char *name, \
-		StaticMethodCallback cb \
+		Es5MethodCallback cb \
 	) { \
 		Napi::Function proto = _ctorEs5.Value().Get("prototype").As<Napi::Function>(); \
 		proto.DefineProperty(                                                   \
@@ -556,7 +556,7 @@ typedef void (*StaticSetterCallback)(const Napi::CallbackInfo& info);
 	}; \
 	inline static void accessorR( \
 		const char *name, \
-		StaticGetterCallback getter \
+		Es5GetterCallback getter \
 	) { \
 		Napi::Function proto = _ctorEs5.Value().Get("prototype").As<Napi::Function>(); \
 		proto.DefineProperty(                                                   \
@@ -565,8 +565,8 @@ typedef void (*StaticSetterCallback)(const Napi::CallbackInfo& info);
 	}; \
 	inline static void accessorRw( \
 		const char *name, \
-		StaticGetterCallback getter, \
-		StaticSetterCallback setter \
+		Es5GetterCallback getter, \
+		Es5SetterCallback setter \
 	) { \
 		Napi::Function proto = _ctorEs5.Value().Get("prototype").As<Napi::Function>(); \
 		proto.DefineProperty(                                                   \
