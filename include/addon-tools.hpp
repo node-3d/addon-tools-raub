@@ -529,6 +529,17 @@ typedef void (*Es5SetterCallback)(const Napi::CallbackInfo& info);
 			_super.Call(info.This(), args); \
 		} \
 	}; \
+	inline void super( \
+		const Napi::CallbackInfo& info, \
+		int argc = 0, \
+		const napi_value *argv = nullptr \
+	) { \
+		Napi::Function ctor = _ctorEs5.Value(); \
+		if (ctor.Has("super_")) { \
+			Napi::Function _super = ctor.Get("super_").As<Napi::Function>(); \
+			_super.Call(info.This(), argc, argv); \
+		} \
+	}; \
 	inline static Napi::Function wrap(Napi::Env env) { \
 		napi_value __initResult; \
 		napi_create_function(env, #NAME, 0, CLASS::_createEs5, nullptr, &__initResult); \
