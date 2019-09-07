@@ -510,6 +510,7 @@ typedef void (*Es5SetterCallback)(const Napi::CallbackInfo& info);
 
 
 #define DECLARE_ES5_CLASS(CLASS, NAME) \
+private: \
 	static Napi::FunctionReference _ctorEs5; \
 	static const char *_nameEs5; \
 	static void CLASS::_finalizeEs5(napi_env e, void *dest, void* hint); \
@@ -589,7 +590,18 @@ typedef void (*Es5SetterCallback)(const Napi::CallbackInfo& info);
 				setter \
 			)   \
 		); \
+	}; \
+public: \
+	inline static CLASS *unwrap(Napi::Object thatObj) { \
+		CLASS *that; \
+		napi_unwrap( \
+			thatObj.Env(), \
+			thatObj.Get(_nameEs5), \
+			reinterpret_cast<void**>(&that) \
+		); \
+		return that; \
 	};
+
 
 #define JS_GET_THAT(CLASS) \
 	CLASS *that; \
