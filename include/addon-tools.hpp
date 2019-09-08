@@ -250,7 +250,7 @@
 	Napi::Object VAR = info.This().As<Napi::Object>();
 
 #define SETTER_STR_ARG                                                        \
-	SETTER_CHECK(IsNumber(), "String");                                       \
+	SETTER_CHECK(IsString(), "String");                                       \
 	std::string v = value.ToString().Utf8Value();
 
 #define SETTER_INT32_ARG                                                      \
