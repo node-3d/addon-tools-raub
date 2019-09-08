@@ -643,7 +643,7 @@ public: \
 
 #define IMPLEMENT_ES5_CLASS(CLASS) \
 	Napi::FunctionReference CLASS::_ctorEs5; \
-	const char *CLASS::_nameEs5 = "CLASS##__TIMESTAMP__"; \
+	const char *CLASS::_nameEs5 = #CLASS; \
 	void CLASS::_finalizeEs5(napi_env e, void *dest, void* hint) { \
 		CLASS *instance = reinterpret_cast<CLASS*>(dest); \
 		delete instance; \
