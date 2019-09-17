@@ -7,7 +7,7 @@ This is a part of [Node3D](https://github.com/node-3d) project.
 [![Build Status](https://api.travis-ci.com/node-3d/addon-tools-raub.svg?branch=master)](https://travis-ci.com/node-3d/addon-tools-raub)
 [![CodeFactor](https://www.codefactor.io/repository/github/node-3d/addon-tools-raub/badge)](https://www.codefactor.io/repository/github/node-3d/addon-tools-raub)
 
-> npm i -s addon-tools-raub
+> npm i addon-tools-raub
 
 
 ## Synopsis
@@ -17,13 +17,14 @@ Helpers for Node.js **NAPI** addons and dependency packages:
 * Supported platforms (x64): Windows, Linux, OSX.
 * C++ helpers:
 	* Macro shortcuts for NAPI.
-	* `consoleLog()` function.
 	* `eventEmit()` function.
 	* `getData()` function.
+	* **Es5** class wrapper (like `Napi::ObjectWrap`, but Es5 functions).
 * Module helpers:
 	* Crossplatform commands for GYP: `cp`, `rm`, `mkdir`.
 	* Deps unzip installer.
 	* Url-to-buffer downloader.
+	* Binary copy helper.
 
 Useful links: [N-API Docs](https://nodejs.org/api/n-api.html),
 [Napi Docs](https://github.com/nodejs/node-addon-api/blob/master/doc/setup.md),
@@ -36,12 +37,16 @@ Useful links: [N-API Docs](https://nodejs.org/api/n-api.html),
 [include/addon-tools.hpp](#includeaddon-toolshpp)
 
 [index.js](#indexjs)
+[cpbin.js](#cpbinjs)
+[download.js](#downloadjs)
+[install.js](#installjs)
+[writable-buffer.js](#writablebufferjs)
 
 [Crossplatform commands](#crossplatform-commands)
 
-[Function consoleLog](#function-consolelog)
-
 [Function eventEmit](#function-eventEmit)
+
+[Es5 class wrapper](#es5-class-wrapper)
 
 ---
 
@@ -57,38 +62,11 @@ Useful links: [N-API Docs](https://nodejs.org/api/n-api.html),
 	'cp'    : '<!(node -p "require(\'addon-tools-raub\').cp")',
 	'mkdir' : '<!(node -p "require(\'addon-tools-raub\').mkdir")',
 },
+...
+'action': ['<(mkdir)', '-p', '<(binary)']
 ```
 
-On both Windows and Unix those commands now have the same result:
-
-```
-{
-	'target_name'  : 'make_directory',
-	'type'         : 'none',
-	'dependencies' : ['addon'],
-	'actions'      : [{
-		'action_name' : 'Directory created.',
-		'inputs'      : [],
-		'outputs'     : ['build'],
-		'action': ['<(mkdir)', '-p', '<(binary)']
-	}],
-},
-{
-	'target_name'  : 'copy_binary',
-	'type'         : 'none',
-	'dependencies' : ['make_directory'],
-	'actions'      : [{
-		'action_name' : 'Module copied.',
-		'inputs'      : [],
-		'outputs'     : ['binary'],
-		'action'      : [
-			'<(cp)',
-			'build/Release/addon.node',
-			'<(binary)/addon.node'
-		],
-	}],
-},
-```
+On both Windows and Unix those commands now have the same result.
 
 
 ### Addon binary directory
@@ -161,14 +139,13 @@ contain the final binaries. The tag of the release should be the same as in
 `npm_package_config_install` - that is the way installer will find it.
 	
 * NOTE: You can publish your binaries to anywhere, not necessarily Github.
-Just tweak the **install.js** script as appropriate. The only limitation
+Just tweak **YOUR install.js** script as appropriate. The only limitation
 from **Addon Tools** is that it should be a zipped set of files/folders.
 
 
 ### Compiled addon
 
-With the advent of N-API the focus of compiled addons shifted towards the
-word "addons". Since ABI is now compatible across Node.js versions, now addons
+N-API ABI is compatible across Node.js versions, now addons
 are just plain DLLs. Therefore distribution of the binaries is covered in the
 previous section. But for an addon you have to provide a GYP compilation step.
 N-API changes it's role to out-of-install compilation, so we can't/shouldnt
