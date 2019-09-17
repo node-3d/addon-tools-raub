@@ -21,6 +21,7 @@
 		"bat",
 		"include",
 		"download.js",
+		"cpbin.js",
 		"index.js",
 		"install.js",
 		"writable-buffer.js",
