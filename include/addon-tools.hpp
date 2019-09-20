@@ -529,7 +529,7 @@ private: \
 			} \
 			_super.Call(info.This(), args); \
 		} \
-	}; \
+	} \
 	inline void super( \
 		const Napi::CallbackInfo& info, \
 		int argc = 0, \
@@ -540,7 +540,7 @@ private: \
 			Napi::Function _super = ctor.Get("super_").As<Napi::Function>(); \
 			_super.Call(info.This(), argc, argv); \
 		} \
-	}; \
+	} \
 	inline static Napi::Function wrap(Napi::Env env) { \
 		napi_value __initResult; \
 		napi_create_function(env, #NAME, 0, CLASS::_createEs5, nullptr, &__initResult); \
@@ -548,7 +548,7 @@ private: \
 		_ctorEs5 = Napi::Persistent(ctor); \
 		_ctorEs5.SuppressDestruct(); \
 		return ctor; \
-	}; \
+	} \
 	inline static Napi::Function wrap( \
 		Napi::Env env, \
 		Napi::Function superCtor \
@@ -556,7 +556,7 @@ private: \
 		Napi::Function ctor = wrap(env); \
 		inheritEs5(env, ctor, superCtor); \
 		return ctor; \
-	}; \
+	} \
 	inline static void method( \
 		const char *name, \
 		Es5MethodCallback cb \
@@ -565,7 +565,7 @@ private: \
 		proto.DefineProperty(                                                   \
 			Napi::PropertyDescriptor::Function(proto.Env(), proto, name, cb)   \
 		); \
-	}; \
+	} \
 	inline static void accessorR( \
 		const char *name, \
 		Es5GetterCallback getter \
@@ -574,7 +574,7 @@ private: \
 		proto.DefineProperty(                                                   \
 			Napi::PropertyDescriptor::Accessor(proto.Env(), proto, name, getter)   \
 		); \
-	}; \
+	} \
 	inline static void accessorRw( \
 		const char *name, \
 		Es5GetterCallback getter, \
@@ -590,7 +590,7 @@ private: \
 				setter \
 			)   \
 		); \
-	}; \
+	} \
 public: \
 	inline static CLASS *unwrap(Napi::Object thatObj) { \
 		CLASS *that; \
@@ -600,7 +600,7 @@ public: \
 			reinterpret_cast<void**>(&that) \
 		); \
 		return that; \
-	};
+	}
 
 
 #define JS_GET_THAT(CLASS) \
