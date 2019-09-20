@@ -653,7 +653,7 @@ public: \
 		CLASS *instance = new CLASS(info); \
 		Napi::Object wrapObj = Napi::Object::New(env); \
 		info.This().As<Napi::Object>().Set(_nameEs5, wrapObj); \
-		napi_wrap(env, wrapObj, instance, CLASS::_finalizeEs5, nullptr, nullptr); \
+		napi_wrap(env, wrapObj, instance, _finalizeEs5, nullptr, nullptr); \
 		return info.Env().Undefined(); \
 	}
 
