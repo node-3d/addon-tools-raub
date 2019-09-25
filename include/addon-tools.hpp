@@ -2,6 +2,7 @@
 #define _ADDON_TOOLS_HPP_
 
 #define NODE_ADDON_API_DISABLE_DEPRECATED
+#define NAPI_DISABLE_CPP_EXCEPTIONS
 #include <napi.h>
 
 
