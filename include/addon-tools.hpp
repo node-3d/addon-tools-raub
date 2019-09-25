@@ -514,8 +514,8 @@ typedef void (*Es5SetterCallback)(const Napi::CallbackInfo& info);
 private: \
 	static Napi::FunctionReference _ctorEs5; \
 	static const char *_nameEs5; \
-	static void CLASS::_finalizeEs5(napi_env e, void *dest, void* hint); \
-	static napi_value CLASS::_createEs5(napi_env e, napi_callback_info i); \
+	static void _finalizeEs5(napi_env e, void *dest, void* hint); \
+	static napi_value _createEs5(napi_env e, napi_callback_info i); \
 	inline void super( \
 		const Napi::CallbackInfo& info, \
 		int argc, \
@@ -544,7 +544,7 @@ private: \
 	} \
 	inline static Napi::Function wrap(Napi::Env env) { \
 		napi_value __initResult; \
-		napi_create_function(env, #NAME, 0, CLASS::_createEs5, nullptr, &__initResult); \
+		napi_create_function(env, #NAME, 0, _createEs5, nullptr, &__initResult); \
 		Napi::Function ctor = Napi::Function(env, __initResult); \
 		_ctorEs5 = Napi::Persistent(ctor); \
 		_ctorEs5.SuppressDestruct(); \
