@@ -1,5 +1,5 @@
-#ifndef _ADDON_TOOLS_HPP_
-#define _ADDON_TOOLS_HPP_
+#ifndef ADDON_TOOLS_HPP
+#define ADDON_TOOLS_HPP
 
 #define NODE_ADDON_API_DISABLE_DEPRECATED
 #define NAPI_DISABLE_CPP_EXCEPTIONS
@@ -7,7 +7,7 @@
 
 
 #ifdef _WIN32
-	#define	strcasestr(s, t) strstr(strupr(s), strupr(t))
+	#define strcasestr(s, t) strstr(strupr(s), strupr(t))
 #endif
 
 
@@ -41,6 +41,7 @@
 #define REQ_ARGS(N)                                                           \
 	if (info.Length() < (N)) {                                                \
 		JS_THROW("Expected at least " #N " arguments");                       \
+		RET_UNDEFINED;                                                        \
 	}
 
 
@@ -51,6 +52,7 @@
 #define CHECK_REQ_ARG(I, C, T)                                                \
 	if (info.Length() <= (I) || ! info[I].C) {                                \
 		JS_THROW("Argument " #I " must be of type `" T "`");                  \
+		RET_UNDEFINED;                                                        \
 	}
 
 #define CHECK_LET_ARG(I, C, T)                                                \
@@ -60,6 +62,7 @@
 			" must be of type `" T                                            \
 			"` or be `null`/`undefined`"                                      \
 		);                                                                    \
+		RET_UNDEFINED;                                                        \
 	}
 
 
@@ -195,6 +198,7 @@
 	REQ_OBJ_ARG(I, _obj_##VAR);                                               \
 	if ( ! _obj_##VAR.IsArray() ) {                                           \
 		JS_THROW("Argument " #I " must  be of type `Array`");                 \
+		RET_UNDEFINED;                                                        \
 	}                                                                         \
 	Napi::Array VAR = _obj_##VAR.As<Napi::Array>();
 
@@ -203,13 +207,10 @@
 	REQ_OBJ_ARG(I, _obj_##VAR);                                               \
 	if ( ! _obj_##VAR.IsTypedArray() ) {                                      \
 		JS_THROW("Argument " #I " must be of type `TypedArray`");             \
+		RET_UNDEFINED;                                                        \
 	}                                                                         \
 	Napi::TypedArray VAR = _obj_##VAR.As<Napi::TypedArray>();
 
-
-#define CTOR_CHECK(T)                                                         \
-	if ( ! info.IsConstructCall() )                                           \
-		JS_THROW(T " must be called with the 'new' keyword.");
 
 #define DES_CHECK                                                             \
 	if (_isDestroyed) return;
@@ -220,17 +221,15 @@
 
 #define CACHE_CAS(CACHE, V)                                                   \
 	if (CACHE == V) {                                                         \
-		return;                                                               \
+		RET_UNDEFINED;                                                        \
 	}                                                                         \
 	CACHE = V;
 
-#define THIS_SETTER_CHECK                                                     \
-	if (_isDestroyed) return;                                                 \
-	NAPI_ENV;
-
 #define SETTER_CHECK(C, T)                                                    \
-	if ( ! value.C )                                                          \
-		JS_THROW("Value must be " T);
+	if ( ! value.C ) {                                                        \
+		JS_THROW("Value must be " T);                                         \
+		RET_UNDEFINED;                                                        \
+	}
 
 
 #define JS_METHOD(NAME) Napi::Value NAME(const Napi::CallbackInfo &info)
@@ -335,7 +334,11 @@
 
 
 template<typename Type = uint8_t>
-inline Type* getArrayData(Napi::Env env, Napi::Object obj, int *num = nullptr) {
+inline Type* getArrayData(
+	Napi::Env env,
+	Napi::Object obj,
+	int *num = nullptr
+) {
 	
 	Type *data = nullptr;
 	
@@ -366,7 +369,11 @@ inline Type* getArrayData(Napi::Env env, Napi::Object obj, int *num = nullptr) {
 }
 
 template<typename Type = uint8_t>
-inline Type* getBufferData(Napi::Env env, Napi::Object obj, int *num = nullptr) {
+inline Type* getBufferData(
+	Napi::Env env,
+	Napi::Object obj,
+	int *num = nullptr
+) {
 	
 	Type *data = nullptr;
 	
@@ -410,7 +417,11 @@ inline void *getData(Napi::Env env, Napi::Object obj) {
 }
 
 
-inline void consoleLog(Napi::Env env, int argc, const Napi::Value *argv) {
+inline void consoleLog(
+	Napi::Env env,
+	int argc,
+	const Napi::Value *argv
+) {
 	JS_RUN_2("console.log", log);
 	std::vector<napi_value> args;
 	for (int i = 0; i < argc; i++) {
@@ -481,9 +492,17 @@ inline void eventEmitAsync(
 }
 
 
-inline void inheritEs5(napi_env env, Napi::Function ctor, Napi::Function superCtor) {
+inline void inheritEs5(
+	napi_env env,
+	Napi::Function ctor,
+	Napi::Function superCtor
+) {
 	
-	napi_value global, globalObject, setProto, ctorProtoProp, superCtorProtoProp;
+	napi_value global;
+	napi_value globalObject;
+	napi_value setProto;
+	napi_value ctorProtoProp;
+	napi_value superCtorProtoProp;
 	napi_value argv[2];
 	
 	napi_get_global(env, &global);
@@ -510,153 +529,170 @@ typedef Napi::Value (*Es5GetterCallback)(const Napi::CallbackInfo& info);
 typedef void (*Es5SetterCallback)(const Napi::CallbackInfo& info);
 
 
-#define DECLARE_ES5_CLASS(CLASS, NAME) \
-private: \
-	static Napi::FunctionReference _ctorEs5; \
-	static const char *_nameEs5; \
-	static void _finalizeEs5(napi_env e, void *dest, void* hint); \
-	static napi_value _createEs5(napi_env e, napi_callback_info i); \
-	inline void super( \
-		const Napi::CallbackInfo& info, \
-		int argc, \
-		const Napi::Value *argv \
-	) { \
-		Napi::Function ctor = _ctorEs5.Value(); \
-		if (ctor.Has("super_")) { \
-			Napi::Function _super = ctor.Get("super_").As<Napi::Function>(); \
-			std::vector<napi_value> args; \
-			for (int i = 0; i < argc; i++) { \
-				args.push_back(argv[i]); \
-			} \
-			_super.Call(info.This(), args); \
-		} \
-	} \
-	inline void super( \
-		const Napi::CallbackInfo& info, \
-		int argc = 0, \
-		const napi_value *argv = nullptr \
-	) { \
-		Napi::Function ctor = _ctorEs5.Value(); \
-		if (ctor.Has("super_")) { \
-			Napi::Function _super = ctor.Get("super_").As<Napi::Function>(); \
-			_super.Call(info.This(), argc, argv); \
-		} \
-	} \
-	inline static Napi::Function wrap(Napi::Env env) { \
-		napi_value __initResult; \
-		napi_create_function(env, #NAME, 0, _createEs5, nullptr, &__initResult); \
-		Napi::Function ctor = Napi::Function(env, __initResult); \
-		_ctorEs5 = Napi::Persistent(ctor); \
-		_ctorEs5.SuppressDestruct(); \
-		return ctor; \
-	} \
-	inline static Napi::Function wrap( \
-		Napi::Env env, \
-		Napi::Function superCtor \
-	) { \
-		Napi::Function ctor = wrap(env); \
-		inheritEs5(env, ctor, superCtor); \
-		return ctor; \
-	} \
-	inline static void method( \
-		const char *name, \
-		Es5MethodCallback cb \
-	) { \
-		Napi::Function proto = _ctorEs5.Value().Get("prototype").As<Napi::Function>(); \
-		proto.DefineProperty(                                                   \
-			Napi::PropertyDescriptor::Function(proto.Env(), proto, name, cb)   \
-		); \
-	} \
-	inline static void accessorR( \
-		const char *name, \
-		Es5GetterCallback getter \
-	) { \
-		Napi::Function proto = _ctorEs5.Value().Get("prototype").As<Napi::Function>(); \
-		proto.DefineProperty(                                                   \
-			Napi::PropertyDescriptor::Accessor(proto.Env(), proto, name, getter)   \
-		); \
-	} \
-	inline static void accessorRw( \
-		const char *name, \
-		Es5GetterCallback getter, \
-		Es5SetterCallback setter \
-	) { \
-		Napi::Function proto = _ctorEs5.Value().Get("prototype").As<Napi::Function>(); \
-		proto.DefineProperty(                                                   \
-			Napi::PropertyDescriptor::Accessor( \
-				proto.Env(), \
-				proto, \
-				name, \
-				getter, \
-				setter \
-			)   \
-		); \
-	} \
-public: \
-	inline static CLASS *unwrap(Napi::Object thatObj) { \
-		CLASS *that; \
-		napi_unwrap( \
-			thatObj.Env(), \
-			thatObj.Get(_nameEs5), \
-			reinterpret_cast<void**>(&that) \
-		); \
-		return that; \
+#define DECLARE_ES5_CLASS(CLASS, NAME)                                        \
+public:                                                                       \
+	inline static CLASS *unwrap(Napi::Object thatObj) {                       \
+		CLASS *that;                                                          \
+		napi_unwrap(                                                          \
+			thatObj.Env(),                                                    \
+			thatObj.Get(_nameEs5),                                            \
+			reinterpret_cast<void**>(&that)                                   \
+		);                                                                    \
+		return that;                                                          \
+	}                                                                         \
+private:                                                                      \
+	static Napi::FunctionReference _ctorEs5;                                  \
+	static const char *_nameEs5;                                              \
+	static void _finalizeEs5(napi_env e, void *dest, void* hint);             \
+	static napi_value _createEs5(napi_env e, napi_callback_info i);           \
+	inline void super(                                                        \
+		const Napi::CallbackInfo& info,                                       \
+		int argc,                                                             \
+		const Napi::Value *argv                                               \
+	) {                                                                       \
+		Napi::Function ctor = _ctorEs5.Value();                               \
+		if (ctor.Has("super_")) {                                             \
+			Napi::Function _super = ctor.Get("super_").As<Napi::Function>();  \
+			std::vector<napi_value> args;                                     \
+			for (int i = 0; i < argc; i++) {                                  \
+				args.push_back(argv[i]);                                      \
+			}                                                                 \
+			_super.Call(info.This(), args);                                   \
+		}                                                                     \
+	}                                                                         \
+	inline void super(                                                        \
+		const Napi::CallbackInfo& info,                                       \
+		int argc = 0,                                                         \
+		const napi_value *argv = nullptr                                      \
+	) {                                                                       \
+		Napi::Function ctor = _ctorEs5.Value();                               \
+		if (ctor.Has("super_")) {                                             \
+			Napi::Function _super = ctor.Get("super_").As<Napi::Function>();  \
+			_super.Call(info.This(), argc, argv);                             \
+		}                                                                     \
+	}                                                                         \
+	inline static Napi::Function wrap(Napi::Env env) {                        \
+		napi_value __initResult;                                              \
+		napi_create_function(                                                 \
+			env, #NAME, 0, _createEs5, nullptr, &__initResult                 \
+		);                                                                    \
+		Napi::Function ctor = Napi::Function(env, __initResult);              \
+		_ctorEs5 = Napi::Persistent(ctor);                                    \
+		_ctorEs5.SuppressDestruct();                                          \
+		return ctor;                                                          \
+	}                                                                         \
+	inline static Napi::Function wrap(                                        \
+		Napi::Env env,                                                        \
+		Napi::Function superCtor                                              \
+	) {                                                                       \
+		Napi::Function ctor = wrap(env);                                      \
+		inheritEs5(env, ctor, superCtor);                                     \
+		return ctor;                                                          \
+	}                                                                         \
+	inline static void method(                                                \
+		const char *name,                                                     \
+		Es5MethodCallback cb                                                  \
+	) {                                                                       \
+		Napi::Function proto = (                                              \
+			_ctorEs5.Value().Get("prototype").As<Napi::Function>()            \
+		);                                                                    \
+		proto.DefineProperty(                                                 \
+			Napi::PropertyDescriptor::Function(                               \
+				proto.Env(), proto, name, cb                                  \
+			)                                                                 \
+		);                                                                    \
+	}                                                                         \
+	inline static void accessorR(                                             \
+		const char *name,                                                     \
+		Es5GetterCallback getter                                              \
+	) {                                                                       \
+		Napi::Function proto = (                                              \
+			_ctorEs5.Value().Get("prototype").As<Napi::Function>()            \
+		);                                                                    \
+		proto.DefineProperty(                                                 \
+			Napi::PropertyDescriptor::Accessor(                               \
+				proto.Env(), proto, name, getter                              \
+			)                                                                 \
+		);                                                                    \
+	}                                                                         \
+	inline static void accessorRw(                                            \
+		const char *name,                                                     \
+		Es5GetterCallback getter,                                             \
+		Es5SetterCallback setter                                              \
+	) {                                                                       \
+		Napi::Function proto = (                                              \
+			_ctorEs5.Value().Get("prototype").As<Napi::Function>()            \
+		);                                                                    \
+		proto.DefineProperty(                                                 \
+			Napi::PropertyDescriptor::Accessor(                               \
+				proto.Env(),                                                  \
+				proto,                                                        \
+				name,                                                         \
+				getter,                                                       \
+				setter                                                        \
+			)                                                                 \
+		);                                                                    \
 	}
 
 
-#define JS_GET_THAT(CLASS) \
-	CLASS *that; \
-	Napi::Object thatObj = info.This().As<Napi::Object>(); \
-	napi_unwrap(info.Env(), thatObj.Get(_nameEs5), reinterpret_cast<void**>(&that));
+#define JS_GET_THAT(CLASS)                                                    \
+	CLASS *that;                                                              \
+	Napi::Object thatObj = info.This().As<Napi::Object>();                    \
+	napi_unwrap(                                                              \
+		info.Env(), thatObj.Get(_nameEs5), reinterpret_cast<void**>(&that)    \
+	);
 
-#define JS_DECLARE_METHOD(CLASS, NAME) \
-	inline static Napi::Value __st_##NAME(const Napi::CallbackInfo &info) { \
-		JS_GET_THAT(CLASS); \
-		return that->__i_##NAME(info); \
-	}; \
+#define JS_DECLARE_METHOD(CLASS, NAME)                                        \
+	inline static Napi::Value __st_##NAME(const Napi::CallbackInfo &info) {   \
+		JS_GET_THAT(CLASS);                                                   \
+		return that->__i_##NAME(info);                                        \
+	};                                                                        \
 	Napi::Value __i_##NAME(const Napi::CallbackInfo &info);
 
 #define JS_DECLARE_GETTER(CLASS, NAME) JS_DECLARE_METHOD(CLASS, NAME##Getter)
 
-#define JS_DECLARE_SETTER(CLASS, NAME)                                                       \
-	inline static void __st_##NAME##Setter( \
-		const Napi::CallbackInfo &info \
-	) { \
-		JS_GET_THAT(CLASS); \
-		that->__i_##NAME##Setter(info, info[0]); \
-	} \
-	void __i_##NAME##Setter(const Napi::CallbackInfo &info, const Napi::Value &value);
+#define JS_DECLARE_SETTER(CLASS, NAME)                                        \
+	inline static void __st_##NAME##Setter(                                   \
+		const Napi::CallbackInfo &info                                        \
+	) {                                                                       \
+		JS_GET_THAT(CLASS);                                                   \
+		that->__i_##NAME##Setter(info, info[0]);                              \
+	}                                                                         \
+	Napi::Value __i_##NAME##Setter(                                           \
+		const Napi::CallbackInfo &info,                                       \
+		const Napi::Value &value                                              \
+	);
 
-#define JS_IMPLEMENT_METHOD(CLASS, NAME) \
+#define JS_IMPLEMENT_METHOD(CLASS, NAME)                                      \
 	Napi::Value CLASS::__i_##NAME(const Napi::CallbackInfo &info)
 
 #define JS_IMPLEMENT_GETTER(CLASS, NAME) JS_IMPLEMENT_METHOD(CLASS, NAME##Getter)
 
-#define JS_IMPLEMENT_SETTER(CLASS, NAME) \
-	void CLASS::__i_##NAME##Setter( \
-		const Napi::CallbackInfo &info, \
-		const Napi::Value &value \
+#define JS_IMPLEMENT_SETTER(CLASS, NAME)                                      \
+	Napi::Value CLASS::__i_##NAME##Setter(                                    \
+		const Napi::CallbackInfo &info,                                       \
+		const Napi::Value &value                                              \
 	)
 
 #define JS_ASSIGN_METHOD(NAME) method(#NAME, __st_##NAME)
 #define JS_ASSIGN_GETTER(NAME) accessorR(#NAME, __st_##NAME##Getter)
-#define JS_ASSIGN_SETTER(NAME) accessorRw(#NAME, __st_##NAME##Getter, __st_##NAME##Setter)
+#define JS_ASSIGN_SETTER(NAME)                                                \
+	accessorRw(#NAME, __st_##NAME##Getter, __st_##NAME##Setter)
 
-#define IMPLEMENT_ES5_CLASS(CLASS) \
-	Napi::FunctionReference CLASS::_ctorEs5; \
-	const char *CLASS::_nameEs5 = #CLASS; \
-	void CLASS::_finalizeEs5(napi_env e, void *dest, void* hint) { \
-		CLASS *instance = reinterpret_cast<CLASS*>(dest); \
-		delete instance; \
-	} \
-	napi_value CLASS::_createEs5(napi_env env, napi_callback_info i) { \
-		Napi::CallbackInfo info(env, i); \
-		CLASS *instance = new CLASS(info); \
-		Napi::Object wrapObj = Napi::Object::New(env); \
-		info.This().As<Napi::Object>().Set(_nameEs5, wrapObj); \
-		napi_wrap(env, wrapObj, instance, _finalizeEs5, nullptr, nullptr); \
-		return info.Env().Undefined(); \
+#define IMPLEMENT_ES5_CLASS(CLASS)                                            \
+	Napi::FunctionReference CLASS::_ctorEs5;                                  \
+	const char *CLASS::_nameEs5 = #CLASS;                                     \
+	void CLASS::_finalizeEs5(napi_env e, void *dest, void* hint) {            \
+		CLASS *instance = reinterpret_cast<CLASS*>(dest);                     \
+		delete instance;                                                      \
+	}                                                                         \
+	napi_value CLASS::_createEs5(napi_env env, napi_callback_info i) {        \
+		Napi::CallbackInfo info(env, i);                                      \
+		CLASS *instance = new CLASS(info);                                    \
+		Napi::Object wrapObj = Napi::Object::New(env);                        \
+		info.This().As<Napi::Object>().Set(_nameEs5, wrapObj);                \
+		napi_wrap(env, wrapObj, instance, _finalizeEs5, nullptr, nullptr);    \
+		return info.Env().Undefined();                                        \
 	}
 
-
-#endif // _ADDON_TOOLS_HPP_
+#endif // ADDON_TOOLS_HPP
