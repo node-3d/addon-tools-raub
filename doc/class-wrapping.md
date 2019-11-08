@@ -1,6 +1,6 @@
 # Es5 class wrapping
 
-## Class declaration
+## Class Declaration
 
 ```
 class ClassName {
@@ -35,3 +35,43 @@ the second is the name of the method to be created.
 the second is the name of the getter to be created.
 `JS_DECLARE_SETTER` - declares a setter, the first argument is this class,
 the second is the name of the setter to be created.
+
+
+## Class Implementation
+
+```
+IMPLEMENT_ES5_CLASS(ClassName);
+void ClassName::init(Napi::Env env, Napi::Object exports) {
+	
+	Napi::Function ctor = wrap(env);
+	
+	JS_ASSIGN_METHOD(destroy);
+	
+	JS_ASSIGN_GETTER(isDestroyed);
+	
+	exports.Set("JSClassName", ctor);
+	
+}
+
+Body::Body(const Napi::CallbackInfo &info) { NAPI_ENV;
+	
+	super(info);
+	
+	_isDestroyed = false;
+	
+	// ...
+	
+}
+
+Body::~Body() {
+	_destroy();
+}
+
+
+void Body::_destroy() { DES_CHECK;
+	_isDestroyed = true;
+}
+
+
+
+```
