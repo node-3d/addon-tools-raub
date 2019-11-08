@@ -233,9 +233,6 @@
 
 
 #define JS_METHOD(NAME) Napi::Value NAME(const Napi::CallbackInfo &info)
-#define JS_GETTER(NAME) Napi::Value NAME(const Napi::CallbackInfo &info)
-#define JS_SETTER(NAME)                                                       \
-	void NAME(const Napi::CallbackInfo &info, const Napi::Value &value)
 
 #define ACCESSOR_RW(CLASS, NAME)                                              \
 	InstanceAccessor(#NAME, &CLASS::NAME ## Getter, &CLASS::NAME ## Setter)

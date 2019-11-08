@@ -37,11 +37,6 @@ const paths = dir => {
 };
 
 
-const mkdirPath = isWindows ? `${rootPath}/bat/mkdir.bat` : 'mkdir';
-const rmPath    = isWindows ? `${rootPath}/bat/rm.bat` : 'rm';
-const cpPath    = isWindows ? `${rootPath}/bat/cp.bat` : 'cp';
-
-
 module.exports = {
 	
 	paths,
@@ -49,9 +44,5 @@ module.exports = {
 	bin      : `bin-${platformName}`,
 	platform : platformName,
 	include  : includePath,
-	
-	mkdir : mkdirPath,
-	rm    : rmPath,
-	cp    : cpPath,
 	
 };
