@@ -40,20 +40,19 @@ the second is the name of the setter to be created.
 ## Class Implementation
 
 ```
+// Some utility stuff
 IMPLEMENT_ES5_CLASS(ClassName);
+
+// Fill the properties and export the class
 void ClassName::init(Napi::Env env, Napi::Object exports) {
-	
 	Napi::Function ctor = wrap(env);
-	
 	JS_ASSIGN_METHOD(destroy);
-	
 	JS_ASSIGN_GETTER(isDestroyed);
-	
+	// ...
 	exports.Set("JSClassName", ctor);
-	
 }
 
-Body::Body(const Napi::CallbackInfo &info) { NAPI_ENV;
+ClassName::ClassName(const Napi::CallbackInfo &info) { NAPI_ENV;
 	
 	super(info);
 	
@@ -63,15 +62,26 @@ Body::Body(const Napi::CallbackInfo &info) { NAPI_ENV;
 	
 }
 
-Body::~Body() {
+ClassName::~ClassName() {
 	_destroy();
 }
 
-
-void Body::_destroy() { DES_CHECK;
+void ClassName::_destroy() { DES_CHECK;
+	// ...
 	_isDestroyed = true;
 }
 
+
+JS_IMPLEMENT_METHOD(ClassName, destroy) { THIS_CHECK;
+	emit("destroy");
+	_destroy();
+	RET_UNDEFINED;
+}
+
+
+JS_IMPLEMENT_GETTER(ClassName, isDestroyed) { THIS_CHECK;
+	RET_BOOL(_isDestroyed);
+}
 
 
 ```
