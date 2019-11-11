@@ -310,24 +310,20 @@
 		}                                                                     \
 	} while (0)
 
-#define NAPI_CALL(the_call, ATE)                                              \
+#define NAPI_CALL(the_call)                                                   \
 	do {                                                                      \
 		if ((the_call) != napi_ok) {                                          \
 			GET_AND_THROW_LAST_ERROR();                                       \
-			ATE;                                                              \
+			RET_UNDEFINED;                                                    \
 		}                                                                     \
 	} while (0)
 
-#define JS_RUN_3(code, VAR, ATE)                                              \
+#define JS_RUN(code, VAR)                                                     \
 	napi_value __RESULT_ ## VAR;                                              \
 	NAPI_CALL(                                                                \
-		napi_run_script(env, napi_value(JS_STR(code)), &__RESULT_ ## VAR),    \
-		ATE                                                                   \
+		napi_run_script(env, napi_value(JS_STR(code)), &__RESULT_ ## VAR)     \
 	);                                                                        \
 	Napi::Value VAR(env, __RESULT_ ## VAR);
-
-#define JS_RUN_2(code, VAR) JS_RUN_3(code, VAR, return)
-#define JS_RUN JS_RUN_3
 
 
 template<typename Type = uint8_t>
@@ -400,6 +396,8 @@ inline void *getData(Napi::Env env, Napi::Object obj) {
 	
 	if (obj.IsTypedArray() || obj.IsArrayBuffer()) {
 		pixels = getArrayData<uint8_t>(env, obj);
+	} else if (obj.IsBuffer()) {
+		pixels = getBufferData<uint8_t>(env, obj);
 	} else if (obj.Has("data")) {
 		Napi::Object data = obj.Get("data").As<Napi::Object>();
 		if (data.IsTypedArray() || data.IsArrayBuffer()) {
@@ -414,23 +412,25 @@ inline void *getData(Napi::Env env, Napi::Object obj) {
 }
 
 
-inline void consoleLog(
+inline Napi::Value consoleLog(
 	Napi::Env env,
 	int argc,
 	const Napi::Value *argv
 ) {
-	JS_RUN_2("console.log", log);
+	JS_RUN("console.log", log);
 	std::vector<napi_value> args;
 	for (int i = 0; i < argc; i++) {
 		args.push_back(napi_value(argv[i]));
 	}
 	log.As<Napi::Function>().Call(args);
+	RET_UNDEFINED;
 }
 
 
-inline void consoleLog(Napi::Env env, const std::string &message) {
+inline Napi::Value consoleLog(Napi::Env env, const std::string &message) {
 	Napi::Value arg = JS_STR(message);
 	consoleLog(env, 1, &arg);
+	RET_UNDEFINED;
 }
 
 
@@ -490,31 +490,26 @@ inline void eventEmitAsync(
 
 
 inline void inheritEs5(
-	napi_env env,
+	Napi::Env env,
 	Napi::Function ctor,
 	Napi::Function superCtor
 ) {
 	
-	napi_value global;
-	napi_value globalObject;
-	napi_value setProto;
-	napi_value ctorProtoProp;
-	napi_value superCtorProtoProp;
-	napi_value argv[2];
+	Napi::Object global = env.Global();
+	Napi::Object globalObject = global.Get("Object").As<Napi::Object>();
+	Napi::Function setProto = globalObject.Get("setPrototypeOf").As<Napi::Function>();
+	Napi::Value ctorProtoProp = ctor.Get("prototype");
+	Napi::Value superCtorProtoProp = superCtor.Get("prototype");
 	
-	napi_get_global(env, &global);
-	napi_get_named_property(env, global, "Object", &globalObject);
-	napi_get_named_property(env, globalObject, "setPrototypeOf", &setProto);
-	napi_get_named_property(env, ctor, "prototype", &ctorProtoProp);
-	napi_get_named_property(env, superCtor, "prototype", &superCtorProtoProp);
+	napi_value argv[2];
 	
 	argv[0] = ctorProtoProp;
 	argv[1] = superCtorProtoProp;
-	napi_call_function(env, global, setProto, 2, argv, nullptr);
+	setProto.Call(global, 2, argv);
 	
 	argv[0] = ctor;
 	argv[1] = superCtor;
-	napi_call_function(env, global, setProto, 2, argv, nullptr);
+	setProto.Call(global, 2, argv);
 	
 	ctor.Set("super_", superCtor);
 	
@@ -640,11 +635,11 @@ private:                                                                      \
 	);
 
 #define JS_DECLARE_METHOD(CLASS, NAME)                                        \
-	inline static Napi::Value __st_##NAME(const Napi::CallbackInfo &info) {   \
+	inline static JS_METHOD(__st_##NAME) {   \
 		JS_GET_THAT(CLASS);                                                   \
 		return that->__i_##NAME(info);                                        \
 	};                                                                        \
-	Napi::Value __i_##NAME(const Napi::CallbackInfo &info);
+	JS_METHOD(__i_##NAME);
 
 #define JS_DECLARE_GETTER(CLASS, NAME) JS_DECLARE_METHOD(CLASS, NAME##Getter)
 
@@ -661,9 +656,10 @@ private:                                                                      \
 	);
 
 #define JS_IMPLEMENT_METHOD(CLASS, NAME)                                      \
-	Napi::Value CLASS::__i_##NAME(const Napi::CallbackInfo &info)
+	JS_METHOD(CLASS::__i_##NAME)
 
-#define JS_IMPLEMENT_GETTER(CLASS, NAME) JS_IMPLEMENT_METHOD(CLASS, NAME##Getter)
+#define JS_IMPLEMENT_GETTER(CLASS, NAME)                                      \
+	JS_IMPLEMENT_METHOD(CLASS, NAME##Getter)
 
 #define JS_IMPLEMENT_SETTER(CLASS, NAME)                                      \
 	Napi::Value CLASS::__i_##NAME##Setter(                                    \

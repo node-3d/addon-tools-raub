@@ -58,8 +58,6 @@ have `CallbackInfo info` passed as an argument.
 * `JS_NUM(VAL)` - create a `Napi::Number` value.
 * `JS_EXT(VAL)` - create a `Napi::External` (from pointer) value.
 * `JS_BOOL(VAL)` - create a `Napi::Boolean` value.
-* `JS_FUN(VAL)` - create a `Napi::Function` value.
-* `JS_OBJ(VAL)` - create a `Napi::Object` value.
 
 </details>
 
@@ -70,7 +68,7 @@ have `CallbackInfo info` passed as an argument.
 
 These checks throw JS TypeError if not passed. Here `T` is always used as a typename
 in error messages. `C` is a
-[Napi::Value](https://github.com/nodejs/node-addon-api/blob/master/doc/value.md#isboolean)
+[Napi::Value](https://github.com/nodejs/node-addon-api/blob/master/doc/value.md)
 check method, like `IsObject()`. `I` is the index of argument as in `info[I]`,
 starting from `0`.
 
@@ -151,43 +149,11 @@ That extrapolates well to all the helpers below:
 
 ```
 NAN_METHOD(test) {
-	
 	REQ_UINT32_ARG(0, width);
 	REQ_UINT32_ARG(1, height);
 	LET_FLOAT_ARG(2, z);
 	// Variables created: unsigned int width, height; float z;
 	...
-```
-
-</details>
-
-
-<details>
-
-<summary>Set object accessors</summary>
-
-Simplified accessor assignment, adds accessors of NAME for OBJ. Read accessor is
-assumed to have the name `NAME+'Getter'` and write accessor is `NAME+'Setter'`.
-
-* `ACCESSOR_RW(CLASS, NAME)` - add read and write accessors NAME of CLASS.
-* `ACCESSOR_R(CLASS, NAME)` - add read accessor NAME of CLASS.
-* `ACCESSOR_M(CLASS, NAME)` - add method NAME of CLASS.
-
-
-```
-void MyClass::init(Napi::Env env, Napi::Object exports) {
-	...
-	Napi::Function ctor = DefineClass(env, "MyClass", {
-		ACCESSOR_R(MyClass, isDestroyed),
-		ACCESSOR_RW(MyClass, x),
-		ACCESSOR_M(MyClass, reset),
-	});
-	...
-}
-JS_GETTER(MyClass::isDestroyedGetter) { ...
-JS_GETTER(MyClass::xGetter) { ...
-JS_SETTER(MyClass::xSetter) { ...
-JS_METHOD(MyClass::save) { ...
 ```
 
 </details>
@@ -215,24 +181,29 @@ argument, from which a C++ value is extracted.
 * `SETTER_ARRV_ARG`
 
 ```
-JS_SETTER(MyClass::x) { SETTER_STR_ARG;
+JS_IMPLEMENT_SETTER(MyClass, x) { THIS_CHECK; SETTER_STR_ARG;
 	// Variable created: std::string v;
 	...
 ```
+
+See also: [Class Wrapping](class-wrapping.md)
 
 </details>
 
 
 <details>
 
-<summary>Data retrieval</summary>
+<summary>JS Data to C++ Data</summary>
 
 * `T *getArrayData(value, num = NULL)` - extracts TypedArray data of any type from
 the given JS value. Does not accept `Array`. Checks with `IsArrayBuffer()`.
 Returns `nullptr` for empty JS values. For unacceptable values throws TypeError.
 
-* `void *getData(value)` - if value is a TypedArray, then the result of
-`getArrayData(value)` is returned. Otherwise if value has `'data'` property, it's
-content is then returned as `node::Buffer`. Returns `nullptr` in other cases.
+* `T *getBufferData(value, num = NULL)` - extracts Buffer data from
+the given JS value. Checks with `IsBuffer()`.
+Returns `nullptr` for empty JS values. For unacceptable values throws TypeError.
+
+* `void *getData(value)` - if `value` or `value.data` is a `TypedArray|Buffer`,
+calls `getArrayData` or `getArrayData` respectively. Returns `nullptr` in other cases.
 
 </details>
