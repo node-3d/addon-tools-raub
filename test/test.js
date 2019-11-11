@@ -5,7 +5,7 @@ const { expect } = require('chai');
 const tools = require('..');
 
 
-const PROPS = ['bin', 'platform', 'include', 'mkdir', 'rm', 'cp'];
+const PROPS = ['bin', 'platform', 'include'];
 
 
 describe('Tools', () => {
