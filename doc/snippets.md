@@ -2,7 +2,7 @@
 
 ## C++ Addon building
 
-N-API addons are built separately from the installation, so we can't/shouldn't
+**NAPI** addons are built separately from the installation, so we shouldn't
 put the file **binding.gyp** to the module root anymore. It is better to have a
 separate folder with a separate **package.json**, **binding.gyp** and the sources.
 
@@ -114,7 +114,7 @@ dependency include path(s).
 
 <details>
 
-<summary>See a snipped for src/binding.gyp here</summary>
+<summary>**See a snipped for src/binding.gyp here**</summary>
 
 * Assume `DEPS` is the name of an Addon Tools compliant dependency module.
 * Assume `ADDON` is the name of this addon's resulting binary.

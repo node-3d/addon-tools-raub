@@ -1,14 +1,15 @@
 # Es5 class wrapping
 
-For NAPI addons this allows to call `super()` from C++ and makes the class
-constructor callable with `ClassName.call(obj, ...args)`.
-Also multiple C++ objects can be attached to a single JS object
+This wrapping implementation diverges from standard ES6 style wrapping.
+It also uses composition rather than inheritance, so it is easily pluggable.
+
+* For **NAPI** addons, `super()` can be called from C++ side.
+* Constructor is callable with `ClassName.call(obj, ...args)`.
+* Multiple C++ objects can be attached to a single JS object
 if it is necessary in an inheritance scenario.
-On JS side `util.inherits`
+* On JS side `util.inherits`
 [is used](https://nodejs.org/api/util.html#util_util_inherits_constructor_superconstructor),
-and on C++ side `inheritEs5`.
-This implementation is using composition rather than inheritance, so
-it is easily pluggable.
+and on C++ side there is `inheritEs5` function.
 
 
 ## Class Declaration
@@ -34,17 +35,15 @@ public:
 };
 ```
 
-`DECLARE_ES5_CLASS` - adds utility declarations, the first argument
+* `DECLARE_ES5_CLASS` - adds utility declarations, the first argument
 must be this class name, and the second argument will become the
 name (arbitrary) of this function (constructor) in JS.
-
-`init` - can be used to initialize this class and export it.
-
-`JS_DECLARE_METHOD` - declares a method, the first argument is this class,
+* `init` - can be used to initialize this class and export it.
+* `JS_DECLARE_METHOD` - declares a method, the first argument is this class,
 the second is the name of the method to be created.
-`JS_DECLARE_GETTER` - declares a getter, the first argument is this class,
+* `JS_DECLARE_GETTER` - declares a getter, the first argument is this class,
 the second is the name of the getter to be created.
-`JS_DECLARE_SETTER` - declares a setter, the first argument is this class,
+* `JS_DECLARE_SETTER` - declares a setter, the first argument is this class,
 the second is the name of the setter to be created.
 
 
@@ -95,14 +94,14 @@ JS_IMPLEMENT_GETTER(ClassName, isDestroyed) { THIS_CHECK;
 
 ```
 
-`IMPLEMENT_ES5_CLASS` - implements some utility functions for class wrapping.
-`JS_ASSIGN_METHOD` - in `init()`, assigns the given method to this class.
-`JS_ASSIGN_GETTER` - in `init()`, assigns the given getter to this class.
-`JS_ASSIGN_SETTER` - in `init()`, assigns both getter and setter to this class.
+* `IMPLEMENT_ES5_CLASS` - implements some utility functions for class wrapping.
+* `JS_ASSIGN_METHOD` - in `init()`, assigns the given method to this class.
+* `JS_ASSIGN_GETTER` - in `init()`, assigns the given getter to this class.
+* `JS_ASSIGN_SETTER` - in `init()`, assigns both getter and setter to this class.
 It also takes only one argument because both have the same name.
-`JS_IMPLEMENT_METHOD` - implements a method, the first argument is this class,
+* `JS_IMPLEMENT_METHOD` - implements a method, the first argument is this class,
 the second is the name of the method being implemented.
-`JS_IMPLEMENT_GETTER` - implements a getter, the first argument is this class,
+* `JS_IMPLEMENT_GETTER` - implements a getter, the first argument is this class,
 the second is the name of the getter being implemented.
-`JS_IMPLEMENT_SETTER` - implements a setter, the first argument is this class,
+* `JS_IMPLEMENT_SETTER` - implements a setter, the first argument is this class,
 the second is the name of the setter being implemented.

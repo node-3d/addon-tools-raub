@@ -20,11 +20,14 @@ additional snippets follow the links below.
 **Go to**:
 
 * [include/addon-tools.hpp](doc/addon-tools.md)
-Macro shortcuts for C++ addons using NAPI.
+	
+	Macro shortcuts for C++ addons using **NAPI**.
 * [Es5 Class Wrapping](doc/class-wrapping.md)
-An alternative, lightweight native class-defining mechanism for addons.
+	
+	An alternative, lightweight native class-defining mechanism for addons.
 * [Snippets](doc/snippets.md)
-Some repetitive bits of code for addons.
+	
+	Some repetitive bits of code for addons.
 
 
 ## index.js
@@ -84,8 +87,8 @@ const tag    = process.env.npm_package_config_install;
 install(`${prefix}/${tag}`);
 ```
 
-`prefix` - the constant base part of the download url.
-`tag` - the version-dependent part of the url,
+* `prefix` - the constant base part of the download url.
+* `tag` - the version-dependent part of the url,
 here `process.env.npm_package_config_install` is taken
 ([automatically](https://docs.npmjs.com/misc/config#per-package-config-settings))
 from **package.json**:
@@ -105,7 +108,7 @@ from **package.json**:
 A [Writable](https://nodejs.org/api/stream.html#stream_writable_streams)
 stream buffer, that is stored in-memory and can be fully
 obtained when writing was finished. It is equivalent to stream-writing
-a temporary file and then reading it into a Buffer.
+a temporary file and then reading it into a `Buffer`.
 
 Use `stream.get()` to obtain the data when writing was finished:
 ```
