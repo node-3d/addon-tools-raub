@@ -32,7 +32,7 @@ within `Napi::Value`-returning functions.
 
 <details>
 
-<summary>**Return value**</summary>
+<summary><b>Return value</b></summary>
 
 * `RET_VALUE(VAL)`- return a given Napi::Value.
 * `RET_UNDEFINED`- return `undefined`.
@@ -48,7 +48,7 @@ within `Napi::Value`-returning functions.
 
 <details>
 
-<summary>**New JS value**</summary>
+<summary><b>New JS value</b></summary>
 
 * `JS_STR(VAL)` - create a `Napi::String`, expected `VAL` is `const char *`.
 * `JS_NUM(VAL)` - create a `Napi::Number`, expected `VAL` is of numeric type.
@@ -60,7 +60,7 @@ within `Napi::Value`-returning functions.
 
 <details>
 
-<summary>**Method check**</summary>
+<summary><b>Method check</b></summary>
 
 These checks throw JS `TypeError` if not passed. `T` is always used as a typename
 in error messages. `C` is a
@@ -83,7 +83,7 @@ destroyed by `destroy()`, and then fetch `env`.
 
 <details>
 
-<summary>**Method arguments**</summary>
+<summary><b>Method arguments</b></summary>
 
 Following macros convert JS arguments into C++ variables.
 Three types of argument retrieval are supported:
@@ -159,7 +159,7 @@ JS_METHOD(test) {
 
 <details>
 
-<summary>**Setter argument**</summary>
+<summary><b>Setter argument</b></summary>
 
 Works similar to method arguments. But there is always `value`
 argument, from which a C++ value is extracted.
@@ -191,7 +191,7 @@ See also: [Class Wrapping](class-wrapping.md)
 
 <details>
 
-<summary>**JS Data to C++ Data**</summary>
+<summary><b>JS Data to C++ Data</b></summary>
 
 * `T *getArrayData(value, num = NULL)` - extracts TypedArray data of any type from
 the given JS value. Does not accept `Array`. Checks with `IsArrayBuffer()`.
