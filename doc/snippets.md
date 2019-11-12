@@ -114,7 +114,7 @@ dependency include path(s).
 
 <details>
 
-<summary>**See a snipped for src/binding.gyp here**</summary>
+<summary><b>See a snipped for src/binding.gyp here</b></summary>
 
 * Assume `DEPS` is the name of an Addon Tools compliant dependency module.
 * Assume `ADDON` is the name of this addon's resulting binary.
