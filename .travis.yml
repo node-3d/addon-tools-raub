@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-  - "10.16.1"
+  - "12.13.0"
 
 
 matrix:
@@ -12,7 +12,8 @@ matrix:
     sudo: false
   - name: "MacOS"
     os: osx
-
+  - name: "Windows"
+    os: windows
 
 install:
   - cd test
