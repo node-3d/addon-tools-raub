@@ -13,7 +13,7 @@ This is a part of [Node3D](https://github.com/node-3d) project.
 ## Synopsis
 
 This module contains numerous helpers for Node.js **NAPI**
-addons and dependency packages. In this file, helper scripts
+addons and dependency packages. On this page, helper scripts
 are described. For details on **addon-tools.hpp** and some
 additional snippets follow the links below.
 
