@@ -18,7 +18,6 @@
 		"gyp"
 	],
 	"files": [
-		"bat",
 		"include",
 		"download.js",
 		"cpbin.js",

@@ -635,7 +635,7 @@ private:                                                                      \
 	);
 
 #define JS_DECLARE_METHOD(CLASS, NAME)                                        \
-	inline static JS_METHOD(__st_##NAME) {   \
+	inline static JS_METHOD(__st_##NAME) {                                    \
 		JS_GET_THAT(CLASS);                                                   \
 		return that->__i_##NAME(info);                                        \
 	};                                                                        \
