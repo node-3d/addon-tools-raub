@@ -104,6 +104,7 @@ double x = IS_ARG_EMPTY(0) ? 0.0 : info[0].ToNumber().DoubleValue();
 ```
 
 That extrapolates well to all the helpers below:
+
 |     Macro        | JS type       | C++ type                | Default   |
 | :---             | :---:         | :---:                   | :---:     |
 | `REQ_STR_ARG`    | `string`      | `std::string`           | -         |
