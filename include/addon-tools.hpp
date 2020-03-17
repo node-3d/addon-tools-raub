@@ -104,7 +104,7 @@
 
 #define LET_UINT32_ARG(I, VAR) USE_UINT32_ARG(I, VAR, 0)
 
-#define REQ_UINT_ARG(I, VAR) REQ_UINT_ARG(I, VAR)
+#define REQ_UINT_ARG(I, VAR) REQ_UINT32_ARG(I, VAR)
 #define USE_UINT_ARG(I, VAR, DEF) USE_UINT32_ARG(I, VAR, DEF)
 #define LET_UINT_ARG(I, VAR) LET_UINT32_ARG(I, VAR)
 
@@ -181,7 +181,7 @@
 	CHECK_LET_ARG(I, IsObject(), "Object");                                   \
 	Napi::Object VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As<Napi::Object>();
 
-#define LET_OBJ_ARG(I, VAR) USE_OBJ_ARG(I, VAR, info[I].As<Napi::Object>())
+#define LET_OBJ_ARG(I, VAR) USE_OBJ_ARG(I, VAR, Napi::Object::New(env))
 
 
 #define REQ_ARRV_ARG(I, VAR)                                                  \
@@ -194,13 +194,15 @@
 	Napi::Buffer<uint8_t> VAR = info[I].As< Napi::Buffer<uint8_t> >();
 
 
-#define REQ_ARRAY_ARG(I, VAR)                                                 \
-	REQ_OBJ_ARG(I, _obj_##VAR);                                               \
-	if ( ! _obj_##VAR.IsArray() ) {                                           \
-		JS_THROW("Argument " #I " must  be of type `Array`");                 \
-		RET_UNDEFINED;                                                        \
-	}                                                                         \
-	Napi::Array VAR = _obj_##VAR.As<Napi::Array>();
+#define REQ_ARRAY_ARG(I, VAR)                                                \
+	CHECK_REQ_ARG(I, IsArray(), "Array");                                    \
+	Napi::Array VAR = info[I].As<Napi::Array>();
+
+#define USE_ARRAY_ARG(I, VAR, DEF)                                           \
+	CHECK_LET_ARG(I, IsArray(), "Array");                                    \
+	Napi::Array VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As<Napi::Array>();
+
+#define LET_ARRAY_ARG(I, VAR) USE_ARRAY_ARG(I, VAR, Napi::Array::New(env))
 
 
 #define REQ_TYPED_ARRAY_ARG(I, VAR)                                           \

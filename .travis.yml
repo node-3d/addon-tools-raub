@@ -18,3 +18,9 @@ matrix:
 install:
   - cd test
   - npm ci
+  - cd ..
+
+test:
+  - cd test
+  - npm test
+  - ./build/release/test

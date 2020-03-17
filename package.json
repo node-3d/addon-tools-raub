@@ -1,7 +1,7 @@
 {
 	"author": "Luis Blanco <luisblanco1337@gmail.com>",
 	"name": "addon-tools-raub",
-	"version": "5.0.0",
+	"version": "5.0.1",
 	"description": "Helpers for Node.js addons and dependency packages",
 	"license": "MIT",
 	"main": "index.js",
@@ -37,7 +37,7 @@
 		"url": "https://github.com/node-3d/addon-tools-raub.git"
 	},
 	"dependencies": {
-		"node-addon-api": "1.7.1",
-		"unzipper": "0.10.5"
+		"node-addon-api": "2.0.0",
+		"unzipper": "0.10.10"
 	}
 }

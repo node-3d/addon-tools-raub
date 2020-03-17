@@ -7,4 +7,5 @@
 .vscode
 .eslintrc
 node_modules/
+test/build/
 *.log
