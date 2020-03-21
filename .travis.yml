@@ -20,7 +20,7 @@ install:
   - npm ci
   - cd ..
 
-test:
+script:
   - cd test
   - npm test
   - ./build/release/test
