@@ -23,4 +23,4 @@ install:
 script:
   - cd test
   - npm test
-  - ./build/release/test
+  - ./build/Release/test
