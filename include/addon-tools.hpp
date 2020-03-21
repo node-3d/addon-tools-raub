@@ -119,6 +119,9 @@
 
 #define LET_BOOL_ARG(I, VAR) USE_BOOL_ARG(I, VAR, false)
 
+#define SOFT_BOOL_ARG(I, VAR)                                                 \
+	bool VAR = info.Length() >= (I) && info[I].ToBoolean().Value() || false;
+
 
 #define REQ_OFFS_ARG(I, VAR)                                                  \
 	CHECK_REQ_ARG(I, IsNumber(), "Number");                                   \
@@ -187,6 +190,12 @@
 #define REQ_ARRV_ARG(I, VAR)                                                  \
 	CHECK_REQ_ARG(I, IsArrayBuffer(), "Object");                              \
 	Napi::ArrayBuffer VAR = info[I].As<Napi::ArrayBuffer>();
+
+#define USE_ARRAY_ARG(I, VAR, DEF)                                            \
+	CHECK_LET_ARG(I, IsArray(), "Array");                                     \
+	Napi::Array VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As<Napi::Array>();
+
+#define LET_ARRAY_ARG(I, VAR) USE_ARRAY_ARG(I, VAR, Napi::Array::New(env));
 
 
 #define REQ_BUF_ARG(I, VAR)                                                   \
@@ -527,11 +536,14 @@ typedef void (*Es5SetterCallback)(const Napi::CallbackInfo& info);
 public:                                                                       \
 	inline static CLASS *unwrap(Napi::Object thatObj) {                       \
 		CLASS *that;                                                          \
-		napi_unwrap(                                                          \
+		napi_status ns = napi_unwrap(                                         \
 			thatObj.Env(),                                                    \
 			thatObj.Get(_nameEs5),                                            \
 			reinterpret_cast<void**>(&that)                                   \
 		);                                                                    \
+		if (ns != napi_ok) {                                                  \
+			return nullptr;                                                   \
+		}                                                                     \
 		return that;                                                          \
 	}                                                                         \
 private:                                                                      \
@@ -630,11 +642,7 @@ private:                                                                      \
 
 
 #define JS_GET_THAT(CLASS)                                                    \
-	CLASS *that;                                                              \
-	Napi::Object thatObj = info.This().As<Napi::Object>();                    \
-	napi_unwrap(                                                              \
-		info.Env(), thatObj.Get(_nameEs5), reinterpret_cast<void**>(&that)    \
-	);
+	CLASS *that = CLASS::unwrap(info.This().As<Napi::Object>());
 
 #define JS_DECLARE_METHOD(CLASS, NAME)                                        \
 	inline static JS_METHOD(__st_##NAME) {                                    \
