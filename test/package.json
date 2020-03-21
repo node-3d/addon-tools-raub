@@ -5,7 +5,7 @@
 	"main": "mocha",
 	"scripts": {
 		"test": "mocha",
-		"postinstall": "cd .. && npm ci"
+		"preinstall": "cd .. && npm ci"
 	},
 	"dependencies": {
 		"chai": "4.2.0",
