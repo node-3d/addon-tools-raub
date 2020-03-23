@@ -23,6 +23,7 @@
 		"cpbin.js",
 		"index.js",
 		"install.js",
+		"utils.js",
 		"writable-buffer.js",
 		"LICENSE",
 		"package.json",
