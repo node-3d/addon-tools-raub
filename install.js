@@ -8,6 +8,7 @@ const fs  = require('fs');
 const AdmZip = require('adm-zip');
 
 const { bin, platform } = require('.');
+const { mkdir, rm } = require('./utils');
 
 
 const protocols = { http, https };
@@ -20,11 +21,16 @@ const onError = msg => {
 const zipPath = `${bin}/${bin}.zip`;
 
 
-const install = (url, count = 1) => {
-	
-	const proto = protocols[url.match(/^https?/)[0]];
-	
-	const request = proto.get(url, response => {
+const install = async (url, count = 1) => {
+	try {
+		
+		const proto = protocols[url.match(/^https?/)[0]];
+		
+		const response = await new Promise((res, rej) => {
+			const request = proto.get(url, response => res(response));
+			request.on('error', err => rej(err));
+		});
+		response.on('error', err => { throw err; });
 		
 		// Handle redirects
 		if ([301, 302, 303, 307].includes(response.statusCode)) {
@@ -32,36 +38,37 @@ const install = (url, count = 1) => {
 				return install(response.headers.location, count + 1);
 			}
 			console.log(url);
-			return onError('Error: Too many redirects.');
+			throw new Error('Error: Too many redirects.');
 		}
 		
 		// Handle bad status
 		if (response.statusCode !== 200) {
 			console.log(url);
-			return onError(`Response status was ${response.statusCode}`);
+			throw new Error(`Response status was ${response.statusCode}`);
 		}
 		
-		response.on('error', err => onError(err.message));
+		await mkdir(bin);
 		
-		fs.mkdirSync(bin);
-		const zipWriter = fs.createWriteStream(zipPath);
-		zipWriter.on('error', err => onError(err.message));
-		response.pipe(zipWriter);
-		
-		zipWriter.on('finish', () => {
-			const zip = new AdmZip(zipPath);
-			zip.extractAllTo(bin, true);
-			fs.unlinkSync(zipPath);
+		await new Promise((res, rej) => {
+			const zipWriter = fs.createWriteStream(zipPath);
+			zipWriter.on('error', err => rej(err));
+			zipWriter.on('finish', () => res());
+			response.pipe(zipWriter);
 		});
 		
-	});
-	
-	request.on('error', err => onError(err.message));
+		const zip = new AdmZip(zipPath);
+		zip.extractAllTo(bin, true);
+		
+		await rm(zipPath);
+		
+	} catch (ex) {
+		onError(ex.message);
+	}
 	
 };
 
 
 module.exports = folder => {
 	const url = `${folder}/${platform}.zip`;
-	install(url);
+	install(url).then();
 };

@@ -117,3 +117,25 @@ const stream = new WritableBuffer();
 sourceStream.pipe(stream);
 sourceStream.on('end', () => useData(stream.get()));
 ```
+
+
+## utils.js
+
+* `read` - (async) Reads a whole file to string, NOT A Buffer.
+* `write` - (async) Write a file.
+* `copy` - (async) Copy a file.
+* `exists` - (async) Check if a file/folder exists.
+* `mkdir` - (async) Create an empty folder.
+* `stat` - (async) Get status on a file.
+* `isDir` - (async) Check if the path is a folder.
+* `isFile` - (async) Check if the path is a file.
+* `dirUp` - Cut the path one folder up.
+* `ensuredir` - (async) Like `mkdir -p`, makes sure a directory exists.
+* `copysafe` - (async) Copy a file, `dest` folder is created if needed.
+* `readdir` - (async) Get file/folder names of the 1st level.
+* `subdirs` - (async) Get folder paths (concatenated with input) of the 1st level.
+* `subfiles` - (async) Get file paths (concatenated with input) of the 1st level.
+* `traverse` - (async) Get all nested files recursively.
+* `copyall` - (async) Copy a folder with all the contained files.
+* `rmdir` - (async) Like `rm -rf`, removes everything recursively.
+* `rm` - (async) Remove a file. Must be a file, not a folder. Just `fs.unlink`.
