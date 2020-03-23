@@ -397,22 +397,22 @@ inline Type* getBufferData(
 
 inline void *getData(Napi::Env env, Napi::Object obj) {
 	
-	void *pixels = nullptr;
+	void *data = nullptr;
 	
-	if (obj.IsTypedArray() || obj.IsArrayBuffer()) {
-		pixels = getArrayData<uint8_t>(env, obj);
-	} else if (obj.IsBuffer()) {
-		pixels = getBufferData<uint8_t>(env, obj);
+	if (obj.IsBuffer()) {
+		data = getBufferData<uint8_t>(env, obj);
+	} else if (obj.IsTypedArray() || obj.IsArrayBuffer()) {
+		data = getArrayData<uint8_t>(env, obj);
 	} else if (obj.Has("data")) {
 		Napi::Object data = obj.Get("data").As<Napi::Object>();
-		if (data.IsTypedArray() || data.IsArrayBuffer()) {
-			pixels = getArrayData<uint8_t>(env, data);
-		} else if (data.IsBuffer()) {
-			pixels = getBufferData<uint8_t>(env, data);
+		if (data.IsBuffer()) {
+			data = getBufferData<uint8_t>(env, data);
+		} else if (data.IsTypedArray() || data.IsArrayBuffer()) {
+			data = getArrayData<uint8_t>(env, data);
 		}
 	}
 	
-	return pixels;
+	return data;
 	
 }
 
