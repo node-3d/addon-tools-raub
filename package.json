@@ -37,7 +37,7 @@
 		"url": "https://github.com/node-3d/addon-tools-raub.git"
 	},
 	"dependencies": {
-		"node-addon-api": "2.0.0",
-		"unzipper": "0.10.10"
+		"adm-zip": "0.4.14",
+		"node-addon-api": "2.0.0"
 	}
 }
