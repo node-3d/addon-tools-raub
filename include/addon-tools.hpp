@@ -120,7 +120,7 @@
 #define LET_BOOL_ARG(I, VAR) USE_BOOL_ARG(I, VAR, false)
 
 #define SOFT_BOOL_ARG(I, VAR)                                                 \
-	bool VAR = info.Length() >= (I) && info[I].ToBoolean().Value() || false;
+	bool VAR = (info.Length() >= (I) && info[I].ToBoolean().Value()) || false;
 
 
 #define REQ_OFFS_ARG(I, VAR)                                                  \

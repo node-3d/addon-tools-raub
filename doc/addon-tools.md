@@ -90,6 +90,7 @@ Three types of argument retrieval are supported:
 * `REQ_` - 2 params, requires an argument to have a value
 * `USE_` - 3 params, allows the argument to be empty and have a default
 * `LET_` - 2 params, is `USE_` with a preset zero-default.
+* `SOFT_` - 2 params, is `LET_` without type and arity checks.
 
 What it does, basically:
 ```
@@ -125,6 +126,7 @@ That extrapolates well to all the helpers below:
 | `REQ_BOOL_ARG`   | `Boolean`     | `bool`                  | -         |
 | `USE_BOOL_ARG`   | `Boolean`     | `bool`                  | -         |
 | `LET_BOOL_ARG`   | `Boolean`     | `bool`                  | `false`   |
+| `SOFT_BOOL_ARG`  | `Boolean`     | `bool`                  | `false`   |
 | `REQ_OFFS_ARG`   | `number`      | `size_t`                | -         |
 | `USE_OFFS_ARG`   | `number`      | `size_t`                | -         |
 | `LET_OFFS_ARG`   | `number`      | `size_t`                | `0`       |
@@ -141,6 +143,9 @@ That extrapolates well to all the helpers below:
 | `REQ_OBJ_ARG`    | `object`      | `Napi::Object`          | -         |
 | `USE_OBJ_ARG`    | `object`      | `Napi::Object`          | -         |
 | `LET_OBJ_ARG`    | `object`      | `Napi::Object`          | `{}`      |
+| `REQ_ARRAY_ARG`  | `object`      | `Napi::Array`           | -         |
+| `USE_ARRAY_ARG`  | `object`      | `Napi::Array`           | -         |
+| `LET_ARRAY_ARG`  | `object`      | `Napi::Array`           | `[]`      |
 | `REQ_ARRV_ARG`   | `ArrayBuffer` | `Napi::ArrayBuffer`     | -         |
 | `REQ_BUF_ARG`    | `Buffer`      | `Napi::Buffer<uint8_t>` | -         |
 
