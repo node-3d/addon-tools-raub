@@ -3,8 +3,9 @@
 
 const https = require('https');
 const http  = require('http');
+const fs  = require('fs');
 
-const unzipper = require('unzipper');
+const AdmZip = require('adm-zip');
 
 const { bin, platform } = require('.');
 
@@ -15,6 +16,8 @@ const onError = msg => {
 	console.error(msg);
 	process.exit(-1);
 };
+
+const zipPath = `${bin}/${bin}.zip`;
 
 
 const install = (url, count = 1) => {
@@ -40,10 +43,16 @@ const install = (url, count = 1) => {
 		
 		response.on('error', err => onError(err.message));
 		
-		const extractor = unzipper.Extract({ path: bin });
-		extractor.on('error', err => onError(err.message));
+		fs.mkdirSync(bin);
+		const zipWriter = fs.createWriteStream(zipPath);
+		zipWriter.on('error', err => onError(err.message));
+		response.pipe(zipWriter);
 		
-		response.pipe(extractor);
+		zipWriter.on('finish', () => {
+			const zip = new AdmZip(zipPath);
+			zip.extractAllTo(bin, true);
+			fs.unlinkSync(zipPath);
+		});
 		
 	});
 	

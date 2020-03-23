@@ -338,7 +338,7 @@ inline Type* getArrayData(
 	int *num = nullptr
 ) {
 	
-	Type *data = nullptr;
+	Type *out = nullptr;
 	
 	if (obj.IsTypedArray()) {
 		Napi::TypedArray ta = obj.As<Napi::TypedArray>();
@@ -348,13 +348,13 @@ inline Type* getArrayData(
 			*num = arr.ByteLength() / sizeof(Type);
 		}
 		uint8_t *base = reinterpret_cast<uint8_t *>(arr.Data());
-		data = reinterpret_cast<Type *>(base + offset);
+		out = reinterpret_cast<Type *>(base + offset);
 	} else if (obj.IsArrayBuffer()) {
 		Napi::ArrayBuffer arr = obj.As<Napi::ArrayBuffer>();
 		if (num) {
 			*num = arr.ByteLength() / sizeof(Type);
 		}
-		data = reinterpret_cast<Type *>(arr.Data());
+		out = reinterpret_cast<Type *>(arr.Data());
 	} else {
 		if (num) {
 			*num = 0;
@@ -362,7 +362,7 @@ inline Type* getArrayData(
 		JS_THROW("Argument must be of type `TypedArray`.");
 	}
 	
-	return data;
+	return out;
 	
 }
 
@@ -373,7 +373,7 @@ inline Type* getBufferData(
 	int *num = nullptr
 ) {
 	
-	Type *data = nullptr;
+	Type *out = nullptr;
 	
 	if (num) {
 		*num = 0;
@@ -381,38 +381,38 @@ inline Type* getBufferData(
 	
 	if ( ! obj.IsBuffer() ) {
 		JS_THROW("Argument must be of type `Buffer`.");
-		return data;
+		return out;
 	}
 	
 	Napi::Buffer<uint8_t> arr = obj.As< Napi::Buffer<uint8_t> >();
 	if (num) {
 		*num = arr.Length() / sizeof(Type);
 	}
-	data = arr.Data();
+	out = arr.Data();
 	
-	return data;
+	return out;
 	
 }
 
 
 inline void *getData(Napi::Env env, Napi::Object obj) {
 	
-	void *pixels = nullptr;
+	void *out = nullptr;
 	
 	if (obj.IsTypedArray() || obj.IsArrayBuffer()) {
-		pixels = getArrayData<uint8_t>(env, obj);
+		out = getArrayData<uint8_t>(env, obj);
 	} else if (obj.IsBuffer()) {
-		pixels = getBufferData<uint8_t>(env, obj);
+		out = getBufferData<uint8_t>(env, obj);
 	} else if (obj.Has("data")) {
 		Napi::Object data = obj.Get("data").As<Napi::Object>();
 		if (data.IsTypedArray() || data.IsArrayBuffer()) {
-			pixels = getArrayData<uint8_t>(env, data);
+			out = getArrayData<uint8_t>(env, data);
 		} else if (data.IsBuffer()) {
-			pixels = getBufferData<uint8_t>(env, data);
+			out = getBufferData<uint8_t>(env, data);
 		}
 	}
 	
-	return pixels;
+	return out;
 	
 }
 
