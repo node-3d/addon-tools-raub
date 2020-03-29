@@ -15,23 +15,22 @@
 #define NAPI_HS Napi::HandleScope scope(env);
 
 
+#define JS_UNDEFINED env.Undefined()
+#define JS_NULL env.Null()
 #define JS_STR(VAL) Napi::String::New(env, VAL)
 #define JS_NUM(VAL) Napi::Number::New(env, static_cast<double>(VAL))
 #define JS_EXT(VAL) Napi::External<void>::New(env, reinterpret_cast<void*>(VAL))
 #define JS_BOOL(VAL) Napi::Boolean::New(env, static_cast<bool>(VAL))
-#define JS_FUN(VAL) Napi::Function::New(env, VAL)
-#define JS_OBJ(VAL) Napi::Object::New(env, VAL)
-
+#define JS_OBJECT Napi::Object::New(env)
+#define JS_ARRAY Napi::Array::New(env)
 
 #define RET_VALUE(VAL) return VAL;
-#define RET_UNDEFINED RET_VALUE(env.Undefined())
-#define RET_NULL RET_VALUE(env.Null())
+#define RET_UNDEFINED RET_VALUE(JS_UNDEFINED)
+#define RET_NULL RET_VALUE(JS_NULL)
 #define RET_STR(VAL) RET_VALUE(JS_STR(VAL))
 #define RET_NUM(VAL) RET_VALUE(JS_NUM(VAL))
 #define RET_EXT(VAL) RET_VALUE(JS_EXT(VAL))
 #define RET_BOOL(VAL) RET_VALUE(JS_BOOL(VAL))
-#define RET_FUN(VAL) RET_VALUE(JS_FUN(VAL))
-#define RET_OBJ(VAL) RET_VALUE(JS_OBJ(VAL))
 
 
 #define JS_THROW(VAL)                                                         \
@@ -160,15 +159,13 @@
 
 #define REQ_EXT_ARG(I, VAR)                                                   \
 	CHECK_REQ_ARG(I, IsExternal(), "Pointer");                                \
-	Napi::External<void> VAR = info[I].As< Napi::External<void> >();
+	void *VAR = info[I].As< Napi::External<void> >().Data();
 
 #define USE_EXT_ARG(I, VAR, DEF)                                              \
 	CHECK_LET_ARG(I, IsExternal(), "Pointer");                                \
-	Napi::External<void> VAR = IS_ARG_EMPTY(I)                                \
-		? (DEF)                                                               \
-		: info[I].As< Napi::External<void> >();
+	void *VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As< Napi::External<void> >().Data();
 
-#define LET_EXT_ARG(I, VAR) USE_EXT_ARG(I, VAR, JS_EXT(nullptr))
+#define LET_EXT_ARG(I, VAR) USE_EXT_ARG(I, VAR, nullptr)
 
 
 #define REQ_FUN_ARG(I, VAR)                                                   \
@@ -188,7 +185,7 @@
 
 
 #define REQ_ARRV_ARG(I, VAR)                                                  \
-	CHECK_REQ_ARG(I, IsArrayBuffer(), "Object");                              \
+	CHECK_REQ_ARG(I, IsArrayBuffer(), "ArrayBuffer");                              \
 	Napi::ArrayBuffer VAR = info[I].As<Napi::ArrayBuffer>();
 
 
@@ -209,12 +206,8 @@
 
 
 #define REQ_TYPED_ARRAY_ARG(I, VAR)                                           \
-	REQ_OBJ_ARG(I, _obj_##VAR);                                               \
-	if ( ! _obj_##VAR.IsTypedArray() ) {                                      \
-		JS_THROW("Argument " #I " must be of type `TypedArray`");             \
-		RET_UNDEFINED;                                                        \
-	}                                                                         \
-	Napi::TypedArray VAR = _obj_##VAR.As<Napi::TypedArray>();
+	CHECK_REQ_ARG(I, IsTypedArray(), "TypedArray");                           \
+	Napi::TypedArray VAR = info[I].As<Napi::TypedArray>();
 
 
 #define DES_CHECK                                                             \
@@ -494,33 +487,6 @@ inline void eventEmitAsync(
 }
 
 
-inline void inheritEs5(
-	Napi::Env env,
-	Napi::Function ctor,
-	Napi::Function superCtor
-) {
-	
-	Napi::Object global = env.Global();
-	Napi::Object globalObject = global.Get("Object").As<Napi::Object>();
-	Napi::Function setProto = globalObject.Get("setPrototypeOf").As<Napi::Function>();
-	Napi::Value ctorProtoProp = ctor.Get("prototype");
-	Napi::Value superCtorProtoProp = superCtor.Get("prototype");
-	
-	napi_value argv[2];
-	
-	argv[0] = ctorProtoProp;
-	argv[1] = superCtorProtoProp;
-	setProto.Call(global, 2, argv);
-	
-	argv[0] = ctor;
-	argv[1] = superCtor;
-	setProto.Call(global, 2, argv);
-	
-	ctor.Set("super_", superCtor);
-	
-}
-
-
 typedef Napi::Value (*Es5MethodCallback)(const Napi::CallbackInfo& info);
 typedef Napi::Value (*Es5GetterCallback)(const Napi::CallbackInfo& info);
 typedef void (*Es5SetterCallback)(const Napi::CallbackInfo& info);
@@ -579,14 +545,6 @@ private:                                                                      \
 		Napi::Function ctor = Napi::Function(env, __initResult);              \
 		_ctorEs5 = Napi::Persistent(ctor);                                    \
 		_ctorEs5.SuppressDestruct();                                          \
-		return ctor;                                                          \
-	}                                                                         \
-	inline static Napi::Function wrap(                                        \
-		Napi::Env env,                                                        \
-		Napi::Function superCtor                                              \
-	) {                                                                       \
-		Napi::Function ctor = wrap(env);                                      \
-		inheritEs5(env, ctor, superCtor);                                     \
 		return ctor;                                                          \
 	}                                                                         \
 	inline static void method(                                                \

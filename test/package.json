@@ -5,6 +5,7 @@
 	"main": "mocha",
 	"scripts": {
 		"test": "mocha",
+		"build": "node-gyp rebuild",
 		"preinstall": "cd .. && npm ci"
 	},
 	"dependencies": {
