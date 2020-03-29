@@ -6,10 +6,22 @@ const test = require('./build/Release/test.node');
 
 describe('Function arguments', () => {
 	
-	it('can require 3 args / REQ_ARGS', () => {
-		expect(test.reqArgs3).to.be.a('function');
-		expect(() => test.reqArgs3(1)).to.throw('Expected at least 3 arguments');
-		expect(test.reqArgs3(1, 2, 3)).to.be.true;
+	describe('REQ_ARGS', () => {
+		it('exports reqArgs3', () => {
+			expect(test.reqArgs3).to.be.a('function');
+		});
+		it('throws if no args passed', () => {
+			expect(() => test.reqArgs3()).to.throw('Expected at least 3 arguments');
+		});
+		it('throws if 1 arg passed', () => {
+			expect(() => test.reqArgs3(1)).to.throw('Expected at least 3 arguments');
+		});
+		it('returns true if 3 args passed', () => {
+			expect(test.reqArgs3(1, 2, 3)).to.be.true;
+		});
+		it('returns true if 5 args passed', () => {
+			expect(test.reqArgs3(1, 2, 3, 4, 5)).to.be.true;
+		});
 	});
 	
 	describe('IS_ARG_EMPTY', () => {

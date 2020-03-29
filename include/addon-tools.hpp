@@ -19,7 +19,7 @@
 #define JS_NULL env.Null()
 #define JS_STR(VAL) Napi::String::New(env, VAL)
 #define JS_NUM(VAL) Napi::Number::New(env, static_cast<double>(VAL))
-#define JS_EXT(VAL) Napi::External<void>::New(env, (void*)(VAL))
+#define JS_EXT(VAL) Napi::External<void>::New(env, static_cast<void*>(VAL))
 #define JS_BOOL(VAL) Napi::Boolean::New(env, static_cast<bool>(VAL))
 #define JS_OBJECT Napi::Object::New(env)
 #define JS_ARRAY Napi::Array::New(env)
