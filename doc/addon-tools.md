@@ -50,10 +50,14 @@ within `Napi::Value`-returning functions.
 
 <summary><b>New JS value</b></summary>
 
+* `JS_UNDEFINED` - an `undefined` value.
+* `JS_NULL` - a `null` value.
 * `JS_STR(VAL)` - create a `Napi::String`, expected `VAL` is `const char *`.
 * `JS_NUM(VAL)` - create a `Napi::Number`, expected `VAL` is of numeric type.
 * `JS_EXT(VAL)` - create a `Napi::External`, expected `VAL` is a pointer.
 * `JS_BOOL(VAL)` - create a `Napi::Boolean`, expected `VAL` is convertible to bool.
+* `JS_OBJECT` - a new empty `Object` instance.
+* `JS_ARRAY` - a new empty `Array` instance.
 
 </details>
 
@@ -139,13 +143,13 @@ That extrapolates well to all the helpers below:
 | `REQ_EXT_ARG`    | `native`      | `void*`                 | -         |
 | `USE_EXT_ARG`    | `native`      | `void*`                 | -         |
 | `LET_EXT_ARG`    |  `native`     | `void*`                 | `nullptr` |
-| `REQ_FUN_ARG`    | `function`    | `Napi::Function`        | -         |
 | `REQ_OBJ_ARG`    | `object`      | `Napi::Object`          | -         |
 | `USE_OBJ_ARG`    | `object`      | `Napi::Object`          | -         |
 | `LET_OBJ_ARG`    | `object`      | `Napi::Object`          | `{}`      |
 | `REQ_ARRAY_ARG`  | `object`      | `Napi::Array`           | -         |
 | `USE_ARRAY_ARG`  | `object`      | `Napi::Array`           | -         |
 | `LET_ARRAY_ARG`  | `object`      | `Napi::Array`           | `[]`      |
+| `REQ_FUN_ARG`    | `function`    | `Napi::Function`        | -         |
 | `REQ_ARRV_ARG`   | `ArrayBuffer` | `Napi::ArrayBuffer`     | -         |
 | `REQ_BUF_ARG`    | `Buffer`      | `Napi::Buffer<uint8_t>` | -         |
 
