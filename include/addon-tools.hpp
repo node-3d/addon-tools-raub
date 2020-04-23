@@ -338,7 +338,7 @@ inline Type* getArrayData(
 		size_t offset = ta.ByteOffset();
 		Napi::ArrayBuffer arr = ta.ArrayBuffer();
 		if (num) {
-			*num = arr.ByteLength() / sizeof(Type);
+			*num = ta.ByteLength() / sizeof(Type);
 		}
 		uint8_t *base = reinterpret_cast<uint8_t *>(arr.Data());
 		out = reinterpret_cast<Type *>(base + offset);
