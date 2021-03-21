@@ -1,39 +1,33 @@
 'use strict';
 
-const { expect } = require('chai');
+const tools = require('..');
 
 
 describe('index.js', () => {
-	
-	const tools = require('..');
-	
 	describe(
 		'Properties',
 		() => ['bin', 'platform', 'include'].forEach(
 			m => it(`#${m} is a string`, () => {
-				expect(tools[m]).to.be.a('string');
+				expect(typeof tools[m]).toBe('string');
 			})
 		)
 	);
 	
 	describe('#paths()', () => {
-		
 		it('is a function', () => {
-			expect(tools.paths).to.be.a('function');
+			expect(typeof tools.paths).toBe('function');
 		});
 		
 		it('returns an object', () => {
-			expect(tools.paths(__dirname)).to.be.an('object');
+			expect(typeof tools.paths(__dirname)).toBe('object');
 		});
 		
 		it('has "include" string', () => {
-			expect(tools.paths(__dirname).include).to.be.a('string');
+			expect(typeof tools.paths(__dirname).include).toBe('string');
 		});
 		
 		it('has "bin" string', () => {
-			expect(tools.paths(__dirname).include).to.be.a('string');
+			expect(typeof tools.paths(__dirname).include).toBe('string');
 		});
-		
 	});
-	
 });

@@ -1,57 +1,45 @@
 'use strict';
 
-const { expect } = require('chai');
 const test = require('./build/Release/test.node');
 
 
-describe('Function arguments', () => {
+describe('addon-tools.hpp: Function arguments', () => {
 	
 	describe('REQ_ARGS', () => {
 		it('exports reqArgs3', () => {
-			expect(test.reqArgs3).to.be.a('function');
+			expect(typeof test.reqArgs3).toBe('function');
 		});
 		it('throws if no args passed', () => {
-			expect(() => test.reqArgs3()).to.throw('Expected at least 3 arguments');
+			expect(() => test.reqArgs3()).toThrow('Expected at least 3 arguments');
 		});
 		it('throws if 1 arg passed', () => {
-			expect(() => test.reqArgs3(1)).to.throw('Expected at least 3 arguments');
+			expect(() => test.reqArgs3(1)).toThrow('Expected at least 3 arguments');
 		});
 		it('returns true if 3 args passed', () => {
-			expect(test.reqArgs3(1, 2, 3)).to.be.true;
+			expect(test.reqArgs3(1, 2, 3)).toEqual(true);
 		});
 		it('returns true if 5 args passed', () => {
-			expect(test.reqArgs3(1, 2, 3, 4, 5)).to.be.true;
+			expect(test.reqArgs3(1, 2, 3, 4, 5)).toEqual(true);
 		});
 	});
 	
 	describe('IS_ARG_EMPTY', () => {
 		it('exports isArg0Empty', () => {
-			expect(test.isArg0Empty).to.be.a('function');
+			expect(typeof test.isArg0Empty).toBe('function');
 		});
 		it('returns true for absent arg', () => {
-			expect(test.isArg0Empty()).to.be.true;
+			expect(test.isArg0Empty()).toEqual(true);
 		});
 		it('returns true for undefined arg', () => {
-			expect(test.isArg0Empty(undefined)).to.be.true;
+			expect(test.isArg0Empty(undefined)).toEqual(true);
 		});
 		it('returns true for null arg', () => {
-			expect(test.isArg0Empty(null)).to.be.true;
+			expect(test.isArg0Empty(null)).toEqual(true);
 		});
 		it('returns false for non-empty value', () => {
-			expect(test.isArg0Empty(1)).to.be.false;
+			expect(test.isArg0Empty(1)).toEqual(false);
 		});
 	});
-	
-	require('./test-hpp-arg-str');
-	require('./test-hpp-arg-int');
-	require('./test-hpp-arg-uint');
-	require('./test-hpp-arg-bool');
-	require('./test-hpp-arg-offs');
-	require('./test-hpp-arg-double');
-	require('./test-hpp-arg-float');
-	require('./test-hpp-arg-ext');
-	require('./test-hpp-arg-obj');
-	require('./test-hpp-arg-array');
 	
 	// ------------------------------ FUN_ARG
 	
@@ -59,37 +47,37 @@ describe('Function arguments', () => {
 	
 	describe('REQ_FUN_ARG', () => {
 		it('exports reqFunArg', () => {
-			expect(test.reqFunArg).to.be.a('function');
+			expect(typeof test.reqFunArg).toBe('function');
 		});
 		it('throws if arg was not passed', () => {
-			expect(() => test.reqFunArg()).to.throw(funArgMsg);
+			expect(() => test.reqFunArg()).toThrow(funArgMsg);
 		});
 		it('throws if arg was passed undefined', () => {
-			expect(() => test.reqFunArg(undefined)).to.throw(funArgMsg);
+			expect(() => test.reqFunArg(undefined)).toThrow(funArgMsg);
 		});
 		it('throws if arg was passed null', () => {
-			expect(() => test.reqFunArg(null)).to.throw(funArgMsg);
+			expect(() => test.reqFunArg(null)).toThrow(funArgMsg);
 		});
 		it('throws if arg was passed a string', () => {
-			expect(() => test.reqFunArg('1')).to.throw(funArgMsg);
+			expect(() => test.reqFunArg('1')).toThrow(funArgMsg);
 		});
 		it('throws if arg was passed a number', () => {
-			expect(() => test.reqFunArg(1)).to.throw(funArgMsg);
+			expect(() => test.reqFunArg(1)).toThrow(funArgMsg);
 		});
 		it('throws if arg was passed a boolean', () => {
-			expect(() => test.reqFunArg(true)).to.throw(funArgMsg);
+			expect(() => test.reqFunArg(true)).toThrow(funArgMsg);
 		});
 		it('throws if arg was passed a pointer', () => {
-			expect(() => test.reqFunArg(test.retExt())).to.throw(funArgMsg);
+			expect(() => test.reqFunArg(test.retExt())).toThrow(funArgMsg);
 		});
 		it('throws if arg was passed an object', () => {
-			expect(() => test.reqFunArg({})).to.throw(funArgMsg);
+			expect(() => test.reqFunArg({})).toThrow(funArgMsg);
 		});
 		it('throws if arg was passed an array', () => {
-			expect(() => test.reqFunArg([])).to.throw(funArgMsg);
+			expect(() => test.reqFunArg([])).toThrow(funArgMsg);
 		});
 		it('accepts a function', () => {
-			expect(test.reqFunArg(() => {})).to.be.a('function');
+			expect(typeof test.reqFunArg(() => {})).toBe('function');
 		});
 	});
 	
@@ -99,38 +87,38 @@ describe('Function arguments', () => {
 	
 	describe('REQ_ARRV_ARG', () => {
 		it('exports reqArrvArg', () => {
-			expect(test.reqArrvArg).to.be.a('function');
+			expect(typeof test.reqArrvArg).toBe('function');
 		});
 		it('throws if arg was not passed', () => {
-			expect(() => test.reqArrvArg()).to.throw(arrvArgMsg);
+			expect(() => test.reqArrvArg()).toThrow(arrvArgMsg);
 		});
 		it('throws if arg was passed undefined', () => {
-			expect(() => test.reqArrvArg(undefined)).to.throw(arrvArgMsg);
+			expect(() => test.reqArrvArg(undefined)).toThrow(arrvArgMsg);
 		});
 		it('throws if arg was passed null', () => {
-			expect(() => test.reqArrvArg(null)).to.throw(arrvArgMsg);
+			expect(() => test.reqArrvArg(null)).toThrow(arrvArgMsg);
 		});
 		it('throws if arg was passed a string', () => {
-			expect(() => test.reqArrvArg('1')).to.throw(arrvArgMsg);
+			expect(() => test.reqArrvArg('1')).toThrow(arrvArgMsg);
 		});
 		it('throws if arg was passed a number', () => {
-			expect(() => test.reqArrvArg(1)).to.throw(arrvArgMsg);
+			expect(() => test.reqArrvArg(1)).toThrow(arrvArgMsg);
 		});
 		it('throws if arg was passed a boolean', () => {
-			expect(() => test.reqArrvArg(true)).to.throw(arrvArgMsg);
+			expect(() => test.reqArrvArg(true)).toThrow(arrvArgMsg);
 		});
 		it('throws if arg was passed a pointer', () => {
-			expect(() => test.reqArrvArg(test.retExt())).to.throw(arrvArgMsg);
+			expect(() => test.reqArrvArg(test.retExt())).toThrow(arrvArgMsg);
 		});
 		it('throws if arg was passed an object', () => {
-			expect(() => test.reqArrvArg({})).to.throw(arrvArgMsg);
+			expect(() => test.reqArrvArg({})).toThrow(arrvArgMsg);
 		});
 		it('throws if arg was passed an array', () => {
-			expect(() => test.reqArrvArg([])).to.throw(arrvArgMsg);
+			expect(() => test.reqArrvArg([])).toThrow(arrvArgMsg);
 		});
 		it('accepts an array buffer', () => {
 			const { buffer } = new Uint8Array([1, 2, 3]);
-			expect(test.reqArrvArg(buffer)).to.be.equal(buffer);
+			expect(test.reqArrvArg(buffer)).toEqual(buffer);
 		});
 	});
 	
@@ -140,38 +128,38 @@ describe('Function arguments', () => {
 	
 	describe('REQ_BUF_ARG', () => {
 		it('exports reqBufArg', () => {
-			expect(test.reqBufArg).to.be.a('function');
+			expect(typeof test.reqBufArg).toBe('function');
 		});
 		it('throws if arg was not passed', () => {
-			expect(() => test.reqBufArg()).to.throw(bufArgMsg);
+			expect(() => test.reqBufArg()).toThrow(bufArgMsg);
 		});
 		it('throws if arg was passed undefined', () => {
-			expect(() => test.reqBufArg(undefined)).to.throw(bufArgMsg);
+			expect(() => test.reqBufArg(undefined)).toThrow(bufArgMsg);
 		});
 		it('throws if arg was passed null', () => {
-			expect(() => test.reqBufArg(null)).to.throw(bufArgMsg);
+			expect(() => test.reqBufArg(null)).toThrow(bufArgMsg);
 		});
 		it('throws if arg was passed a string', () => {
-			expect(() => test.reqBufArg('1')).to.throw(bufArgMsg);
+			expect(() => test.reqBufArg('1')).toThrow(bufArgMsg);
 		});
 		it('throws if arg was passed a number', () => {
-			expect(() => test.reqBufArg(1)).to.throw(bufArgMsg);
+			expect(() => test.reqBufArg(1)).toThrow(bufArgMsg);
 		});
 		it('throws if arg was passed a boolean', () => {
-			expect(() => test.reqBufArg(true)).to.throw(bufArgMsg);
+			expect(() => test.reqBufArg(true)).toThrow(bufArgMsg);
 		});
 		it('throws if arg was passed a pointer', () => {
-			expect(() => test.reqBufArg(test.retExt())).to.throw(bufArgMsg);
+			expect(() => test.reqBufArg(test.retExt())).toThrow(bufArgMsg);
 		});
 		it('throws if arg was passed an object', () => {
-			expect(() => test.reqBufArg({})).to.throw(bufArgMsg);
+			expect(() => test.reqBufArg({})).toThrow(bufArgMsg);
 		});
 		it('throws if arg was passed an array', () => {
-			expect(() => test.reqBufArg([])).to.throw(bufArgMsg);
+			expect(() => test.reqBufArg([])).toThrow(bufArgMsg);
 		});
 		it('accepts a buffer', () => {
 			const buffer = Buffer.from([1, 2, 3]);
-			expect(test.reqBufArg(buffer)).to.be.equal(buffer);
+			expect(test.reqBufArg(buffer)).toEqual(buffer);
 		});
 	});
 	
@@ -181,38 +169,38 @@ describe('Function arguments', () => {
 	
 	describe('REQ_TYPED_ARRAY_ARG', () => {
 		it('exports reqTypedArg', () => {
-			expect(test.reqTypedArg).to.be.a('function');
+			expect(typeof test.reqTypedArg).toBe('function');
 		});
 		it('throws if arg was not passed', () => {
-			expect(() => test.reqTypedArg()).to.throw(typedArgMsg);
+			expect(() => test.reqTypedArg()).toThrow(typedArgMsg);
 		});
 		it('throws if arg was passed undefined', () => {
-			expect(() => test.reqTypedArg(undefined)).to.throw(typedArgMsg);
+			expect(() => test.reqTypedArg(undefined)).toThrow(typedArgMsg);
 		});
 		it('throws if arg was passed null', () => {
-			expect(() => test.reqTypedArg(null)).to.throw(typedArgMsg);
+			expect(() => test.reqTypedArg(null)).toThrow(typedArgMsg);
 		});
 		it('throws if arg was passed a string', () => {
-			expect(() => test.reqTypedArg('1')).to.throw(typedArgMsg);
+			expect(() => test.reqTypedArg('1')).toThrow(typedArgMsg);
 		});
 		it('throws if arg was passed a number', () => {
-			expect(() => test.reqTypedArg(1)).to.throw(typedArgMsg);
+			expect(() => test.reqTypedArg(1)).toThrow(typedArgMsg);
 		});
 		it('throws if arg was passed a boolean', () => {
-			expect(() => test.reqTypedArg(true)).to.throw(typedArgMsg);
+			expect(() => test.reqTypedArg(true)).toThrow(typedArgMsg);
 		});
 		it('throws if arg was passed a pointer', () => {
-			expect(() => test.reqTypedArg(test.retExt())).to.throw(typedArgMsg);
+			expect(() => test.reqTypedArg(test.retExt())).toThrow(typedArgMsg);
 		});
 		it('throws if arg was passed an object', () => {
-			expect(() => test.reqTypedArg({})).to.throw(typedArgMsg);
+			expect(() => test.reqTypedArg({})).toThrow(typedArgMsg);
 		});
 		it('throws if arg was passed an array', () => {
-			expect(() => test.reqTypedArg([])).to.throw(typedArgMsg);
+			expect(() => test.reqTypedArg([])).toThrow(typedArgMsg);
 		});
 		it('accepts a typed array', () => {
 			const typed = new Uint8Array([1, 2, 3]);
-			expect(test.reqTypedArg(typed)).to.be.equal(typed);
+			expect(test.reqTypedArg(typed)).toEqual(typed);
 		});
 	});
 	

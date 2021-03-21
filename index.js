@@ -1,5 +1,8 @@
 'use strict';
 
+const napi = require('node-addon-api');
+
+
 const platformNames = {
 	win32  : 'windows',
 	linux  : 'linux',
@@ -16,13 +19,12 @@ if ( ! platformName ) {
 const rootPath = __dirname.replace(/\\/g, '/');
 
 
-const napiInclude = require('node-addon-api').include.replace(/\\/g, '/');
+const napiInclude = napi.include.replace(/\\/g, '/');
 const thisInclude = `${rootPath}/include`;
 const includePath = `${napiInclude} ${thisInclude}`;
 
 
 const paths = dir => {
-	
 	dir = dir.replace(/\\/g, '/');
 	
 	const bin     = `${dir}/bin-${platformName}`;
@@ -33,16 +35,12 @@ const paths = dir => {
 	}
 	
 	return { bin, include };
-	
 };
 
 
 module.exports = {
-	
 	paths,
-	
 	bin      : `bin-${platformName}`,
 	platform : platformName,
 	include  : includePath,
-	
 };

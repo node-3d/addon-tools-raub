@@ -5,10 +5,9 @@ const { bin } = require('.');
 
 
 module.exports = async name => {
-	
 	const srcDir = process.cwd().replace(/\\/g, '/');
 	
-	if ( ! await exists(`${srcDir}/build/Release/${name}.node`) ) {
+	if (!await exists(`${srcDir}/build/Release/${name}.node`) ) {
 		console.error(`Error. File "${srcDir}/build/Release/${name}.node" not found.`);
 	}
 	
@@ -27,5 +26,4 @@ module.exports = async name => {
 	await copy(`${srcDir}/build/Release/${name}.node`, destAbs);
 	
 	console.log(`The binary "${name}.node" was copied to "${bin}".`);
-	
 };

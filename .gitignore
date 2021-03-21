@@ -8,4 +8,5 @@
 .eslintrc
 node_modules/
 test/build/
+doc/jest/
 *.log

@@ -3,11 +3,11 @@
 This is a part of [Node3D](https://github.com/node-3d) project.
 
 [![NPM](https://nodei.co/npm/addon-tools-raub.png?compact=true)](https://www.npmjs.com/package/addon-tools-raub)
-
-[![Build Status](https://api.travis-ci.com/node-3d/addon-tools-raub.svg?branch=master)](https://travis-ci.com/node-3d/addon-tools-raub)
 [![CodeFactor](https://www.codefactor.io/repository/github/node-3d/addon-tools-raub/badge)](https://www.codefactor.io/repository/github/node-3d/addon-tools-raub)
 
-> npm i addon-tools-raub
+```
+npm i addon-tools-raub
+```
 
 
 ## Synopsis
@@ -33,23 +33,41 @@ additional snippets follow the links below.
 ## index.js
 
 Main exports for cross-platform addon configuration.
-* `paths(dir)` - function. Returns a set of platform dependent paths depending on
+
+```
+export const paths: (dir: string) => Readonly<{
+    bin: string;
+    include: string;
+}>;
+export const bin: string;
+export const platform: string;
+export const include: string;
+```
+
+* `paths` - Returns a set of platform dependent paths depending on
 input `dir`.
 	* `bin` - platform binary directory absolute path.
 	* `include` - include directory for this `dir`.
-* `include` - both `'addon-tools-raub'` and `'node-addon-api'` include paths.
-Use with `node -p` through list context command expansion `<!@(...)`.
 * `bin` - platform-dependent binary directory name.
 * `platform` - platform name: `'windows', 'linux', 'osx'`.
+* `include` - both `'addon-tools-raub'` and `'node-addon-api'` include paths.
+Use with `node -p` through list context command expansion `<!@(...)`.
 
 
 ## download.js
 
 Downloads a file into the memory, **HTTP** or **HTTPS**.
-`async WritableBuffer download(string url)` - accepts an **URL**, and
-returns an in-memory buffer, when file is loaded.
 
-Example use:
+```
+declare const download: (url: string) => Promise<Buffer>;
+export default download;
+```
+
+Accepts an **URL**, and returns an in-memory file Buffer,
+when the file is loaded. Use for small files, as the whole
+file will be loaded into memory at once.
+
+Example:
 ```
 download(srcUrl).then(
 	data => useData(data),
@@ -63,7 +81,13 @@ useData(data);
 
 ## cpbin.js
 
-Copies the addon binary from **src/build/Release** to the platform folder.
+Copies the addon binary from `src/build/Release` to the platform folder.
+
+```
+declare const cpbin: (name: string) => Promise<void>;
+export default cpbin;
+```
+
 It is useful for development builds. Use it in your **src/package.json**:
 ```
 	"scripts": {
@@ -76,6 +100,12 @@ Here ADDON should be replaced with the name of your addon, without `.node` exten
 ## install.js
 
 Downloads and unzips the platform specific binary for the calling package.
+
+```
+declare const install: (folder: string) => void;
+export default install;
+```
+
 To use it, create a new script for your package, which may as well be named
 **install.js**, with the following content:
 
@@ -110,6 +140,14 @@ stream buffer, that is stored in-memory and can be fully
 obtained when writing was finished. It is equivalent to stream-writing
 a temporary file and then reading it into a `Buffer`.
 
+```
+import type { Writable } from 'stream';
+export class WritableBuffer extends Writable {
+    constructor();
+    get(): Buffer;
+};
+```
+
 Use `stream.get()` to obtain the data when writing was finished:
 ```
 const stream = new WritableBuffer();
@@ -120,6 +158,30 @@ sourceStream.on('end', () => useData(stream.get()));
 
 
 ## utils.js
+
+Async `fs` based helpers for common addon-related file operations.
+
+```
+import type { Stats } from 'fs';
+export const read: (name: string) => Promise<string>;
+export const write: (name: string, text: string) => Promise<void>;
+export const copy: (src: string, dest: string) => Promise<void>;
+export const exists: (name: string) => Promise<boolean>;
+export const mkdir: (name: string) => Promise<void>;
+export const stat: (name: string) => Promise<Stats>;
+export const isDir: (name: string) => Promise<boolean>;
+export const isFile: (name: string) => Promise<boolean>;
+export const dirUp: (dir: string) => string;
+export const ensuredir: (dir: string) => Promise<void>;
+export const copysafe: (src: string, dest: string) => Promise<void>;
+export const readdir: (src: string, dest: string) => Promise<ReadonlyArray<string>>;
+export const subdirs: (name: string) => Promise<ReadonlyArray<string>>;
+export const subfiles: (name: string) => Promise<ReadonlyArray<string>>;
+export const traverse: (name: string, showDirs?: boolean) => Promise<ReadonlyArray<string>>;
+export const copyall: (src: string, dest: string) => Promise<void>;
+export const rmdir: (name: string) => Promise<void>;
+export const rm: (name: string) => Promise<void>;
+```
 
 * `read` - (async) Reads a whole file to string, NOT A Buffer.
 * `write` - (async) Write a file.
