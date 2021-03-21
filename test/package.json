@@ -21,6 +21,7 @@
 	"scripts": {
 		"test": "jest --coverage=false --watch",
 		"test-ci": "jest --coverage=false --verbose",
+		"coverage": "rm -rf ../doc/jest && jest --coverage --silent",
 		"build": "node-gyp rebuild",
 		"preinstall": "cd .. && npm ci"
 	},
