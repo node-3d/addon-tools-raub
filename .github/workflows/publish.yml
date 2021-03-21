@@ -28,8 +28,7 @@ jobs:
       - name: Publish
         run: |
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
-          echo npm publish --ignore-scripts
-          echo v${{ steps.package-version.outputs.current-version}}
+          npm publish --ignore-scripts
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: GitHub Release
