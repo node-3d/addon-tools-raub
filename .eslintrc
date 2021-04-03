@@ -43,10 +43,6 @@
 				"SwitchCase": 1
 			}
 		],
-		"linebreak-style": [
-			"error",
-			"unix"
-		],
 		"max-len": ["error", 110],
 		"quotes": [
 			"error",
@@ -68,6 +64,7 @@
 		"no-shadow": [0],
 		"node/no-unpublished-require": [0],
 		"no-process-exit": [0],
+		"linebreak-style": [0],
 		"no-console": [0]
 	}
 }
