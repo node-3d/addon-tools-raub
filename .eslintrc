@@ -65,6 +65,7 @@
 		"node/no-unpublished-require": [0],
 		"no-process-exit": [0],
 		"linebreak-style": [0],
+		"node/no-missing-require": [0],
 		"no-console": [0]
 	}
 }

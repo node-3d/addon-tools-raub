@@ -41,10 +41,26 @@
 	},
 	"scripts": {
 		"eslint": "eslint .",
-		"test": "cd test && npm run test && cd ..",
-		"test-ci": "cd test && npm run test-ci && cd ..",
-		"test-install": "cd test && npm ci && cd ..",
-		"test-coverage": "cd test && npm run coverage && cd .."
+		"test": "jest --coverage=false --watch",
+		"test-ci": "jest --coverage=false --verbose",
+		"test-coverage": "rm -rf doc/jest && jest --coverage --silent",
+		"test-build": "cd test && node-gyp rebuild && cd .."
+	},
+	"jest": {
+		"moduleFileExtensions": [
+			"js"
+		],
+		"testMatch": [
+			"**/*.test.js"
+		],
+		"coverageDirectory": "doc/jest",
+		"coverageReporters": [
+			"lcov"
+		],
+		"collectCoverageFrom": [
+			"**/*.js",
+			"!**/*.test.js"
+		]
 	},
 	"repository": {
 		"type": "git",
@@ -55,8 +71,9 @@
 		"node-addon-api": "3.1.0"
 	},
 	"devDependencies": {
-		"eslint": "^7.23.0",
-		"eslint-plugin-jest": "^24.3.3",
-		"eslint-plugin-node": "^11.1.0"
+		"eslint": "7.23.0",
+		"eslint-plugin-jest": "24.3.3",
+		"eslint-plugin-node": "11.1.0",
+		"jest": "26.6.3"
 	}
 }
