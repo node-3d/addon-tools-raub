@@ -13,7 +13,7 @@ class WritableBuffer extends Writable {
 		
 		super();
 		
-		this._buffer = new Buffer(INITIAL_SIZE);
+		this._buffer = Buffer.alloc(INITIAL_SIZE);
 		this._size = 0;
 		
 	}
@@ -24,7 +24,7 @@ class WritableBuffer extends Writable {
 			return null;
 		}
 		
-		const data = new Buffer(this._size);
+		const data = Buffer.alloc(this._size);
 		this._buffer.copy(data, 0, 0, this._size);
 		
 		return data;
@@ -41,7 +41,7 @@ class WritableBuffer extends Writable {
 		const freeSpace = this._buffer.length - this._size;
 		const factor = Math.ceil((incomingSize - freeSpace) / INCREMENT_SIZE);
 		
-		const newBuffer = new Buffer(this._buffer.length + (INCREMENT_SIZE * factor));
+		const newBuffer = Buffer.alloc(this._buffer.length + (INCREMENT_SIZE * factor));
 		this._buffer.copy(newBuffer, 0, 0, this._size);
 		
 		this._buffer = newBuffer;

@@ -90,9 +90,9 @@ export default cpbin;
 
 It is useful for development builds. Use it in your **src/package.json**:
 ```
-	"scripts": {
-		"build": "node-gyp rebuild && node -e \"require('addon-tools-raub/cpbin')('ADDON')\""
-	},
+"scripts": {
+	"build": "node-gyp rebuild && node -e \"require('addon-tools-raub/cpbin')('ADDON')\""
+},
 ```
 Here ADDON should be replaced with the name of your addon, without `.node` extension.
 
@@ -113,7 +113,7 @@ To use it, create a new script for your package, which may as well be named
 'use strict';
 const install = require('addon-tools-raub/install');
 const prefix = 'https://github.com/USER/ADDON-NAME/releases/download';
-const tag    = process.env.npm_package_config_install;
+const tag = 'v1.0.0';
 install(`${prefix}/${tag}`);
 ```
 
@@ -183,7 +183,7 @@ export const rmdir: (name: string) => Promise<void>;
 export const rm: (name: string) => Promise<void>;
 ```
 
-* `read` - (async) Reads a whole file to string, NOT A Buffer.
+* `read` - (async) Reads a whole file to string, NOT a Buffer.
 * `write` - (async) Write a file.
 * `copy` - (async) Copy a file.
 * `exists` - (async) Check if a file/folder exists.
