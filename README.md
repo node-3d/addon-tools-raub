@@ -39,7 +39,7 @@ See [TypeScript definitions](/index.d.ts).
 ## download.js
 
 Downloads a file into the memory, **HTTP** or **HTTPS**.
-See [TypeScript definitions](/downloads.d.ts).
+See [TypeScript definitions](/download.d.ts).
 
 
 ## cpbin.js
@@ -64,4 +64,4 @@ See [TypeScript definitions](/writable-buffer.d.ts).
 ## utils.js
 
 Async `fs` based helpers for common addon-related file operations.
-See [TypeScript definitions](/writable-buffer.d.ts).
+See [TypeScript definitions](/utils.d.ts).
