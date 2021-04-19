@@ -33,35 +33,35 @@ additional snippets follow the links below.
 ## index.js
 
 Main exports for cross-platform addon configuration.
-See [TypeScript definitions](/index.d.ts).
+See [TypeScript definitions](/index.d.ts) with comments.
 
 
 ## download.js
 
 Downloads a file into the memory, **HTTP** or **HTTPS**.
-See [TypeScript definitions](/download.d.ts).
+See [TypeScript definitions](/download.d.ts) with comments.
 
 
 ## cpbin.js
 
 Downloads a file into the memory, **HTTP** or **HTTPS**.
-See [TypeScript definitions](/cpbin.d.ts).
+See [TypeScript definitions](/cpbin.d.ts) with comments.
 
 
 ## install.js
 
 Downloads and unzips the platform specific binary for the calling package.
-See [TypeScript definitions](/install.d.ts).
+See [TypeScript definitions](/install.d.ts) with comments.
 
 
 ## writable-buffer.js
 
 A [Writable](https://nodejs.org/api/stream.html#stream_writable_streams)
 stream buffer.
-See [TypeScript definitions](/writable-buffer.d.ts).
+See [TypeScript definitions](/writable-buffer.d.ts) with comments.
 
 
 ## utils.js
 
 Async `fs` based helpers for common addon-related file operations.
-See [TypeScript definitions](/utils.d.ts).
+See [TypeScript definitions](/utils.d.ts) with comments.
