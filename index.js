@@ -19,7 +19,7 @@ if ( ! platformName ) {
 const rootPath = __dirname.replace(/\\/g, '/');
 
 
-const napiInclude = napi.include.replace(/\\/g, '/');
+const napiInclude = napi.include_dir.replace(/\\/g, '/');
 const thisInclude = `${rootPath}/include`;
 const includePath = `${napiInclude} ${thisInclude}`;
 

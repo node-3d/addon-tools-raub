@@ -16,7 +16,7 @@ A snippet for **src/package.json**:
 		"build": "node-gyp rebuild && node -e \"require('addon-tools-raub/cpbin')('ADDON')\""
 	},
 	"dependencies": {
-		"addon-tools-raub": "5.0.0",
+		"addon-tools-raub": "6.0.0",
 		"DEPS": "1.0.0"
 	}
 }

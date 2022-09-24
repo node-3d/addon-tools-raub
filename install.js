@@ -4,7 +4,6 @@
 const https = require('https');
 const http  = require('http');
 const fs  = require('fs');
-
 const AdmZip = require('adm-zip');
 
 const { bin, platform } = require('.');
@@ -23,7 +22,6 @@ const zipPath = `${bin}/${bin}.zip`;
 
 const install = async (url, count = 1) => {
 	try {
-		
 		const proto = protocols[url.match(/^https?/)[0]];
 		
 		const response = await new Promise((res, rej) => {
@@ -64,7 +62,6 @@ const install = async (url, count = 1) => {
 	} catch (ex) {
 		onError(ex.message);
 	}
-	
 };
 
 

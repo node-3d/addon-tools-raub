@@ -4,8 +4,6 @@
 .DS_Store
 .project
 .DS_Store
-.vscode
-.eslintrc
 node_modules/
 test/build/
 doc/jest/

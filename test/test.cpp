@@ -229,7 +229,6 @@ JS_METHOD(reqTypedArg) { NAPI_ENV;
 	);
 
 Napi::Object init(Napi::Env env, Napi::Object exports) {
-	
 	TEST_SET_METHOD(empty);
 	TEST_SET_METHOD(throwing);
 	
@@ -291,7 +290,6 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
 	TEST_SET_METHOD(reqTypedArg);
 	
 	return exports;
-	
 }
 
 NODE_API_MODULE(test, init)

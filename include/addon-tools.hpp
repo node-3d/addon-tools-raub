@@ -185,7 +185,7 @@
 
 
 #define REQ_ARRV_ARG(I, VAR)                                                  \
-	CHECK_REQ_ARG(I, IsArrayBuffer(), "ArrayBuffer");                              \
+	CHECK_REQ_ARG(I, IsArrayBuffer(), "ArrayBuffer");                         \
 	Napi::ArrayBuffer VAR = info[I].As<Napi::ArrayBuffer>();
 
 
