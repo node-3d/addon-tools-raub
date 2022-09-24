@@ -7,6 +7,7 @@ put the file **binding.gyp** to the module root anymore. It is better to have a
 separate folder with a separate **package.json**, **binding.gyp** and the sources.
 
 A snippet for **src/package.json**:
+
 ```
 {
 	"name": "build",

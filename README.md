@@ -9,15 +9,12 @@ This is a part of [Node3D](https://github.com/node-3d) project.
 npm i addon-tools-raub
 ```
 
-
-## Synopsis
-
 This module contains numerous helpers for Node.js **NAPI**
 addons and dependency packages. On this page, helper scripts
 are described. For details on **addon-tools.hpp** and some
 additional snippets follow the links below.
 
-**Go to**:
+**Docs**:
 
 * [include/addon-tools.hpp](doc/addon-tools.md)
 	
@@ -31,6 +28,8 @@ additional snippets follow the links below.
 
 
 ## index.js
+
+> NOTE: peer dependency `node-addon-api` is required for this helper.
 
 Main exports for cross-platform addon configuration.
 See [TypeScript definitions](/index.d.ts) with comments.
@@ -49,6 +48,8 @@ See [TypeScript definitions](/cpbin.d.ts) with comments.
 
 
 ## install.js
+
+> NOTE: peer dependency `adm-zip` is required for this helper.
 
 Downloads and unzips the platform specific binary for the calling package.
 See [TypeScript definitions](/install.d.ts) with comments.
