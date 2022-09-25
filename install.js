@@ -1,10 +1,16 @@
 'use strict';
 
-
 const https = require('https');
-const http  = require('http');
-const fs  = require('fs');
-const AdmZip = require('adm-zip');
+const http = require('http');
+const fs = require('fs');
+
+let AdmZip = null;
+try {
+	AdmZip = require('adm-zip');
+} catch (ex) {
+	console.error('The `install` script requires `adm-zip` module to be installed.');
+	process.exit(1);
+}
 
 const { bin, platform } = require('.');
 const { mkdir, rm } = require('./utils');

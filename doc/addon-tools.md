@@ -3,6 +3,7 @@
 There is a C++ header file, `addon-tools.hpp`, shipped with this package. It
 introduces several useful macros and utilities. Also it includes **Napi**
 implicitly, so you can replace:
+
 ```
 #include <napi.h>
 ```

@@ -73,12 +73,12 @@ directory. E.g. on Windows it will be **bin-windows**.
 	```
 
 
-Publishing binaries is done by attaching a zipped platform folder to the Github
+Publishing binaries is done by attaching a zipped platform folder to the GitHub
 release. Zip file must NOT contain platform folder as a subfolder, but rather
 contain the final binaries. The tag of the release should be the same as in
 `npm_package_config_install` - that is the way installer will find it.
 
-> NOTE: You can publish your binaries to anywhere, not necessarily Github.
+> NOTE: You can publish your binaries to anywhere, not necessarily GitHub.
 Just tweak **YOUR install.js** script as appropriate. The only limitation
 from **Addon Tools** is that it should be a zipped set of files/folders.
 
@@ -87,9 +87,9 @@ from **Addon Tools** is that it should be a zipped set of files/folders.
 
 ```
 	'variables': {
-		'bin'          : '<!(node -p "require(\'addon-tools-raub\').bin")',
-		'DEPS_include' : '<!(node -p "require(\'DEPS\').include")',
-		'DEPS_bin'     : '<!(node -p "require(\'DEPS\').bin")',
+		'bin': '<!(node -p "require(\'addon-tools-raub\').bin")',
+		'DEPS_include': '<!(node -p "require(\'DEPS\').include")',
+		'DEPS_bin': '<!(node -p "require(\'DEPS\').bin")',
 	},
 ```
 

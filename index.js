@@ -1,12 +1,18 @@
 'use strict';
 
-const napi = require('node-addon-api');
+let napi = null;
+try {
+	napi = require('node-addon-api');
+} catch (ex) {
+	console.error('To build addons, `node-addon-api` module is required.');
+	process.exit(1);
+}
 
 
 const platformNames = {
-	win32  : 'windows',
-	linux  : 'linux',
-	darwin : 'osx',
+	win32: 'windows',
+	linux: 'linux',
+	darwin: 'osx',
 };
 
 const platformName = platformNames[process.platform];
@@ -27,7 +33,7 @@ const includePath = `${napiInclude} ${thisInclude}`;
 const paths = dir => {
 	dir = dir.replace(/\\/g, '/');
 	
-	const bin     = `${dir}/bin-${platformName}`;
+	const bin = `${dir}/bin-${platformName}`;
 	const include = `${dir}/include`;
 	
 	if (isWindows) {
@@ -40,7 +46,7 @@ const paths = dir => {
 
 module.exports = {
 	paths,
-	bin      : `bin-${platformName}`,
-	platform : platformName,
-	include  : includePath,
+	bin: `bin-${platformName}`,
+	platform: platformName,
+	include: includePath,
 };

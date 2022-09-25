@@ -70,6 +70,10 @@
 		"adm-zip": "^0.5.9",
 		"node-addon-api": "^5.0.0"
 	},
+	"peerDependenciesMeta": {
+		"adm-zip": { "optional": true },
+		"node-addon-api": { "optional": true }
+	},
 	"devDependencies": {
 		"adm-zip": "^0.5.9",
 		"eslint-plugin-jest": "^27.0.4",

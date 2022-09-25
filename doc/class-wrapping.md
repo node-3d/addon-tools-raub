@@ -31,7 +31,6 @@ public:
 	JS_DECLARE_METHOD(ClassName, ClassName, destroy);
 	
 	bool _isDestroyed;
-	
 };
 ```
 
@@ -62,13 +61,10 @@ void ClassName::init(Napi::Env env, Napi::Object exports) {
 }
 
 ClassName::ClassName(const Napi::CallbackInfo &info) { NAPI_ENV;
-	
 	super(info);
-	
 	_isDestroyed = false;
 	
 	// ...
-	
 }
 
 ClassName::~ClassName() {
