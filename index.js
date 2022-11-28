@@ -4,8 +4,7 @@ let napi = null;
 try {
 	napi = require('node-addon-api');
 } catch (ex) {
-	console.error('To build addons, `node-addon-api` module is required.');
-	process.exit(1);
+	// do nothing
 }
 
 
@@ -25,7 +24,7 @@ if ( ! platformName ) {
 const rootPath = __dirname.replace(/\\/g, '/');
 
 
-const napiInclude = napi.include_dir.replace(/\\/g, '/');
+const napiInclude = napi ? napi.include_dir.replace(/\\/g, '/') : '';
 const thisInclude = `${rootPath}/include`;
 const includePath = `${napiInclude} ${thisInclude}`;
 
