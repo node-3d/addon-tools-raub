@@ -9,8 +9,35 @@ on:
       - master
 
 jobs:
-  validate:
-    name: Validate
+  eslint:
+    name: ESLint
+    strategy:
+        matrix:
+          os: [ubuntu-20.04, windows-2022, macos-11]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+      - name: Fetch Repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.12.1
+          cache: 'npm'
+
+      - name: Install Modules
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run eslint
+
+  unit-tests:
+    name: Unit Tests
     strategy:
         matrix:
           os: [ubuntu-20.04, windows-2022, macos-11]
@@ -38,6 +65,3 @@ jobs:
 
       - name: Run Unit Tests
         run: npm run test-ci
-
-      - name: Run ESLint
-        run: npm run eslint
