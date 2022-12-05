@@ -289,6 +289,8 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
 	TEST_SET_METHOD(useArrayArg);
 	TEST_SET_METHOD(letArrayArg);
 	
+	TEST_SET_METHOD(letArrayStrArg);
+	
 	TEST_SET_METHOD(reqFunArg);
 	TEST_SET_METHOD(reqArrvArg);
 	TEST_SET_METHOD(reqBufArg);
