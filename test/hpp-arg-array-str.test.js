@@ -37,6 +37,6 @@ describe('addon-tools.hpp: LET_ARRAY_ARG', () => {
 		expect(Array.isArray(test.letArrayStrArg([]))).toBe(true);
 	});
 	it('returns same array', () => {
-		expect(test.letArrayStrArg(['a', 'b'])).toBe(['a', 'b']);
+		expect(test.letArrayStrArg(['a', 'b'])).toEqual(['a', 'b']);
 	});
 });
