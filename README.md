@@ -2,6 +2,7 @@
 
 This is a part of [Node3D](https://github.com/node-3d) project.
 
+[![NPM Package][npm]][npm-url]
 [![NPM](https://nodei.co/npm/addon-tools-raub.png?compact=true)](https://www.npmjs.com/package/addon-tools-raub)
 [![CodeFactor](https://www.codefactor.io/repository/github/node-3d/addon-tools-raub/badge)](https://www.codefactor.io/repository/github/node-3d/addon-tools-raub)
 

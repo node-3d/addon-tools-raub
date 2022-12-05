@@ -3,7 +3,7 @@
 const fs = require('fs');
 
 // (async) Reads a whole file to string, NOT A Buffer
-const read = name => new Promise(
+const read = (name) => new Promise(
 	(res, rej) => fs.readFile(
 		name,
 		(err, data) => (err ? rej(err) : res(data.toString()))
@@ -13,7 +13,7 @@ const read = name => new Promise(
 
 // (async) Write a file
 const write = (name, text) => new Promise(
-	(res, rej) => fs.writeFile(name, text, err => (err ? rej(err) : res()))
+	(res, rej) => fs.writeFile(name, text, (err) => (err ? rej(err) : res()))
 );
 
 
@@ -21,7 +21,7 @@ const write = (name, text) => new Promise(
 const copy = async (src, dest) => {
 	try {
 		await new Promise(
-			(res, rej) => fs.copyFile(src, dest, err => (err ? rej(err) : res()))
+			(res, rej) => fs.copyFile(src, dest, (err) => (err ? rej(err) : res()))
 		);
 	} catch (e) {
 		if (e.code !== 'EBUSY') {
@@ -32,46 +32,46 @@ const copy = async (src, dest) => {
 
 
 // (async) Check if a file/folder exists
-const exists = name => new Promise(
-	res => fs.access(
+const exists = (name) => new Promise(
+	(res) => fs.access(
 		name,
 		fs.constants.F_OK,
-		err => res(err ? false : true)
+		(err) => res(err ? false : true)
 	)
 );
 
 
 // (async) Create an empty folder
-const mkdir = async name => {
+const mkdir = async (name) => {
 	if (await exists(name)) {
 		return;
 	}
 	return new Promise(
-		(res, rej) => fs.mkdir(name, err => (err ? rej(err) : res()))
+		(res, rej) => fs.mkdir(name, (err) => (err ? rej(err) : res()))
 	);
 };
 
 
 // (async) Get status on a file
-const stat = name => new Promise(
+const stat = (name) => new Promise(
 	(res, rej) => fs.stat(name, (err, stats) => (err ? rej(err) : res(stats)))
 );
 
 
 // (async) Check if the path is a folder
-const isDir = async name => (await stat(name)).isDirectory();
+const isDir = async (name) => (await stat(name)).isDirectory();
 
 
 // (async) Check if the path is a file
-const isFile = async name => (await stat(name)).isFile();
+const isFile = async (name) => (await stat(name)).isFile();
 
 
 // Cut the path one folder up
-const dirUp = dir => dir.replace(/\\/g, '/').split('/').slice(0, -1).join('/');
+const dirUp = (dir) => dir.replace(/\\/g, '/').split('/').slice(0, -1).join('/');
 
 
 // (async) Like `mkdir -p`, makes sure a directory exists
-const ensuredir = async dir => {
+const ensuredir = async (dir) => {
 	if (await exists(dir) && await isDir(dir)) {
 		return;
 	}
@@ -88,7 +88,7 @@ const copysafe = async (src, dest) => {
 
 
 // (async) Get file/folder names of the 1st level
-const readdir = name => new Promise(
+const readdir = (name) => new Promise(
 	(res, rej) => fs.readdir(
 		name,
 		(err, dirents) => (err ? rej(err) : res(dirents))
@@ -97,18 +97,18 @@ const readdir = name => new Promise(
 
 
 // (async) Get folder paths (concatenated with input) of the 1st level
-const subdirs = async name => {
+const subdirs = async (name) => {
 	const all = await readdir(name);
-	const mapped = await Promise.all(all.map(d => isDir(`${name}/${d}`)));
+	const mapped = await Promise.all(all.map((d) => isDir(`${name}/${d}`)));
 	return all.filter((_, i) => mapped[i]);
 };
 
 
 // (async) Get file paths (concatenated with input) of the 1st level
-const subfiles = async name => {
+const subfiles = async (name) => {
 	const all = await readdir(name);
-	const mapped = await Promise.all(all.map(d => isFile(`${name}/${d}`)));
-	return all.filter((_, i) => mapped[i]).map(f => `${name}/${f}`);
+	const mapped = await Promise.all(all.map((d) => isFile(`${name}/${d}`)));
+	return all.filter((_, i) => mapped[i]).map((f) => `${name}/${f}`);
 };
 
 
@@ -121,7 +121,7 @@ const traverse = async (name, showDirs = false) => {
 	while (stack.length) {
 		const dir = stack.pop();
 		dirs.push(dir);
-		(await subdirs(dir)).forEach(d => stack.push(`${dir}/${d}`));
+		(await subdirs(dir)).forEach((d) => stack.push(`${dir}/${d}`));
 	}
 	return (showDirs ? dirs : []).concat(
 		...(await Promise.all(dirs.map(subfiles)))
@@ -145,8 +145,8 @@ const copyall = async (src, dest) => {
 
 
 // (async) Like `rm -rf`, removes everything recursively
-const rmdir = async name => {
-	if ( ! await exists(name) ) {
+const rmdir = async (name) => {
+	if (!await exists(name)) {
 		return;
 	}
 	const paths = await traverse(name, true);
@@ -156,7 +156,7 @@ const rmdir = async name => {
 		await new Promise(
 			(res, rej) => fs[dir ? 'rmdir' : 'unlink'](
 				target,
-				err => (err ? rej(err) : res())
+				(err) => (err ? rej(err) : res())
 			)
 		);
 	}
@@ -164,12 +164,12 @@ const rmdir = async name => {
 
 
 // (async) Remove a file. Must be a file, not a folder. Just `fs.unlink`.
-const rm = async name => {
-	if ( ! await exists(name) ) {
+const rm = async (name) => {
+	if (!await exists(name)) {
 		return;
 	}
 	await new Promise(
-		(res, rej) => fs.unlink(name, err => (err ? rej(err) : res()))
+		(res, rej) => fs.unlink(name, (err) => (err ? rej(err) : res()))
 	);
 };
 

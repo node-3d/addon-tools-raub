@@ -7,7 +7,7 @@ describe('index.js', () => {
 	describe(
 		'Properties',
 		() => ['bin', 'platform', 'include'].forEach(
-			m => it(`#${m} is a string`, () => {
+			(m) => it(`#${m} is a string`, () => {
 				expect(typeof tools[m]).toBe('string');
 			})
 		)

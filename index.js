@@ -17,7 +17,7 @@ const platformNames = {
 const platformName = platformNames[process.platform];
 const isWindows = process.platform === 'win32';
 
-if ( ! platformName ) {
+if (!platformName) {
 	console.log(`Error: UNKNOWN PLATFORM "${process.platform}"`);
 }
 
@@ -29,7 +29,7 @@ const thisInclude = `${rootPath}/include`;
 const includePath = `${napiInclude} ${thisInclude}`;
 
 
-const paths = dir => {
+const paths = (dir) => {
 	dir = dir.replace(/\\/g, '/');
 	
 	const bin = `${dir}/bin-${platformName}`;

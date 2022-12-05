@@ -49,13 +49,13 @@
 
 
 #define CHECK_REQ_ARG(I, C, T)                                                \
-	if (info.Length() <= (I) || ! info[I].C) {                                \
+	if (info.Length() <= (I) || !info[I].C) {                                 \
 		JS_THROW("Argument " #I " must be of type `" T "`");                  \
 		RET_UNDEFINED;                                                        \
 	}
 
 #define CHECK_LET_ARG(I, C, T)                                                \
-	if ( ! (IS_ARG_EMPTY(I) || info[I].C) ) {                                 \
+	if (!(IS_ARG_EMPTY(I) || info[I].C)) {                                    \
 		JS_THROW(                                                             \
 			"Argument " #I                                                    \
 			" must be of type `" T                                            \
@@ -194,15 +194,55 @@
 	Napi::Buffer<uint8_t> VAR = info[I].As< Napi::Buffer<uint8_t> >();
 
 
-#define REQ_ARRAY_ARG(I, VAR)                                                \
-	CHECK_REQ_ARG(I, IsArray(), "Array");                                    \
+#define REQ_ARRAY_ARG(I, VAR)                                                 \
+	CHECK_REQ_ARG(I, IsArray(), "Array");                                     \
 	Napi::Array VAR = info[I].As<Napi::Array>();
 
-#define USE_ARRAY_ARG(I, VAR, DEF)                                           \
-	CHECK_LET_ARG(I, IsArray(), "Array");                                    \
+#define USE_ARRAY_ARG(I, VAR, DEF)                                            \
+	CHECK_LET_ARG(I, IsArray(), "Array");                                     \
 	Napi::Array VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As<Napi::Array>();
 
 #define LET_ARRAY_ARG(I, VAR) USE_ARRAY_ARG(I, VAR, Napi::Array::New(env))
+
+
+std::vector<std::string> arrayStrToVec(const Napi::Array &arr) {
+	uint32_t count = arr.Length();
+	std::vector<std::string> result(count);
+	for (uint32_t i = 0; i < count; i++) {
+		Napi::Value item = arr[i];
+		if (item.IsString()) {
+			result[i] = item.ToString().Utf8Value();
+		}
+	}
+	return result;
+}
+
+
+Napi::Array stringsToArray(Napi::Env env, const char **strings, size_t count) {
+	Napi::Array arr = JS_ARRAY;
+	for (size_t i = 0; i < count; i++) {
+		arr.Set(i, strings[i]);
+	}
+	return arr;
+}
+
+
+Napi::Array vecStrToArray(Napi::Env env, const std::vector<std::string> &strings) {
+	Napi::Array arr = JS_ARRAY;
+	size_t count = strings.size();
+	for (size_t i = 0; i < count; i++) {
+		arr.Set(i, strings[i]);
+	}
+	return arr;
+}
+
+
+#define LET_ARRAY_STR_ARG(I, VAR)                                             \
+	USE_ARRAY_ARG(I, __ARRAY_ ## VAR, Napi::Array::New(env));                 \
+	std::vector<std::string> VAR = arrayStrToVec(__ARRAY_ ## VAR);
+
+
+#define RET_ARRAY_STR(VAL) RET_VALUE(vecStrToArray(env, VAL))
 
 
 #define REQ_TYPED_ARRAY_ARG(I, VAR)                                           \
@@ -224,7 +264,7 @@
 	CACHE = V;
 
 #define SETTER_CHECK(C, T)                                                    \
-	if ( ! value.C ) {                                                        \
+	if (!value.C) {                                                           \
 		JS_THROW("Value must be " T);                                         \
 		RET_UNDEFINED;                                                        \
 	}
@@ -330,7 +370,6 @@ inline Type* getArrayData(
 	Napi::Object obj,
 	int *num = nullptr
 ) {
-	
 	Type *out = nullptr;
 	
 	if (obj.IsTypedArray()) {
@@ -356,8 +395,8 @@ inline Type* getArrayData(
 	}
 	
 	return out;
-	
 }
+
 
 template<typename Type = uint8_t>
 inline Type* getBufferData(
@@ -365,14 +404,13 @@ inline Type* getBufferData(
 	Napi::Object obj,
 	int *num = nullptr
 ) {
-	
 	Type *out = nullptr;
 	
 	if (num) {
 		*num = 0;
 	}
 	
-	if ( ! obj.IsBuffer() ) {
+	if (!obj.IsBuffer()) {
 		JS_THROW("Argument must be of type `Buffer`.");
 		return out;
 	}
@@ -384,12 +422,10 @@ inline Type* getBufferData(
 	out = arr.Data();
 	
 	return out;
-	
 }
 
 
 inline void *getData(Napi::Env env, Napi::Object obj) {
-	
 	void *out = nullptr;
 	
 	if (obj.IsTypedArray() || obj.IsArrayBuffer()) {
@@ -406,7 +442,6 @@ inline void *getData(Napi::Env env, Napi::Object obj) {
 	}
 	
 	return out;
-	
 }
 
 
@@ -438,8 +473,7 @@ inline void eventEmit(
 	int argc = 0,
 	const Napi::Value *argv = nullptr
 ) {
-	
-	if ( ! that.Has("emit") ) {
+	if (!that.Has("emit")) {
 		return;
 	}
 	
@@ -455,7 +489,6 @@ inline void eventEmit(
 	}
 	
 	thatEmit.Call(that, args);
-	
 }
 
 
@@ -466,8 +499,7 @@ inline void eventEmitAsync(
 	const Napi::Value *argv = nullptr,
 	napi_async_context context = nullptr
 ) {
-	
-	if ( ! that.Has("emit") ) {
+	if (!that.Has("emit")) {
 		return;
 	}
 	
@@ -483,7 +515,6 @@ inline void eventEmitAsync(
 	}
 	
 	thatEmit.MakeCallback(that, args, context);
-	
 }
 
 

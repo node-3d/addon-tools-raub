@@ -18,7 +18,7 @@ const { mkdir, rm } = require('./utils');
 
 const protocols = { http, https };
 
-const onError = msg => {
+const onError = (msg) => {
 	console.error(msg);
 	process.exit(-1);
 };
@@ -31,10 +31,10 @@ const install = async (url, count = 1) => {
 		const proto = protocols[url.match(/^https?/)[0]];
 		
 		const response = await new Promise((res, rej) => {
-			const request = proto.get(url, response => res(response));
-			request.on('error', err => rej(err));
+			const request = proto.get(url, (response) => res(response));
+			request.on('error', (err) => rej(err));
 		});
-		response.on('error', err => { throw err; });
+		response.on('error', (err) => { throw err; });
 		
 		// Handle redirects
 		if ([301, 302, 303, 307].includes(response.statusCode)) {
@@ -55,7 +55,7 @@ const install = async (url, count = 1) => {
 		
 		await new Promise((res, rej) => {
 			const zipWriter = fs.createWriteStream(zipPath);
-			zipWriter.on('error', err => rej(err));
+			zipWriter.on('error', (err) => rej(err));
 			zipWriter.on('finish', () => res());
 			response.pipe(zipWriter);
 		});
@@ -71,7 +71,7 @@ const install = async (url, count = 1) => {
 };
 
 
-module.exports = folder => {
+module.exports = (folder) => {
 	const url = `${folder}/${platform}.zip`;
 	install(url).then();
 };

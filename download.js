@@ -16,8 +16,8 @@ const download = async (url, count = 1) => {
 	const proto = protocols[url.match(/^https?/)[0]];
 	
 	const response = await new Promise((res, rej) => {
-		const request = proto.get(url, response => res(response));
-		request.on('error', err => rej(err));
+		const request = proto.get(url, (response) => res(response));
+		request.on('error', (err) => rej(err));
 	});
 	
 	// Handle redirects
@@ -38,9 +38,9 @@ const download = async (url, count = 1) => {
 	response.pipe(stream);
 	
 	return new Promise((res, rej) => {
-		response.on('error', err => rej(err));
+		response.on('error', (err) => rej(err));
 		response.on('end', () => res(stream.get()));
 	});
 };
 
-module.exports = url => download(url);
+module.exports = (url) => download(url);

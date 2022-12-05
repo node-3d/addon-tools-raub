@@ -4,7 +4,7 @@ const { copy, exists, mkdir, rm } = require('./utils');
 const { bin } = require('.');
 
 
-module.exports = async name => {
+module.exports = async (name) => {
 	const srcDir = process.cwd().replace(/\\/g, '/');
 	
 	if (!await exists(`${srcDir}/build/Release/${name}.node`) ) {
@@ -13,7 +13,7 @@ module.exports = async name => {
 	
 	const binAbs = `${srcDir}/../${bin}`;
 	
-	if ( ! await exists(binAbs) ) {
+	if (!await exists(binAbs)) {
 		await mkdir(binAbs);
 	}
 	

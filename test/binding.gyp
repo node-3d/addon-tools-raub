@@ -5,11 +5,13 @@
 			'sources': [
 				'test.cpp',
 			],
-			'cflags!': ['-fno-exceptions'],
-			'cflags_cc!': ['-fno-exceptions'],
+			'defines': [
+				'UNICODE', '_UNICODE'
+			],
 			'include_dirs': [
 				'<!@(node -p "require(\'..\').include")',
 			],
+			'cflags_cc': ['-std=c++17'],
 			'conditions': [
 				[
 					'OS=="linux"',
@@ -21,6 +23,7 @@
 					'OS=="mac"',
 					{
 						'defines': ['__APPLE__'],
+  						'OTHER_CFLAGS': ['-std=c++17'],
 					}
 				],
 				[

@@ -3,12 +3,12 @@
 
 JS_METHOD(empty) { NAPI_ENV;
 	NAPI_HS;
-	return env.Undefined();
+	RET_UNDEFINED;
 }
 
 JS_METHOD(throwing) { NAPI_ENV;
 	JS_THROW("Some error");
-	return env.Undefined();
+	RET_UNDEFINED;
 }
 
 JS_METHOD(retUndefined) { NAPI_ENV;
@@ -200,6 +200,11 @@ JS_METHOD(useArrayArg) { NAPI_ENV;
 JS_METHOD(letArrayArg) { NAPI_ENV;
 	LET_ARRAY_ARG(0, arg);
 	RET_VALUE(arg);
+}
+
+JS_METHOD(letArrayStrArg) { NAPI_ENV;
+	LET_ARRAY_STR_ARG(0, arg);
+	RET_ARRAY_STR(arg);
 }
 
 JS_METHOD(reqFunArg) { NAPI_ENV;
