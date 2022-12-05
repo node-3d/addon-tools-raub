@@ -22,7 +22,7 @@ require('addon-tools-raub').include // a string
 ### Helpers in **addon-tools.hpp**:
 
 Usually all the helpers work within the context of a method. In this case we
-have `CallbackInfo info` passed as an argument. And we can return `undefined`
+have `Napi::CallbackInfo info` passed as an argument. And we can return `undefined`
 in case a problem has occured. So most of these macros are only usable
 within `Napi::Value`-returning functions.
 
@@ -42,6 +42,7 @@ within `Napi::Value`-returning functions.
 * `RET_NUM(VAL)` - return `Napi::Number`, expected `VAL` is of numeric type.
 * `RET_EXT(VAL)` - return `Napi::External`, expected `VAL` is a pointer.
 * `RET_BOOL(VAL)` - return `Napi::Boolean`, expected `VAL` is convertible to bool.
+* `RET_ARRAY_STR(VAL)` - return `Napi::Array`, expected `VAL` is `std::vector<std::string>`.
 
 </details>
 
@@ -150,6 +151,7 @@ That extrapolates well to all the helpers below:
 | `REQ_ARRAY_ARG`  | `object`      | `Napi::Array`           | -         |
 | `USE_ARRAY_ARG`  | `object`      | `Napi::Array`           | -         |
 | `LET_ARRAY_ARG`  | `object`      | `Napi::Array`           | `[]`      |
+| `LET_ARRAY_STR_ARG` | `object`   | `std::vector<std::string>` | `std::vector<std::string>()`   |
 | `REQ_FUN_ARG`    | `function`    | `Napi::Function`        | -         |
 | `REQ_ARRV_ARG`   | `ArrayBuffer` | `Napi::ArrayBuffer`     | -         |
 | `REQ_BUF_ARG`    | `Buffer`      | `Napi::Buffer<uint8_t>` | -         |

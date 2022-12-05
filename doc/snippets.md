@@ -14,10 +14,12 @@ A snippet for **src/package.json**:
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"build": "node-gyp rebuild && node -e \"require('addon-tools-raub/cpbin')('ADDON')\""
+		"build": "node-gyp rebuild"
+		"build-dev": "node-gyp build && node -e \"require('addon-tools-raub/cpbin')('ADDON')\""
+		"rebuild-dev": "node-gyp rebuild && node -e \"require('addon-tools-raub/cpbin')('ADDON')\""
 	},
 	"dependencies": {
-		"addon-tools-raub": "6.0.0",
+		"addon-tools-raub": "6.1.0",
 		"DEPS": "1.0.0"
 	}
 }
@@ -34,26 +36,32 @@ In **package.json** use the `"postinstall"` script to download the libraries.
 For example the following structure might work. Note that **Addon Tools** will
 append any given URL with `/${platform}.zip`
 
+In **package.json**:
+
 ```
-	"config" : {
-		"install" : "v1.0.0"
-	},
 	"scripts": {
-		"postinstall": "install",
+		"postinstall": "node install",
 	},
+	"dependencies": {
+		"addon-tools-raub": "^6.0.2",
+		"adm-zip": "^0.5.9"
+	},
+	"devDependencies": {
+		"node-addon-api": "^5.0.0"
+	}
 ```
 
-Here `config.install` is the tag name to download the binaries from.
-To use it, create the *install.js* file in your addon:
+Create the **install.js** file:
 
 ```
+'use strict';
 const install = require('addon-tools-raub/install');
-const prefix = 'https://github.com/USER/ADDON/releases/download';
-const tag = process.env.npm_package_config_install;
+const prefix = 'https://github.com/node-3d/glfw-raub/releases/download';
+const tag = '4.8.0';
 install(`${prefix}/${tag}`);
 ```
 
-**Addon Tools** will unzip the downloaded file into the platform binary
+**Addon Tools** will unzip (using **adm-zip**) the downloaded file into the platform binary
 directory. E.g. on Windows it will be **bin-windows**.
 
 * For a dependency package:
@@ -76,7 +84,7 @@ directory. E.g. on Windows it will be **bin-windows**.
 Publishing binaries is done by attaching a zipped platform folder to the GitHub
 release. Zip file must NOT contain platform folder as a subfolder, but rather
 contain the final binaries. The tag of the release should be the same as in
-`npm_package_config_install` - that is the way installer will find it.
+**install.js**.
 
 > NOTE: You can publish your binaries to anywhere, not necessarily GitHub.
 Just tweak **YOUR install.js** script as appropriate. The only limitation
@@ -128,70 +136,58 @@ dependency include path(s).
 		'DEPS_include' : '<!(node -p "require(\'DEPS\').include")',
 		'DEPS_bin'     : '<!(node -p "require(\'DEPS\').bin")',
 	},
-	'targets': [
-		{
-			'target_name' : 'bullet',
-			'sources' : [
-				'cpp/addon.cpp',
-			],
-			'include_dirs' : [
-				'<!@(node -p "require(\'addon-tools-raub\').include")',
-				'<(DEPS_include)',
-			],
-			'library_dirs' : [ '<(DEPS_bin)' ],
-			'libraries'    : [ '-lDEPS' ],
-			'cflags!': ['-fno-exceptions'],
-			'cflags_cc!': ['-fno-exceptions'],
-			'conditions': [
-				
-				[
-					'OS=="linux"',
-					{
-						'libraries': [
-							"-Wl,-rpath,'$$ORIGIN'",
-							"-Wl,-rpath,'$$ORIGIN/../node_modules/DEPS/<(bin)'",
-							"-Wl,-rpath,'$$ORIGIN/../../DEPS/<(bin)'",
-						],
-						'defines': ['__linux__'],
-					}
+	'targets': [{
+		'target_name' : 'ADDON',
+		'sources' : [
+			'cpp/addon.cpp',
+		],
+		'include_dirs' : [
+			'<!@(node -p "require(\'addon-tools-raub\').include")',
+			'<(DEPS_include)',
+		],
+		'defines': ['UNICODE', '_UNICODE'],
+		'library_dirs': ['<(DEPS_bin)'],
+		'libraries': ['-lDEPS' ],
+		'cflags_cc': ['-std=c++17'],
+		'conditions': [
+			['OS=="linux"', {
+				'libraries': [
+					"-Wl,-rpath,'$$ORIGIN'",
+					"-Wl,-rpath,'$$ORIGIN/../node_modules/DEPS/<(bin)'",
+					"-Wl,-rpath,'$$ORIGIN/../../DEPS/<(bin)'",
 				],
-				
-				[
-					'OS=="mac"',
-					{
-						'libraries': [
-							'-Wl,-rpath,@loader_path',
-							'-Wl,-rpath,@loader_path/../node_modules/DEPS/<(bin)',
-							'-Wl,-rpath,@loader_path/../../DEPS/<(bin)',
-						],
-						'defines': ['__APPLE__'],
-					}
+				'defines': ['__linux__'],
+			}],
+			['OS=="mac"', {
+				'libraries': [
+					'-Wl,-rpath,@loader_path',
+					'-Wl,-rpath,@loader_path/../node_modules/DEPS/<(bin)',
+					'-Wl,-rpath,@loader_path/../../DEPS/<(bin)',
 				],
-				
-				[
-					'OS=="win"',
-					{
-						'defines' : [
-							'WIN32_LEAN_AND_MEAN',
-							'VC_EXTRALEAN',
-							'_WIN32',
-						],
-						'msvs_settings' : {
-							'VCCLCompilerTool' : {
-								'AdditionalOptions' : [
-									'/GL', '/GF', '/EHsc', '/GS', '/Gy', '/GR-',
-								]
-							},
-							'VCLinkerTool' : {
-								'AdditionalOptions' : ['/RELEASE','/OPT:REF','/OPT:ICF','/LTCG'],
-							},
-						},
+				'MACOSX_DEPLOYMENT_TARGET': '10.9',
+				'defines': ['__APPLE__'],
+				'CLANG_CXX_LIBRARY': 'libc++',
+				'OTHER_CFLAGS': ['-std=c++17'],
+			}],
+			['OS=="win"', {
+				'defines' : [
+					'WIN32_LEAN_AND_MEAN',
+					'VC_EXTRALEAN',
+					'_WIN32',
+				],
+				'msvs_settings' : {
+					'VCCLCompilerTool' : {
+						'AdditionalOptions' : [
+							'/GL', '/GF', '/EHsc', '/GS', '/Gy', '/GR-',
+						]
 					},
-				],
-				
-			],
-		},
-	]
+					'VCLinkerTool' : {
+						'AdditionalOptions' : ['/RELEASE','/OPT:REF','/OPT:ICF','/LTCG'],
+					},
+				},
+			}],
+		],
+	}],
 }
 ```
 

@@ -4,7 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${LocalAppData}/node-gyp/Cache/16.17.0/include/node"
+                "${LocalAppData}/node-gyp/Cache/16.17.0/include/node",
+                "${LocalAppData}/node-gyp/Cache/18.12.1/include/node"
             ],
             "defines": [
                 "UNICODE",
