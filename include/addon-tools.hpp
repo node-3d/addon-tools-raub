@@ -205,7 +205,7 @@
 #define LET_ARRAY_ARG(I, VAR) USE_ARRAY_ARG(I, VAR, Napi::Array::New(env))
 
 
-std::vector<std::string> arrayStrToVec(const Napi::Array &arr) {
+inline std::vector<std::string> arrayStrToVec(const Napi::Array &arr) {
 	uint32_t count = arr.Length();
 	std::vector<std::string> result(count);
 	for (uint32_t i = 0; i < count; i++) {
@@ -218,7 +218,7 @@ std::vector<std::string> arrayStrToVec(const Napi::Array &arr) {
 }
 
 
-Napi::Array stringsToArray(Napi::Env env, const char **strings, size_t count) {
+inline Napi::Array stringsToArray(Napi::Env env, const char **strings, size_t count) {
 	Napi::Array arr = JS_ARRAY;
 	for (size_t i = 0; i < count; i++) {
 		arr.Set(i, strings[i]);
@@ -227,7 +227,7 @@ Napi::Array stringsToArray(Napi::Env env, const char **strings, size_t count) {
 }
 
 
-Napi::Array vecStrToArray(Napi::Env env, const std::vector<std::string> &strings) {
+inline Napi::Array vecStrToArray(Napi::Env env, const std::vector<std::string> &strings) {
 	Napi::Array arr = JS_ARRAY;
 	size_t count = strings.size();
 	for (size_t i = 0; i < count; i++) {
