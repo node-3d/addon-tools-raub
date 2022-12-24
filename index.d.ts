@@ -6,29 +6,30 @@ declare module "addon-tools-raub" {
 	export const paths: (dir: string) => Readonly<{
 		/**
 		 * Path to binaries
-		 * Platform binary directory absolute path
+		 * Platform binary directory absolute path for this `dir`
 		*/
 		bin: string;
 		/**
 		 * Path to include
-		 * Include directory for this dir
+		 * Include directory for this `dir`
 		*/
 		include: string;
 	}>;
+	
+	type TPlatformName = 'windows' | 'linux' | 'osx' | 'aarch64' | 'unknown';
+	type TPlatformDir = `bin-${TPlatformName}`;
+	
 	/**
-	 * Binary folder name
 	 * Platform-dependent binary directory name
 	*/
-	export const bin: string;
-	/**
-	 * Platform name
-	 * One of: 'windows', 'linux', 'osx'
-	*/
-	export const platform: string;
+	export const bin: TPlatformDir;
+	
+	export const platform: TPlatformName;
+	
 	/**
 	 * Main include directories
 	 * Both 'addon-tools-raub' and 'node-addon-api' include paths.
-	 * Use with node -p through list context command expansion <!@(...).
+	 * For binding.gyp: `'<!@(node -p "require(\'addon-tools-raub\').include")'`
 	*/
 	export const include: string;
 }

@@ -7,19 +7,27 @@ try {
 	// do nothing
 }
 
+const nameWindows = 'windows';
+const nameUnknown = 'unknown';
 
 const platformNames = {
-	win32: 'windows',
+	win32: nameWindows,
 	linux: 'linux',
 	darwin: 'osx',
+	'linux-arm64': 'aarch64',
 };
 
-const platformName = platformNames[process.platform];
-const isWindows = process.platform === 'win32';
+const platformName = (
+	platformNames[process.platform] ||
+	platformNames[`${process.platform}-${process.arch}`] ||
+	'unknown'
+);
 
-if (!platformName) {
+if (platformName === nameUnknown) {
 	console.log(`Error: UNKNOWN PLATFORM "${process.platform}"`);
 }
+
+const isWindows = platformName === nameWindows;
 
 const rootPath = __dirname.replace(/\\/g, '/');
 

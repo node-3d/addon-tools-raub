@@ -19,7 +19,7 @@ A snippet for **src/package.json**:
 		"rebuild-dev": "node-gyp rebuild && node -e \"require('addon-tools-raub/cpbin')('ADDON')\""
 	},
 	"dependencies": {
-		"addon-tools-raub": "6.1.0",
+		"addon-tools-raub": "6.2.0",
 		"DEPS": "1.0.0"
 	}
 }
@@ -43,8 +43,8 @@ In **package.json**:
 		"postinstall": "node install",
 	},
 	"dependencies": {
-		"addon-tools-raub": "^6.0.2",
-		"adm-zip": "^0.5.9"
+		"addon-tools-raub": "^6.2.0",
+		"adm-zip": "^0.5.10"
 	},
 	"devDependencies": {
 		"node-addon-api": "^5.0.0"
@@ -146,9 +146,9 @@ dependency include path(s).
 			'<(DEPS_include)',
 		],
 		'defines': ['UNICODE', '_UNICODE'],
+		'cflags_cc': ['-std=c++17', '-fno-exceptions'],
 		'library_dirs': ['<(DEPS_bin)'],
 		'libraries': ['-lDEPS' ],
-		'cflags_cc': ['-std=c++17'],
 		'conditions': [
 			['OS=="linux"', {
 				'libraries': [
@@ -167,22 +167,19 @@ dependency include path(s).
 				'MACOSX_DEPLOYMENT_TARGET': '10.9',
 				'defines': ['__APPLE__'],
 				'CLANG_CXX_LIBRARY': 'libc++',
-				'OTHER_CFLAGS': ['-std=c++17'],
+				'OTHER_CFLAGS': ['-std=c++17', '-fno-exceptions'],
 			}],
 			['OS=="win"', {
-				'defines' : [
-					'WIN32_LEAN_AND_MEAN',
-					'VC_EXTRALEAN',
-					'_WIN32',
-				],
+				'defines' : ['WIN32_LEAN_AND_MEAN', 'VC_EXTRALEAN', '_WIN32', '_HAS_EXCEPTIONS=0'],
 				'msvs_settings' : {
 					'VCCLCompilerTool' : {
 						'AdditionalOptions' : [
-							'/GL', '/GF', '/EHsc', '/GS', '/Gy', '/GR-',
+							'/O2','/Oy','/GL','/GF','/Gm-', '/std:c++17',
+							'/EHa-s-c-r-','/MT','/GS','/Gy','/GR-','/Gd',
 						]
 					},
 					'VCLinkerTool' : {
-						'AdditionalOptions' : ['/RELEASE','/OPT:REF','/OPT:ICF','/LTCG'],
+						'AdditionalOptions' : ['/OPT:REF','/OPT:ICF','/LTCG']
 					},
 				},
 			}],

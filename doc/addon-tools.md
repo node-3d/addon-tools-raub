@@ -11,6 +11,7 @@ with
 ```
 #include <addon-tools.hpp>
 ```
+
 In **GYP**, the include directory should be set for your addon.
 An actual path to the directory is exported from the module
 and is accessible like this:
