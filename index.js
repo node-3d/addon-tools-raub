@@ -8,20 +8,16 @@ try {
 }
 
 const nameWindows = 'windows';
-const nameArch = `${process.platform}-${process.arch}`;
+const platformAndArch = `${process.platform}-${process.arch}`;
 
 const platformNames = {
-	win32: nameWindows,
-	linux: 'linux',
-	darwin: 'osx',
+	'win32-x64': nameWindows,
+	'linux-x64': 'linux',
+	'darwin-x64': 'osx',
 	'linux-arm64': 'aarch64',
 };
 
-const platformName = (
-	platformNames[process.platform] ||
-	platformNames[nameArch] ||
-	nameArch
-);
+const platformName = platformNames[platformAndArch] || platformAndArch;
 
 const isWindows = platformName === nameWindows;
 

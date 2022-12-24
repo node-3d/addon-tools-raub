@@ -1,7 +1,7 @@
 {
 	"author": "Luis Blanco <luisblanco1337@gmail.com>",
 	"name": "addon-tools-raub",
-	"version": "6.2.0",
+	"version": "6.2.1",
 	"description": "Helpers for Node.js addons and dependency packages",
 	"license": "MIT",
 	"main": "index.js",
@@ -42,7 +42,7 @@
 	"scripts": {
 		"eslint": "eslint .",
 		"test": "jest --coverage=false --watch",
-		"test-ci": "jest --coverage=false --verbose",
+		"test-ci": "jest --ci --runInBand --coverage=false --forceExit --detectOpenHandles",
 		"test-coverage": "rm -rf doc/jest && jest --coverage --silent",
 		"test-build": "cd test && node-gyp rebuild && cd .."
 	},
