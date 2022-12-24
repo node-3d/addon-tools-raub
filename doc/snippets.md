@@ -175,7 +175,7 @@ dependency include path(s).
 					'VCCLCompilerTool' : {
 						'AdditionalOptions' : [
 							'/O2','/Oy','/GL','/GF','/Gm-', '/std:c++17',
-							'/EHa-s-c-r-','/MT','/GS','/Gy','/GR-','/Gd',
+							'/EHa-s-c-','/MT','/GS','/Gy','/GR-','/Gd',
 						]
 					},
 					'VCLinkerTool' : {
