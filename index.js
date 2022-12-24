@@ -8,7 +8,7 @@ try {
 }
 
 const nameWindows = 'windows';
-const nameUnknown = 'unknown';
+const nameArch = `${process.platform}-${process.arch}`;
 
 const platformNames = {
 	win32: nameWindows,
@@ -19,13 +19,9 @@ const platformNames = {
 
 const platformName = (
 	platformNames[process.platform] ||
-	platformNames[`${process.platform}-${process.arch}`] ||
-	'unknown'
+	platformNames[nameArch] ||
+	nameArch
 );
-
-if (platformName === nameUnknown) {
-	console.log(`Error: UNKNOWN PLATFORM "${process.platform}"`);
-}
 
 const isWindows = platformName === nameWindows;
 

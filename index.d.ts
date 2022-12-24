@@ -16,7 +16,7 @@ declare module "addon-tools-raub" {
 		include: string;
 	}>;
 	
-	type TPlatformName = 'windows' | 'linux' | 'osx' | 'aarch64' | 'unknown';
+	type TPlatformName = 'windows' | 'linux' | 'osx' | 'aarch64';
 	type TPlatformDir = `bin-${TPlatformName}`;
 	
 	/**
