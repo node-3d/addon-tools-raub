@@ -145,7 +145,6 @@ dependency include path(s).
 			'<!@(node -p "require(\'addon-tools-raub\').include")',
 			'<(DEPS_include)',
 		],
-		'defines': ['UNICODE', '_UNICODE'],
 		'cflags_cc': ['-std=c++17', '-fno-exceptions'],
 		'library_dirs': ['<(DEPS_bin)'],
 		'libraries': ['-lDEPS' ],
@@ -179,7 +178,7 @@ dependency include path(s).
 						]
 					},
 					'VCLinkerTool' : {
-						'AdditionalOptions' : ['/OPT:REF','/OPT:ICF','/LTCG']
+						'AdditionalOptions' : ['/DEBUG:NONE', '/LTCG', '/OPT:NOREF'],
 					},
 				},
 			}],

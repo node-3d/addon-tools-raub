@@ -32,6 +32,10 @@ within `Napi::Value`-returning functions.
 #define NAPI_HS Napi::HandleScope scope(env);
 ```
 
+Other global helpers:
+* `DBG_EXPORT`- set symbol visibility (mainly for callstack traces). On Windows, that is
+	equal to exporting a symbol: `__declspec(dllexport)`.
+
 <details>
 
 <summary><b>Return value</b></summary>

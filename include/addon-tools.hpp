@@ -11,6 +11,12 @@
 #endif
 
 
+#ifdef _WIN32
+#define DBG_EXPORT __declspec(dllexport)
+#else
+#define DBG_EXPORT __attribute__((visibility("default")))
+#endif
+
 #define NAPI_ENV Napi::Env env = info.Env();
 #define NAPI_HS Napi::HandleScope scope(env);
 
