@@ -60,7 +60,7 @@ jobs:
         run: npm ci
 
       - name: Build Sample Addon
-        run: npm run test-build
+        run: npm run build-test
 
       - name: Run Unit Tests
         run: npm run test-ci

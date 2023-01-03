@@ -14,9 +14,8 @@ A snippet for **src/package.json**:
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"build": "node-gyp rebuild"
-		"build-dev": "node-gyp build && node -e \"require('addon-tools-raub/cpbin')('ADDON')\""
-		"rebuild-dev": "node-gyp rebuild && node -e \"require('addon-tools-raub/cpbin')('ADDON')\""
+		"build-all": "cd src && node-gyp rebuild -j max --silent && node -e \"require('addon-tools-raub/utils').cpbin('ADDON')\" && cd ..",
+		"build-only": "cd src && node-gyp build -j max --silent && node -e \"require('addon-tools-raub/utils').cpbin('ADDON')\" && cd ..",
 	},
 	"dependencies": {
 		"addon-tools-raub": "6.2.0",
@@ -44,7 +43,6 @@ In **package.json**:
 	},
 	"dependencies": {
 		"addon-tools-raub": "^6.2.0",
-		"adm-zip": "^0.5.10"
 	},
 	"devDependencies": {
 		"node-addon-api": "^5.0.0"
@@ -55,7 +53,7 @@ Create the **install.js** file:
 
 ```
 'use strict';
-const install = require('addon-tools-raub/install');
+const { install } = require('addon-tools-raub/utils');
 const prefix = 'https://github.com/node-3d/glfw-raub/releases/download';
 const tag = '4.8.0';
 install(`${prefix}/${tag}`);
@@ -95,9 +93,9 @@ from **Addon Tools** is that it should be a zipped set of files/folders.
 
 ```
 	'variables': {
-		'bin': '<!(node -p "require(\'addon-tools-raub\').bin")',
-		'DEPS_include': '<!(node -p "require(\'DEPS\').include")',
-		'DEPS_bin': '<!(node -p "require(\'DEPS\').bin")',
+		'bin': '<!(node -p "require(\'addon-tools-raub\').getBin()")',
+		'DEPS_include': '<!(node -p "require(\'DEPS\').getInclude()")',
+		'DEPS_bin': '<!(node -p "require(\'DEPS\').getBin()")',
 	},
 ```
 
@@ -111,7 +109,7 @@ from **Addon Tools** is that it should be a zipped set of files/folders.
 
 ```
 	'include_dirs' : [
-		'<!@(node -p "require(\'addon-tools-raub\').include")',
+		'<!@(node -p "require(\'addon-tools-raub\').getInclude()")',
 		'<(DEPS_include)',
 	],
 ```

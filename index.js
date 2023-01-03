@@ -1,3 +1,5 @@
 'use strict';
 
-module.exports = require('./index');
+module.exports = {
+	...require('./include/index'),
+};

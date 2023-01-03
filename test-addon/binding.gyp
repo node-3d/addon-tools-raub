@@ -6,7 +6,7 @@
 		],
 		'cflags_cc': ['-std=c++17', '-fno-exceptions'],
 		'include_dirs': [
-			'<!@(node -p "require(\'..\').include")',
+			'<!@(node -p "require(\'..\').getInclude()")',
 		],
 		'conditions': [
 			['OS=="linux"', {

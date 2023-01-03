@@ -1,17 +1,17 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2015
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test.vcxproj", "{CA6D0C46-51F8-CCC5-FA71-4D2E9A260624}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test.vcxproj", "{027E2789-D2D0-762D-B6D2-3AA4C73B3DD7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Release|x64 = Release|x64
 		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CA6D0C46-51F8-CCC5-FA71-4D2E9A260624}.Release|x64.ActiveCfg = Release|x64
-		{CA6D0C46-51F8-CCC5-FA71-4D2E9A260624}.Release|x64.Build.0 = Release|x64
-		{CA6D0C46-51F8-CCC5-FA71-4D2E9A260624}.Debug|x64.ActiveCfg = Debug|x64
-		{CA6D0C46-51F8-CCC5-FA71-4D2E9A260624}.Debug|x64.Build.0 = Debug|x64
+		{027E2789-D2D0-762D-B6D2-3AA4C73B3DD7}.Debug|x64.ActiveCfg = Debug|x64
+		{027E2789-D2D0-762D-B6D2-3AA4C73B3DD7}.Debug|x64.Build.0 = Debug|x64
+		{027E2789-D2D0-762D-B6D2-3AA4C73B3DD7}.Release|x64.ActiveCfg = Release|x64
+		{027E2789-D2D0-762D-B6D2-3AA4C73B3DD7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

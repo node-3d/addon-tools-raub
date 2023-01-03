@@ -1,11 +1,7 @@
 'use strict';
 
-let napi = null;
-try {
-	napi = require('node-addon-api');
-} catch (ex) {
-	// do nothing
-}
+const path = require('node:path');
+
 
 const nameWindows = 'windows';
 const platformAndArch = `${process.platform}-${process.arch}`;
@@ -21,15 +17,8 @@ const platformName = platformNames[platformAndArch] || platformAndArch;
 
 const isWindows = platformName === nameWindows;
 
-const rootPath = __dirname.replace(/\\/g, '/');
 
-
-const napiInclude = napi ? napi.include_dir.replace(/\\/g, '/') : '';
-const thisInclude = `${rootPath}/include`;
-const includePath = `${napiInclude} ${thisInclude}`;
-
-
-const paths = (dir) => {
+const getPaths = (dir) => {
 	dir = dir.replace(/\\/g, '/');
 	
 	const bin = `${dir}/bin-${platformName}`;
@@ -43,9 +32,34 @@ const paths = (dir) => {
 };
 
 
+const getBin = () => {
+	return `bin-${platformName}`;
+};
+
+const getPlatform = () => {
+	return platformName;
+};
+
+const getInclude = () => {
+	let napi = null;
+	try {
+		napi = require('node-addon-api');
+	} catch (ex) {
+		// do nothing
+	}
+	
+	const rootPath = path.resolve(`${__dirname}/..`).replace(/\\/g, '/');
+	const napiInclude = napi ? napi.include_dir.replace(/\\/g, '/') : '';
+	const thisInclude = `${rootPath}/include`;
+	const includePath = `${napiInclude} ${thisInclude}`;
+	
+	return includePath;
+};
+
+
 module.exports = {
-	paths,
-	bin: `bin-${platformName}`,
-	platform: platformName,
-	include: includePath,
+	getPaths,
+	getBin,
+	getPlatform,
+	getInclude,
 };
