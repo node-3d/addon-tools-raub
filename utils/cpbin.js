@@ -1,10 +1,10 @@
 'use strict';
 
-const { copy, exists, mkdir, rm } = require('./utils');
-const { bin } = require('.');
+const { copy, exists, mkdir, rm } = require('./files');
+const { bin } = require('..');
 
 
-module.exports = async (name) => {
+const cpbin = async (name) => {
 	const srcDir = process.cwd().replace(/\\/g, '/');
 	
 	if (!await exists(`${srcDir}/build/Release/${name}.node`) ) {
@@ -27,3 +27,5 @@ module.exports = async (name) => {
 	
 	console.log(`The binary "${name}.node" was copied to "${bin}".`);
 };
+
+module.exports = { cpbin };

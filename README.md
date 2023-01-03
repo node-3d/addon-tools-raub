@@ -9,60 +9,69 @@ This is a part of [Node3D](https://github.com/node-3d) project.
 npm i addon-tools-raub
 ```
 
-This module contains numerous helpers for Node.js **NAPI**
-addons and dependency packages. On this page, helper scripts
-are described. For details on **addon-tools.hpp** and some
+This module contains helpers for Node.js **NAPI** addons and dependency packages.
+On this page, helper scripts are described. For details on **addon-tools.hpp** and some
 additional snippets follow the links below.
 
-**Docs**:
 
-* [include/addon-tools.hpp](doc/addon-tools.md)
-	
-	Macro shortcuts for C++ addons using **NAPI**.
-* [Es5 Class Wrapping](doc/class-wrapping.md)
-	
-	An alternative, lightweight native class-defining mechanism for addons.
-* [Snippets](doc/snippets.md)
-	
-	Some repetitive bits of code for addons.
+## include/addon-tools.hpp
+
+Macro shortcuts for C++ addons using **NAPI**.
+See [docs inside the folder](/include).
+
+Example of an addon method definition:
+
+```
+// hpp:
+#include <addon-tools.hpp>
+DBG_EXPORT JS_METHOD(doSomething);
+// cpp:
+DBG_EXPORT JS_METHOD(doSomething) { NAPI_ENV;
+	LET_INT32_ARG(0, param0);
+	std::cout << "param0: " << param0 << std::endl;
+	RET_UNDEFINED;
+}
+```
 
 
 ## index.js
 
-> NOTE: peer dependency `node-addon-api` is required for this helper.
-
 Main exports for cross-platform addon configuration.
-See [TypeScript definitions](/index.d.ts) with comments.
+See the [TypeScript definitions](/index.d.ts) with comments.
 
+> NOTE: the peer dependency `node-addon-api` is used by this helper.
 
-## download.js
+Example for an ADDON's **index.js**:
 
-Downloads a file into the memory, **HTTP** or **HTTPS**.
-See [TypeScript definitions](/download.d.ts) with comments.
+```
+	const { bin } = require('addon-tools-raub');
+	const core = require(`./${bin}/ADDON`); // uses the platform-specific ADDON.node
+```
 
+Example for **binding.gyp**:
 
-## cpbin.js
-
-Downloads a file into the memory, **HTTP** or **HTTPS**.
-See [TypeScript definitions](/cpbin.d.ts) with comments.
-
-
-## install.js
-
-> NOTE: peer dependency `adm-zip` is required for this helper.
-
-Downloads and unzips the platform specific binary for the calling package.
-See [TypeScript definitions](/install.d.ts) with comments.
-
-
-## writable-buffer.js
-
-A [Writable](https://nodejs.org/api/stream.html#stream_writable_streams)
-stream buffer.
-See [TypeScript definitions](/writable-buffer.d.ts) with comments.
+```
+	'include_dirs': [
+		'<!@(node -p "require(\'addon-tools-raub\').include")',
+	],
+```
 
 
 ## utils.js
 
-Async `fs` based helpers for common addon-related file operations.
-See [TypeScript definitions](/utils.d.ts) with comments.
+JS utils for Node.js modules and addons.
+
+```
+const utils = require('addon-tools-raub/utils');
+```
+
+
+Example of `cpbin` usage in **package.json :: scripts**:
+
+```
+	"build-all": "cd src && node-gyp rebuild -j max --silent && node -e \"require('addon-tools-raub/utils').cpbin('segfault')\" && cd ..",
+	"build-only": "cd src && node-gyp build -j max --silent && node -e \"require('addon-tools-raub/utils').cpbin('segfault')\" && cd ..",
+```
+
+
+See the [TypeScript definitions](/utils.d.ts) with comments.

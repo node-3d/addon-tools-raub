@@ -1,10 +1,87 @@
-import type { Stats } from 'fs';
+import type { Writable } from 'stream';
 
 declare module "addon-tools-raub/utils" {
+	/**
+	 * Install binaries
+	 * Downloads and unzips the platform specific binary for the calling package.
+	 * To use it, create a new script for your package, which may as well be named
+	 * **install.js**, with the following content:
+	 * ```
+	 * 'use strict';
+	 * const install = require('addon-tools-raub/install');
+	 * const prefix = 'https://github.com/USER/ADDON-NAME/releases/download';
+	 * const tag = 'v1.0.0';
+	 * install(`${prefix}/${tag}`);
+	 * ```
+	 * * `prefix` - the constant base part of the download url.
+	 * * `tag` - the version-dependent part of the url.
+	 * ```
+	 * "scripts": {
+	 *   "postinstall": "node install"
+	 * },
+	 * ```
+	*/
+	export const install: (folder: string) => void;
+	
+	
+	/**
+	 * Copy binary
+	 * Copies the addon binary from `src/build/Release` to the platform folder.
+	 * ```
+	 * declare const cpbin: (name: string) => Promise<void>;
+	 * export default cpbin;
+	 * ```
+	 * It is useful for development builds. Use it in your **src/package.json**:
+	 * ```
+	 * "scripts": {
+	 *   * "build": "node-gyp rebuild && node -e \"require('addon-tools-raub/cpbin')('ADDON')\""
+	 * },
+	 * ```
+	 * Here ADDON should be replaced with the name of your addon, without `.node` extension.
+	*/
+	export const cpbin: (name: string) => Promise<void>;
+	
+	
+	/**
+	 * Download to memory
+	 * Accepts an **URL**, and returns an in-memory file Buffer,
+	 * when the file is loaded. Use for small files, as the whole
+	 * file will be loaded into memory at once.
+	 * 
+	 * ```
+	 * download(srcUrl).then(data => useData(data), err => emit('error', err));
+	 * ```
+	 * or
+	 * ```
+	 * const data = await download(srcUrl);
+	 * useData(data);
+	 * ```
+	*/
+	export const download: (url: string) => Promise<Buffer>;
+	
 	/**
 	 * (async) Read a file
 	 * Reads a whole file to string, NOT A Buffer
 	*/
+	
+	
+	/**
+	 * WritableBuffer
+	 * A [Writable](https://nodejs.org/api/stream.html#stream_writable_streams)
+	 * stream buffer, that is stored in-memory and can be fully
+	 * obtained when writing was finished. It is equivalent to stream-writing
+	 * a temporary file and then reading it into a `Buffer`.
+	*/
+	export class WritableBuffer extends Writable {
+		constructor();
+		/**
+		 * Get the downloaded data
+		 * Use `stream.get()` to obtain the data when writing was finished
+		*/
+		get(): Buffer;
+	}
+	
+	
 	export const read: (name: string) => Promise<string>;
 	
 	/**
@@ -101,5 +178,4 @@ declare module "addon-tools-raub/utils" {
 	 * Must be a file, not a folder. Just `fs.unlink`.
 	*/
 	export const rm: (name: string) => Promise<void>;
-	
 }

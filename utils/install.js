@@ -1,19 +1,12 @@
 'use strict';
 
-const https = require('https');
-const http = require('http');
-const fs = require('fs');
+const https = require('node:https');
+const http = require('node:http');
+const util = require('node:util');
+const exec = util.promisify(require('node:child_process').exec);
 
-let AdmZip = null;
-try {
-	AdmZip = require('adm-zip');
-} catch (ex) {
-	console.error('The `install` script requires `adm-zip` module to be installed.');
-	process.exit(1);
-}
-
-const { bin, platform } = require('.');
-const { mkdir, rm } = require('./utils');
+const { bin, platform } = require('..');
+const { mkdir, rmdir, rm } = require('./files');
 
 
 const protocols = { http, https };
@@ -26,7 +19,7 @@ const onError = (msg) => {
 const zipPath = `${bin}/${bin}.zip`;
 
 
-const install = async (url, count = 1) => {
+const installRecursive = async (url, count = 1) => {
 	try {
 		const proto = protocols[url.match(/^https?/)[0]];
 		
@@ -39,7 +32,7 @@ const install = async (url, count = 1) => {
 		// Handle redirects
 		if ([301, 302, 303, 307].includes(response.statusCode)) {
 			if (count < 5) {
-				return install(response.headers.location, count + 1);
+				return installRecursive(response.headers.location, count + 1);
 			}
 			console.log(url);
 			throw new Error('Error: Too many redirects.');
@@ -51,27 +44,21 @@ const install = async (url, count = 1) => {
 			throw new Error(`Response status was ${response.statusCode}`);
 		}
 		
+		await rmdir(bin);
 		await mkdir(bin);
 		
-		await new Promise((res, rej) => {
-			const zipWriter = fs.createWriteStream(zipPath);
-			zipWriter.on('error', (err) => rej(err));
-			zipWriter.on('finish', () => res());
-			response.pipe(zipWriter);
-		});
-		
-		const zip = new AdmZip(zipPath);
-		zip.extractAllTo(bin, true);
+		await exec(`tar -xzvf ${platform}.zip --directory ${bin}`);
 		
 		await rm(zipPath);
-		
 	} catch (ex) {
 		onError(ex.message);
 	}
 };
 
 
-module.exports = (folder) => {
+const install = (folder) => {
 	const url = `${folder}/${platform}.zip`;
-	install(url).then();
+	installRecursive(url).then();
 };
+
+module.exports = { install };

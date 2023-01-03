@@ -1,6 +1,6 @@
 'use strict';
 
-const tools = require('..');
+const tools = require('.');
 
 
 describe('index.js', () => {

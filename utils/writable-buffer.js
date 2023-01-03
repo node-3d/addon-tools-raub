@@ -1,6 +1,6 @@
 'use strict';
 
-const { Writable } = require('stream');
+const { Writable } = require('node:stream');
 
 
 const CHUNK_SIZE = 1024;
@@ -53,4 +53,4 @@ class WritableBuffer extends Writable {
 	}
 }
 
-module.exports = WritableBuffer;
+module.exports = { WritableBuffer };

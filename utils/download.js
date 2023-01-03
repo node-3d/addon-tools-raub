@@ -1,15 +1,15 @@
 'use strict';
 
-const https = require('https');
-const http  = require('http');
+const https = require('node:https');
+const http = require('node:http');
 
-const WritableBuffer = require('./writable-buffer');
+const { WritableBuffer } = require('./writable-buffer');
 
 
 const protocols = { http, https };
 
 
-const download = async (url, count = 1) => {
+const downloadRecursive = async (url, count = 1) => {
 	url = url.toLowerCase();
 	
 	const stream = new WritableBuffer();
@@ -23,7 +23,7 @@ const download = async (url, count = 1) => {
 	// Handle redirects
 	if ([301, 302, 303, 307].includes(response.statusCode)) {
 		if (count < 5) {
-			return download(response.headers.location, count + 1);
+			return downloadRecursive(response.headers.location, count + 1);
 		}
 		console.log(url);
 		throw new Error('Error: Too many redirects.');
@@ -43,4 +43,6 @@ const download = async (url, count = 1) => {
 	});
 };
 
-module.exports = (url) => download(url);
+const download = (url) => downloadRecursive(url);
+
+module.exports = { download };

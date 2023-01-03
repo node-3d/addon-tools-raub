@@ -1,7 +1,7 @@
 {
 	"author": "Luis Blanco <luisblanco1337@gmail.com>",
 	"name": "addon-tools-raub",
-	"version": "6.3.0",
+	"version": "7.0.0",
 	"description": "Helpers for Node.js addons and dependency packages",
 	"license": "MIT",
 	"main": "index.js",
@@ -19,18 +19,11 @@
 	],
 	"files": [
 		"include",
-		"cpbin.js",
-		"cpbin.d.ts",
-		"download.js",
-		"download.d.ts",
-		"index.js",
-		"index.d.ts",
-		"install.js",
-		"install.d.ts",
 		"utils.js",
 		"utils.d.ts",
-		"writable-buffer.js",
-		"writable-buffer.d.ts",
+		"index.js",
+		"index.d.ts",
+		"utils",
 		"LICENSE",
 		"package.json",
 		"README.md"
@@ -41,44 +34,25 @@
 	},
 	"scripts": {
 		"eslint": "eslint .",
-		"test": "jest --coverage=false --watch",
-		"test-ci": "jest --ci --runInBand --coverage=false --forceExit --detectOpenHandles",
-		"test-coverage": "rm -rf doc/jest && jest --coverage --silent",
-		"test-build": "cd test && node-gyp rebuild && cd .."
-	},
-	"jest": {
-		"moduleFileExtensions": [
-			"js"
-		],
-		"testMatch": [
-			"**/*.test.js"
-		],
-		"coverageDirectory": "doc/jest",
-		"coverageReporters": [
-			"lcov"
-		],
-		"collectCoverageFrom": [
-			"**/*.js",
-			"!**/*.test.js"
-		]
+		"test": "jest --coverage=false --watch --config=conf/jest.json",
+		"test-ci": "jest --ci --runInBand --coverage=false --forceExit --detectOpenHandles --config=conf/jest.json",
+		"test-coverage": "rm -rf doc/jest && jest --coverage --silent --config=conf/jest.json",
+		"test-build": "cd test-addon && node-gyp rebuild -j max --silent && cd .."
 	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/node-3d/addon-tools-raub.git"
 	},
 	"peerDependencies": {
-		"adm-zip": "^0.5.10",
 		"node-addon-api": "^5.0.0"
 	},
 	"peerDependenciesMeta": {
-		"adm-zip": { "optional": true },
 		"node-addon-api": { "optional": true }
 	},
 	"devDependencies": {
-		"adm-zip": "^0.5.10",
-		"eslint-plugin-jest": "^27.1.7",
+		"eslint-plugin-jest": "^27.2.0",
 		"eslint-plugin-node": "^11.1.0",
-		"eslint": "^8.30.0",
+		"eslint": "^8.31.0",
 		"jest": "^29.3.1",
 		"node-addon-api": "^5.0.0",
 		"typescript": "^4.9.4"
