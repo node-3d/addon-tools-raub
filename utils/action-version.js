@@ -2,5 +2,5 @@
 
 
 module.exports = {
-	actionVersion: () => console.log(`version=${process.env.npm_package_version}`),
+	actionVersion: () => `version=${process.env.npm_package_version}`,
 };

@@ -12,7 +12,7 @@ describe('utils.js', () => {
 		'install', 'cpbin', 'download', 'read', 'write', 'copy', 'exists',
 		'mkdir', 'stat', 'isDir', 'isFile', 'dirUp', 'ensuredir', 'copysafe',
 		'readdir', 'subdirs', 'subfiles', 'traverse', 'copyall',
-		'rmdir', 'rm', 'WritableBuffer',
+		'rmdir', 'rm', 'WritableBuffer', 'actionVersion', 'actionZip',
 	];
 	
 	methods.forEach((name) => {
@@ -23,8 +23,8 @@ describe('utils.js', () => {
 	
 	describe('actionVersion', () => {
 		it('logs package version', async () => {
-			const { stdout } = await exec('node -e "require(\'./utils\').actionVersion()"');
-			expect(stdout).toBe(`version=${packageJson.version}`);
+			const { stdout } = await exec('node -p "require(\'./utils\').actionVersion()"');
+			expect(stdout).toBe(`version=${packageJson.version}\n`);
 		});
 	});
 });

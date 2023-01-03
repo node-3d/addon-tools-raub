@@ -1,9 +1,10 @@
 {
+    "rootDir": "../",
     "moduleFileExtensions": [
         "js"
     ],
     "testMatch": [
-        "**/*.test.js"
+        "<rootDir>/**/*.test.js"
     ],
     "coverageDirectory": "doc/jest",
     "coverageReporters": [
