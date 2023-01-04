@@ -1,7 +1,8 @@
 {
     "rootDir": "../",
     "moduleFileExtensions": [
-        "js"
+        "js",
+        "node"
     ],
     "testMatch": [
         "<rootDir>/**/*.test.js"
