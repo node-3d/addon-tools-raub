@@ -1,7 +1,7 @@
 # include/addon-tools.hpp
 
 There is a C++ header file, `addon-tools.hpp`, shipped with this package. It
-introduces several useful macros and utilities. Also it includes **Napi**
+introduces several useful macros and utilities. Also it includes **NAPI**
 implicitly, so you can replace:
 
 ```
@@ -19,8 +19,20 @@ and is accessible with:
 require('addon-tools-raub').getInclude() // a string
 ```
 
+For more examples, see [code snippets here](snippets.md).
 
-### Helpers in **addon-tools.hpp**:
+
+### ES5 Classes
+
+The standard class-defining (i.e. exporting a JS class from the C++ side) tools
+from **NAPI** are a bit repetitive and excessive. So instead, Addon Tools
+comes with a set of helpers for old-school class definition.
+Think of it as ES5 classes. Just a function, spawning instances that have their
+constructor and prototype set accordingly. Such classes may be further extended
+and/or manipulated from JS-land. See the [class-wrapping doc here](class-wrapping.md).
+
+
+### Method Helpers
 
 Usually all the helpers work within the context of a method. In this case we
 have `Napi::CallbackInfo info` passed as an argument. And we can return `undefined`
