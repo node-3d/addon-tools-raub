@@ -1,6 +1,3 @@
 'use strict';
 
-module.exports = {
-	...require('./include'),
-	...require('./utils'),
-};
+module.exports = Object.assign({}, require('./include'), require('./utils'));

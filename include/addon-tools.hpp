@@ -14,7 +14,7 @@
 #ifdef _WIN32
 #define DBG_EXPORT __declspec(dllexport)
 #else
-#define DBG_EXPORT __attribute__((visibility("default")))
+#define DBG_EXPORT
 #endif
 
 #define NAPI_ENV Napi::Env env = info.Env();
@@ -477,31 +477,6 @@ inline void eventEmit(
 	Napi::Object that,
 	const std::string &name,
 	int argc = 0,
-	const Napi::Value *argv = nullptr
-) {
-	if (!that.Has("emit")) {
-		return;
-	}
-	
-	Napi::Env env = that.Env();
-	
-	Napi::String eventName = JS_STR(name);
-	Napi::Function thatEmit = that.Get("emit").As<Napi::Function>();
-	
-	std::vector<napi_value> args;
-	args.push_back(napi_value(eventName));
-	for (int i = 0; i < argc; i++) {
-		args.push_back(napi_value(argv[i]));
-	}
-	
-	thatEmit.Call(that, args);
-}
-
-
-inline void eventEmitAsync(
-	Napi::Object that,
-	const std::string &name,
-	int argc = 0,
 	const Napi::Value *argv = nullptr,
 	napi_async_context context = nullptr
 ) {
@@ -520,7 +495,11 @@ inline void eventEmitAsync(
 		args.push_back(napi_value(argv[i]));
 	}
 	
-	thatEmit.MakeCallback(that, args, context);
+	if (context) {
+		thatEmit.MakeCallback(that, args, context);
+	} else {
+		thatEmit.Call(that, args);
+	}
 }
 
 
