@@ -28,12 +28,12 @@ jobs:
         id: package-version
         run: node -p "'version='+require('./package').version" >> $GITHUB_OUTPUT
 
-      # - name: Publish
-      #   run: |
-      #     npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
-      #     npm publish --ignore-scripts
-      #   env:
-      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish
+        run: |
+          npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+          npm publish --ignore-scripts
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Release
         id: create_release
