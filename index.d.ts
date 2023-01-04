@@ -84,7 +84,7 @@ declare module "addon-tools-raub" {
 	* ```
 	* - name: Get Package Version
 	* id: package-version
-	* run: node -e \"require('addon-tools-raub').actionVersion()\" >> $GITHUB_OUTPUT
+	* run: node -p "require('addon-tools-raub').actionVersion()" >> $GITHUB_OUTPUT
 	* - name: Create Release
 	* uses: softprops/action-gh-release@v1
 	* with:
@@ -101,7 +101,7 @@ declare module "addon-tools-raub" {
 	* ```
 	* - name: Zip Files
 	* id: zip-files
-	* run: node action-zip >> $GITHUB_OUTPUT
+	* run: node -p "require('addon-tools-raub').actionZip()" >> $GITHUB_OUTPUT
 	* - name: Store Binaries
 	* uses: softprops/action-gh-release@v1
 	* with:
