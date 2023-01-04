@@ -1,11 +1,12 @@
 'use strict';
 
+const fs = require('node:fs');
 const https = require('node:https');
 const http = require('node:http');
 const util = require('node:util');
 const exec = util.promisify(require('node:child_process').exec);
 
-const { bin, platform } = require('..');
+const { getBin, getPlatform } = require('../include');
 const { mkdir, rmdir, rm } = require('./files');
 
 
@@ -16,7 +17,6 @@ const onError = (msg) => {
 	process.exit(-1);
 };
 
-const zipPath = `${bin}/${bin}.zip`;
 
 
 const installRecursive = async (url, count = 1) => {
@@ -44,10 +44,19 @@ const installRecursive = async (url, count = 1) => {
 			throw new Error(`Response status was ${response.statusCode}`);
 		}
 		
-		await rmdir(bin);
-		await mkdir(bin);
+		await rmdir(getBin());
+		await mkdir(getBin());
 		
-		await exec(`tar -xzvf ${platform}.zip --directory ${bin}`);
+		const zipPath = `${getBin()}/${getPlatform()}.zip`;
+		
+		await new Promise((res, rej) => {
+			const zipWriter = fs.createWriteStream(zipPath);
+			zipWriter.on('error', (err) => rej(err));
+			zipWriter.on('finish', () => res());
+			response.pipe(zipWriter);
+		});
+		
+		await exec(`tar -xzvf ${zipPath} --directory ${getBin()}`);
 		
 		await rm(zipPath);
 	} catch (ex) {
@@ -57,7 +66,7 @@ const installRecursive = async (url, count = 1) => {
 
 
 const install = (folder) => {
-	const url = `${folder}/${platform}.zip`;
+	const url = `${folder}/${getPlatform()}.zip`;
 	installRecursive(url).then();
 };
 

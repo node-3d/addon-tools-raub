@@ -3,13 +3,13 @@
 const util = require('node:util');
 const exec = util.promisify(require('node:child_process').exec);
 
-const { platform, bin } = require('..');
+const { getPlatform, getBin } = require('../include');
 
 
 const actionZip = async () => {
 	try {
-		await exec(`cd ${bin} && tar -acf ../${platform}.zip *`);
-		console.log(`zip=${platform}.zip`);
+		await exec(`cd ${getBin()} && tar -acf ../${getPlatform()}.zip *`);
+		console.log(`zip=${getPlatform()}.zip`);
 	} catch (error) {
 		console.error(error);
 		process.exit(-1);

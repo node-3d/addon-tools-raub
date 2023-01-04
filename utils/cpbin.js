@@ -1,7 +1,7 @@
 'use strict';
 
 const { copy, exists, mkdir, rm } = require('./files');
-const { bin } = require('..');
+const { getBin } = require('../include');
 
 
 const cpbin = async (name) => {
@@ -11,7 +11,7 @@ const cpbin = async (name) => {
 		console.error(`Error. File "${srcDir}/build/Release/${name}.node" not found.`);
 	}
 	
-	const binAbs = `${srcDir}/../${bin}`;
+	const binAbs = `${srcDir}/../${getBin()}`;
 	
 	if (!await exists(binAbs)) {
 		await mkdir(binAbs);
@@ -25,7 +25,7 @@ const cpbin = async (name) => {
 	
 	await copy(`${srcDir}/build/Release/${name}.node`, destAbs);
 	
-	console.log(`The binary "${name}.node" was copied to "${bin}".`);
+	console.log(`The binary "${name}.node" was copied to "${getBin()}".`);
 };
 
 module.exports = { cpbin };
