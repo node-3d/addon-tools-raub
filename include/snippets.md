@@ -6,7 +6,7 @@
 
 In **package.json** use the `"postinstall"` script to download the libraries.
 For example the following structure might work. Note that **Addon Tools** will
-append any given URL with `/${getPlatform()}.zip`
+append any given URL with `/${getPlatform()}.gzip`
 
 In **package.json**:
 
@@ -23,7 +23,7 @@ In **package.json**:
 ```
 
 Create the **install.js** file, see `install` in [index.d.ts](/index.d.ts).
-**Addon Tools** will unzip (using **tar**) the downloaded file into the platform binary
+**Addon Tools** will unpack (using **tar**) the downloaded file into the platform binary
 directory. E.g. on Windows it will be **bin-windows**.
 
 * For a dependency package:
@@ -43,14 +43,14 @@ directory. E.g. on Windows it will be **bin-windows**.
 	```
 
 
-Publishing binaries is done by attaching a zipped platform folder to a GitHub
+Publishing binaries is done by attaching a GZIPped platform folder to a GitHub
 release. Zip file must NOT contain platform folder as a subfolder, but rather
 contain the final binaries. The tag of the release should be the same as in
 **install.js**.
 
 > NOTE: You can publish your binaries to anywhere, not necessarily GitHub.
 Just tweak **YOUR install.js** script as appropriate. The only limitation
-from **Addon Tools** is that it should be a zipped set of files/folders.
+from **Addon Tools** is that it should be a GZIPped set of files/folders.
 
 
 ### GYP Variables

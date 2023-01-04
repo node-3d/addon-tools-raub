@@ -8,7 +8,7 @@ describe('AT / utils', () => {
 		'install', 'cpbin', 'download', 'read', 'write', 'copy', 'exists',
 		'mkdir', 'stat', 'isDir', 'isFile', 'dirUp', 'ensuredir', 'copysafe',
 		'readdir', 'subdirs', 'subfiles', 'traverse', 'copyall',
-		'rmdir', 'rm', 'WritableBuffer', 'actionZip',
+		'rmdir', 'rm', 'WritableBuffer', 'actionPack',
 	];
 	
 	methods.forEach((name) => {

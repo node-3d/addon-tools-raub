@@ -6,10 +6,10 @@ const exec = util.promisify(require('node:child_process').exec);
 const { getPlatform, getBin } = require('../include');
 
 
-const actionZip = async () => {
+const actionPack = async () => {
 	try {
-		await exec(`cd ${getBin()} && tar -acf ../${getPlatform()}.zip *`);
-		console.log(`zip=${getPlatform()}.zip`);
+		await exec(`cd ${getBin()} && tar -acf ../${getPlatform()}.gzip *`);
+		console.log(`pack=${getPlatform()}.gzip`);
 	} catch (error) {
 		console.error(error);
 		process.exit(-1);
@@ -17,4 +17,4 @@ const actionZip = async () => {
 };
 
 
-module.exports = { actionZip };
+module.exports = { actionPack };

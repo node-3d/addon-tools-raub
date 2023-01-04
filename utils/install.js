@@ -47,18 +47,18 @@ const installRecursive = async (url, count = 1) => {
 		await rmdir(getBin());
 		await mkdir(getBin());
 		
-		const zipPath = `${getBin()}/${getPlatform()}.zip`;
+		const packPath = `${getBin()}/${getPlatform()}.gzip`;
 		
 		await new Promise((res, rej) => {
-			const zipWriter = fs.createWriteStream(zipPath);
-			zipWriter.on('error', (err) => rej(err));
-			zipWriter.on('finish', () => res());
-			response.pipe(zipWriter);
+			const packWriter = fs.createWriteStream(packPath);
+			packWriter.on('error', (err) => rej(err));
+			packWriter.on('finish', () => res());
+			response.pipe(packWriter);
 		});
 		
-		await exec(`tar -xzvf ${zipPath} --directory ${getBin()}`);
+		await exec(`tar -xzf ${packPath} --directory ${getBin()}`);
 		
-		await rm(zipPath);
+		await rm(packPath);
 	} catch (ex) {
 		onError(ex.message);
 	}
@@ -66,7 +66,7 @@ const installRecursive = async (url, count = 1) => {
 
 
 const install = (folder) => {
-	const url = `${folder}/${getPlatform()}.zip`;
+	const url = `${folder}/${getPlatform()}.gzip`;
 	installRecursive(url).then();
 };
 

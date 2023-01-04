@@ -3,7 +3,7 @@
 
 module.exports = Object.assign(
 	{},
-	require('./action-zip'),
+	require('./action-pack'),
 	require('./cpbin'),
 	require('./download'),
 	require('./files'),

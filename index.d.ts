@@ -1,3 +1,7 @@
+import type { Stats } from 'node:fs';
+import type { Writable } from 'node:stream';
+
+
 declare module "addon-tools-raub" {
 	/**
 	* Get the internal paths for an addon
@@ -38,7 +42,7 @@ declare module "addon-tools-raub" {
 	
 	/**
 	* Install binaries
-	* Downloads and unzips the platform specific binary for the calling package.
+	* Downloads and unpacks the platform specific binary for the calling package.
 	* To use it, create a new script for your package, which may as well be named
 	* **install.js**, with the following content:
 	*
@@ -78,20 +82,20 @@ declare module "addon-tools-raub" {
 	
 	
 	/**
-	* Package version for GitHub Actions
-	* Example of `actionZip` usage in **Github Actions**:
+	* Packs binaries into GZIP
+	* Example of `actionPack` usage in **Github Actions**:
 	*
 	* ```
-	* - name: Zip Files
-	* id: zip-files
-	* run: node -p "require('addon-tools-raub').actionZip()" >> $GITHUB_OUTPUT
+	* - name: Pack Files
+	* id: pack-files
+	* run: node -p "require('addon-tools-raub').actionPack()" >> $GITHUB_OUTPUT
 	* - name: Store Binaries
 	* uses: softprops/action-gh-release@v1
 	* with:
-	* 	files: ${{ steps.zip-files.outputs.zip }}
+	* 	files: ${{ steps.pack-files.outputs.pack }}
 	* ```
 	*/
-	export const actionZip: () => void;
+	export const actionPack: () => void;
 	
 	
 	/**
