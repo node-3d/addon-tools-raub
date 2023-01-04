@@ -47,7 +47,7 @@ const installRecursive = async (url, count = 1) => {
 		await rmdir(getBin());
 		await mkdir(getBin());
 		
-		const packPath = `${getBin()}/${getPlatform()}.gzip`;
+		const packPath = `${getBin()}/${getPlatform()}.gz`;
 		
 		await new Promise((res, rej) => {
 			const packWriter = fs.createWriteStream(packPath);
@@ -66,7 +66,7 @@ const installRecursive = async (url, count = 1) => {
 
 
 const install = (folder) => {
-	const url = `${folder}/${getPlatform()}.gzip`;
+	const url = `${folder}/${getPlatform()}.gz`;
 	installRecursive(url).then();
 };
 

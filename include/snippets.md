@@ -6,7 +6,7 @@
 
 In **package.json** use the `"postinstall"` script to download the libraries.
 For example the following structure might work. Note that **Addon Tools** will
-append any given URL with `/${getPlatform()}.gzip`
+append any given URL with `/${getPlatform()}.gz`
 
 In **package.json**:
 

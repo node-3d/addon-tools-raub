@@ -8,8 +8,8 @@ const { getPlatform, getBin } = require('../include');
 
 const actionPack = async () => {
 	try {
-		await exec(`cd ${getBin()} && tar -acf ../${getPlatform()}.gzip *`);
-		console.log(`pack=${getPlatform()}.gzip`);
+		await exec(`cd ${getBin()} && tar -czf ../${getPlatform()}.gz *`);
+		console.log(`pack=${getPlatform()}.gz`);
 	} catch (error) {
 		console.error(error);
 		process.exit(-1);
