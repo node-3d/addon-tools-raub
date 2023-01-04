@@ -7,7 +7,7 @@ const utils = require('.');
 const packageJson = require('../package.json');
 
 
-describe('utils.js', () => {
+describe('AT / utils', () => {
 	const methods = [
 		'install', 'cpbin', 'download', 'read', 'write', 'copy', 'exists',
 		'mkdir', 'stat', 'isDir', 'isFile', 'dirUp', 'ensuredir', 'copysafe',

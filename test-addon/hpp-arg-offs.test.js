@@ -5,7 +5,7 @@ const test = require('./build/Release/test.node');
 
 const numArgMsg = 'Argument 0 must be of type `Number`';
 
-describe('addon-tools.hpp: REQ_OFFS_ARG', () => {
+describe('AT / addon-tools.hpp / REQ_OFFS_ARG', () => {
 	it('exports reqOffsArg', () => {
 		expect(typeof test.reqOffsArg).toBe('function');
 	});

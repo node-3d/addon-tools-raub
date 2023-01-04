@@ -5,7 +5,7 @@ const test = require('./build/Release/test.node');
 
 const objArgMsg = 'Argument 0 must be of type `Object`';
 
-describe('addon-tools.hpp: REQ_OBJ_ARG', () => {
+describe('AT / addon-tools.hpp / REQ_OBJ_ARG', () => {
 	it('exports reqObjArg', () => {
 		expect(typeof test.reqObjArg).toBe('function');
 	});

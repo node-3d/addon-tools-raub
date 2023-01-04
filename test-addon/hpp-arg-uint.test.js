@@ -5,7 +5,7 @@ const test = require('./build/Release/test.node');
 
 const uintArgMsg = 'Argument 0 must be of type `Uint32`';
 
-describe('addon-tools.hpp: REQ_UINT_ARG / REQ_UINT32_ARG', () => {
+describe('AT / addon-tools.hpp / REQ_UINT_ARG, REQ_UINT32_ARG', () => {
 	it('exports reqUintArg', () => {
 		expect(typeof test.reqUintArg).toBe('function');
 	});

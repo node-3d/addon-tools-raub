@@ -9,10 +9,6 @@ This is a part of [Node3D](https://github.com/node-3d) project.
 npm i addon-tools-raub
 ```
 
-This module contains helpers for Node.js **NAPI** addons and dependency packages.
-On this page, helper scripts are described. For details on **addon-tools.hpp** and some
-additional snippets follow the links below.
-
 
 ## include/addon-tools.hpp
 
@@ -36,42 +32,42 @@ DBG_EXPORT JS_METHOD(doSomething) { NAPI_ENV;
 
 ## index.js
 
-Main exports for cross-platform addon configuration.
+JavaScript helpers for Node.js addon development. The short list of helpers:
+```
+	'getBin', 'getPlatform', 'getInclude', 'getPaths',
+	'install', 'cpbin', 'download', 'read', 'write', 'copy', 'exists',
+	'mkdir', 'stat', 'isDir', 'isFile', 'dirUp', 'ensuredir', 'copysafe',
+	'readdir', 'subdirs', 'subfiles', 'traverse', 'copyall',
+	'rmdir', 'rm', 'WritableBuffer', 'actionVersion', 'actionZip',
+```
+
+
 See the [TypeScript definitions](/index.d.ts) with comments.
 
-> NOTE: the peer dependency `node-addon-api` is used by this helper.
 
-Example for an ADDON's **index.js**:
+### Example for an ADDON's **index.js**:
 
 ```
-	const { bin } = require('addon-tools-raub');
-	const core = require(`./${bin}/ADDON`); // uses the platform-specific ADDON.node
+	const { getBin } = require('addon-tools-raub');
+	const core = require(`./${getBin()}/ADDON`); // uses the platform-specific ADDON.node
 ```
 
-Example for **binding.gyp**:
+
+### Example for **binding.gyp**:
 
 ```
 	'include_dirs': [
-		'<!@(node -p "require(\'addon-tools-raub\').include")',
+		'<!@(node -p "require(\'addon-tools-raub\').getInclude()")',
 	],
 ```
 
-
-## utils.js
-
-JS utils for Node.js modules and addons.
-
-```
-const utils = require('addon-tools-raub/utils');
-```
+> NOTE: the optional `node-addon-api` dependency is used by the `getInclude()` helper. If not found,
+	the **napi.h** include path won't be a part of the returned string.
 
 
-Example of `cpbin` usage in **package.json :: scripts**:
+### Example of `cpbin` usage in **package.json :: scripts**:
 
 ```
-	"build-all": "cd src && node-gyp rebuild -j max --silent && node -e \"require('addon-tools-raub/utils').cpbin('segfault')\" && cd ..",
-	"build-only": "cd src && node-gyp build -j max --silent && node -e \"require('addon-tools-raub/utils').cpbin('segfault')\" && cd ..",
+	"build-all": "cd src && node-gyp rebuild -j max --silent && node -e \"require('addon-tools-raub').cpbin('segfault')\" && cd ..",
+	"build-only": "cd src && node-gyp build -j max --silent && node -e \"require('addon-tools-raub').cpbin('segfault')\" && cd ..",
 ```
-
-
-See the [TypeScript definitions](/utils.d.ts) with comments.

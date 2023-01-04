@@ -2,38 +2,11 @@
 
 ## C++ Addon building
 
-**NAPI** addons are built separately from the installation, so we shouldn't
-put the file **binding.gyp** to the module root anymore. It is better to have a
-separate folder with a separate **package.json**, **binding.gyp** and the sources.
-
-A snippet for **src/package.json**:
-
-```
-{
-	"name": "build",
-	"version": "0.0.0",
-	"private": true,
-	"scripts": {
-		"build-all": "cd src && node-gyp rebuild -j max --silent && node -e \"require('addon-tools-raub/utils').cpbin('ADDON')\" && cd ..",
-		"build-only": "cd src && node-gyp build -j max --silent && node -e \"require('addon-tools-raub/utils').cpbin('ADDON')\" && cd ..",
-	},
-	"dependencies": {
-		"addon-tools-raub": "6.2.0",
-		"DEPS": "1.0.0"
-	}
-}
-```
-
-* `ADDON` - the name of this addon (and subsequently of its binary).
-* `DEPS` - dependency package(s).
-
-
-
 ### Binary distribution
 
 In **package.json** use the `"postinstall"` script to download the libraries.
 For example the following structure might work. Note that **Addon Tools** will
-append any given URL with `/${platform}.zip`
+append any given URL with `/${getPlatform()}.zip`
 
 In **package.json**:
 
@@ -42,44 +15,35 @@ In **package.json**:
 		"postinstall": "node install",
 	},
 	"dependencies": {
-		"addon-tools-raub": "^6.2.0",
+		"addon-tools-raub": "^7.0.0",
 	},
 	"devDependencies": {
 		"node-addon-api": "^5.0.0"
 	}
 ```
 
-Create the **install.js** file:
-
-```
-'use strict';
-const { install } = require('addon-tools-raub/utils');
-const prefix = 'https://github.com/node-3d/glfw-raub/releases/download';
-const tag = '4.8.0';
-install(`${prefix}/${tag}`);
-```
-
-**Addon Tools** will unzip (using **adm-zip**) the downloaded file into the platform binary
+Create the **install.js** file, see `install` in [index.d.ts](/index.d.ts).
+**Addon Tools** will unzip (using **tar**) the downloaded file into the platform binary
 directory. E.g. on Windows it will be **bin-windows**.
 
 * For a dependency package:
 	
-	Place the following piece of code in the `index.js` without changes. Method `paths()`
-	is described [here](../README.md).
+	Place the following piece of code into the `index.js` without changes.
+	
 	```
-	module.exports = require('addon-tools-raub').paths(__dirname);
+	module.exports = require('addon-tools-raub').getPaths(__dirname);
 	```
 	
 * For a compiled addon:
 	
-	Require it in your **index.js** from the platform-specific directory.
+	Require the `ADDON.node` in your **index.js** from the platform-specific directory.
 	```
-	const { bin } = require('addon-tools-raub');
-	const core = require(`./${bin}/ADDON`);
+	const { getBin } = require('addon-tools-raub');
+	const core = require(`./${getBin()}/ADDON`);
 	```
 
 
-Publishing binaries is done by attaching a zipped platform folder to the GitHub
+Publishing binaries is done by attaching a zipped platform folder to a GitHub
 release. Zip file must NOT contain platform folder as a subfolder, but rather
 contain the final binaries. The tag of the release should be the same as in
 **install.js**.
@@ -114,75 +78,4 @@ from **Addon Tools** is that it should be a zipped set of files/folders.
 	],
 ```
 
-The former contains both the path to include **Addon Tools** and the one for
-**Napi** (which is preinstalled with Addon Tools). The latter can be any other
-dependency include path(s).
-
-
-<details>
-
-<summary><b>See a snipped for src/binding.gyp here</b></summary>
-
-* Assume `DEPS` is the name of an Addon Tools compliant dependency module.
-* Assume `ADDON` is the name of this addon's resulting binary.
-* Assume C++ code goes to `cpp` subdirectory.
-
-```
-{
-	'variables': {
-		'bin'          : '<!(node -p "require(\'addon-tools-raub\').bin")',
-		'DEPS_include' : '<!(node -p "require(\'DEPS\').include")',
-		'DEPS_bin'     : '<!(node -p "require(\'DEPS\').bin")',
-	},
-	'targets': [{
-		'target_name' : 'ADDON',
-		'sources' : [
-			'cpp/addon.cpp',
-		],
-		'include_dirs' : [
-			'<!@(node -p "require(\'addon-tools-raub\').include")',
-			'<(DEPS_include)',
-		],
-		'cflags_cc': ['-std=c++17', '-fno-exceptions'],
-		'library_dirs': ['<(DEPS_bin)'],
-		'libraries': ['-lDEPS' ],
-		'conditions': [
-			['OS=="linux"', {
-				'libraries': [
-					"-Wl,-rpath,'$$ORIGIN'",
-					"-Wl,-rpath,'$$ORIGIN/../node_modules/DEPS/<(bin)'",
-					"-Wl,-rpath,'$$ORIGIN/../../DEPS/<(bin)'",
-				],
-				'defines': ['__linux__'],
-			}],
-			['OS=="mac"', {
-				'libraries': [
-					'-Wl,-rpath,@loader_path',
-					'-Wl,-rpath,@loader_path/../node_modules/DEPS/<(bin)',
-					'-Wl,-rpath,@loader_path/../../DEPS/<(bin)',
-				],
-				'MACOSX_DEPLOYMENT_TARGET': '10.9',
-				'defines': ['__APPLE__'],
-				'CLANG_CXX_LIBRARY': 'libc++',
-				'OTHER_CFLAGS': ['-std=c++17', '-fno-exceptions'],
-			}],
-			['OS=="win"', {
-				'defines' : ['WIN32_LEAN_AND_MEAN', 'VC_EXTRALEAN', '_WIN32', '_HAS_EXCEPTIONS=0'],
-				'msvs_settings' : {
-					'VCCLCompilerTool' : {
-						'AdditionalOptions' : [
-							'/O2','/Oy','/GL','/GF','/Gm-', '/std:c++17',
-							'/EHa-s-c-','/MT','/GS','/Gy','/GR-','/Gd',
-						]
-					},
-					'VCLinkerTool' : {
-						'AdditionalOptions' : ['/DEBUG:NONE', '/LTCG', '/OPT:NOREF'],
-					},
-				},
-			}],
-		],
-	}],
-}
-```
-
-</details>
+See example of a working [**binding.gyp** here](/test-addon/binding.gyp)

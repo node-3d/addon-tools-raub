@@ -1,5 +1,6 @@
 'use strict';
 
 module.exports = {
-	...require('./include/index'),
+	...require('./include'),
+	...require('./utils'),
 };

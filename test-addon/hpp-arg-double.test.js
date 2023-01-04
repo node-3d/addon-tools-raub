@@ -5,7 +5,7 @@ const test = require('./build/Release/test.node');
 
 const numArgMsg = 'Argument 0 must be of type `Number`';
 
-describe('addon-tools.hpp: REQ_DOUBLE_ARG', () => {
+describe('AT / addon-tools.hpp / REQ_DOUBLE_ARG', () => {
 	it('exports reqDoubleArg', () => {
 		expect(typeof test.reqDoubleArg).toBe('function');
 	});

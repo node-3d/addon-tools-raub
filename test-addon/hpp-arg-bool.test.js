@@ -5,7 +5,7 @@ const test = require('./build/Release/test.node');
 
 const boolArgMsg = 'Argument 0 must be of type `Bool`';
 
-describe('addon-tools.hpp: REQ_BOOL_ARG', () => {
+describe('AT / addon-tools.hpp / REQ_BOOL_ARG', () => {
 	it('exports reqBoolArg', () => {
 		expect(typeof test.reqBoolArg).toBe('function');
 	});

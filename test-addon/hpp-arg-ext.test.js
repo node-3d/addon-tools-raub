@@ -5,7 +5,7 @@ const test = require('./build/Release/test.node');
 
 const extArgMsg = 'Argument 0 must be of type `Pointer`';
 
-describe('addon-tools.hpp: REQ_EXT_ARG', () => {
+describe('AT / addon-tools.hpp / REQ_EXT_ARG', () => {
 	it('exports reqExtArg', () => {
 		expect(typeof test.reqExtArg).toBe('function');
 	});

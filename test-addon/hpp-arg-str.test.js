@@ -5,7 +5,7 @@ const test = require('./build/Release/test.node');
 
 const strArgMsg = 'Argument 0 must be of type `String`';
 
-describe('addon-tools.hpp: REQ_STR_ARG', () => {
+describe('AT / addon-tools.hpp / REQ_STR_ARG', () => {
 	it('exports reqStrArg', () => {
 		expect(typeof test.reqStrArg).toBe('function');
 	});

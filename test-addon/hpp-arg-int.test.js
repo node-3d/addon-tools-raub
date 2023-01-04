@@ -5,7 +5,7 @@ const test = require('./build/Release/test.node');
 
 const intArgMsg = 'Argument 0 must be of type `Int32`';
 
-describe('addon-tools.hpp: REQ_INT_ARG / REQ_INT32_ARG', () => {
+describe('AT / addon-tools.hpp / REQ_INT_ARG, REQ_INT32_ARG', () => {
 	it('exports reqIntArg', () => {
 		expect(typeof test.reqIntArg).toBe('function');
 	});

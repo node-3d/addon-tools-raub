@@ -3,8 +3,7 @@
 const test = require('./build/Release/test.node');
 
 
-describe('addon-tools.hpp: Function arguments', () => {
-	
+describe('AT / addon-tools.hpp / Function arguments', () => {
 	describe('REQ_ARGS', () => {
 		it('exports reqArgs3', () => {
 			expect(typeof test.reqArgs3).toBe('function');
@@ -203,5 +202,4 @@ describe('addon-tools.hpp: Function arguments', () => {
 			expect(test.reqTypedArg(typed)).toEqual(typed);
 		});
 	});
-	
 });

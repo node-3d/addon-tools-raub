@@ -5,7 +5,7 @@ const test = require('./build/Release/test.node');
 
 const numArgMsg = 'Argument 0 must be of type `Number`';
 
-describe('addon-tools.hpp: REQ_FLOAT_ARG', () => {
+describe('AT / addon-tools.hpp / REQ_FLOAT_ARG', () => {
 	it('exports reqFloatArg', () => {
 		expect(typeof test.reqFloatArg).toBe('function');
 	});

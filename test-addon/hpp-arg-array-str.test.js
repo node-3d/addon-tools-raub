@@ -5,7 +5,7 @@ const test = require('./build/Release/test.node');
 
 const arrayArgMsg = 'Argument 0 must be of type `Array`';
 
-describe('addon-tools.hpp: LET_ARRAY_ARG', () => {
+describe('AT / addon-tools.hpp / LET_ARRAY_ARG', () => {
 	it('exports letArrayStrArg', () => {
 		expect(typeof test.letArrayStrArg).toBe('function');
 	});
