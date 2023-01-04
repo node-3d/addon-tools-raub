@@ -26,7 +26,7 @@ jobs:
 
       - name: Get Package Version
         id: package-version
-        run: node -p "version=${require('./package').version}" >> $GITHUB_OUTPUT
+        run: node -p "'version='+require('./package').version" >> $GITHUB_OUTPUT
 
       # - name: Publish
       #   run: |
