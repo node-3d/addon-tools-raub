@@ -14,9 +14,9 @@ with
 
 In **GYP**, the include directory should be set for your addon.
 An actual path to the directory is exported from the module
-and is accessible like this:
+and is accessible with:
 ```
-require('addon-tools-raub').include // a string
+require('addon-tools-raub').getInclude() // a string
 ```
 
 
@@ -34,7 +34,7 @@ within `Napi::Value`-returning functions.
 
 Other global helpers:
 * `DBG_EXPORT`- set symbol visibility (mainly for callstack traces). On Windows, that is
-	equal to exporting a symbol: `__declspec(dllexport)`.
+	equal to exporting a symbol: `__declspec(dllexport)`. On Unix it does nothing.
 
 <details>
 
