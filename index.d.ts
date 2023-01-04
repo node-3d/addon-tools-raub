@@ -79,23 +79,6 @@ declare module "addon-tools-raub" {
 	
 	/**
 	* Package version for GitHub Actions
-	* Example of `actionVersion` usage in **Github Actions**:
-	*
-	* ```
-	* - name: Get Package Version
-	* id: package-version
-	* run: node -p "require('addon-tools-raub').actionVersion()" >> $GITHUB_OUTPUT
-	* - name: Create Release
-	* uses: softprops/action-gh-release@v1
-	* with:
-	* 	tag_name: ${{ steps.package-version.outputs.version }}
-	* ```
-	*/
-	export const actionVersion: () => void;
-	
-	
-	/**
-	* Package version for GitHub Actions
 	* Example of `actionZip` usage in **Github Actions**:
 	*
 	* ```

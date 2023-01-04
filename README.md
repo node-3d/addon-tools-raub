@@ -38,7 +38,7 @@ JavaScript helpers for Node.js addon development. The short list of helpers:
 	'install', 'cpbin', 'download', 'read', 'write', 'copy', 'exists',
 	'mkdir', 'stat', 'isDir', 'isFile', 'dirUp', 'ensuredir', 'copysafe',
 	'readdir', 'subdirs', 'subfiles', 'traverse', 'copyall',
-	'rmdir', 'rm', 'WritableBuffer', 'actionVersion', 'actionZip',
+	'rmdir', 'rm', 'WritableBuffer', 'actionZip',
 ```
 
 

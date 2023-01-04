@@ -2,7 +2,6 @@
 
 
 module.exports = {
-	...require('./action-version'),
 	...require('./action-zip'),
 	...require('./cpbin'),
 	...require('./download'),
