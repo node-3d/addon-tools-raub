@@ -63,7 +63,7 @@ declare module "addon-tools-raub" {
 	* },
 	* ```
 	*/
-	export const install: (folder: string) => void;
+	export const install: (folder: string) => Promise<boolean>;
 	
 	
 	/**

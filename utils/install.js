@@ -12,12 +12,6 @@ const { mkdir, rmdir, rm } = require('./files');
 
 const protocols = { http, https };
 
-const onError = (msg) => {
-	console.error(msg);
-	process.exit(-1);
-};
-
-
 
 const installRecursive = async (url, count = 1) => {
 	try {
@@ -34,13 +28,13 @@ const installRecursive = async (url, count = 1) => {
 			if (count < 5) {
 				return installRecursive(response.headers.location, count + 1);
 			}
-			console.log(url);
+			console.warn(url);
 			throw new Error('Error: Too many redirects.');
 		}
 		
 		// Handle bad status
 		if (response.statusCode !== 200) {
-			console.log(url);
+			console.warn(url);
 			throw new Error(`Response status was ${response.statusCode}`);
 		}
 		
@@ -56,18 +50,23 @@ const installRecursive = async (url, count = 1) => {
 			response.pipe(packWriter);
 		});
 		
-		await exec(`tar -xzf ${packPath} --directory ${getBin()}`);
+		const { stderr } = await exec(`tar -xzf ${packPath} --directory ${getBin()}`);
+		if (stderr) {
+			console.warn(stderr);
+		}
 		
 		await rm(packPath);
-	} catch (ex) {
-		onError(ex.message);
+		return true;
+	} catch (error) {
+		console.error(error.message);
+		return false;
 	}
 };
 
 
-const install = (folder) => {
+const install = async (folder) => {
 	const url = `${folder}/${getPlatform()}.gz`;
-	installRecursive(url).then();
+	return installRecursive(url);
 };
 
 module.exports = { install };
