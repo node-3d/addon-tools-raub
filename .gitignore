@@ -5,6 +5,6 @@
 .project
 .DS_Store
 node_modules/
-test/build/
+test-addon/build/
 doc/jest/
 *.log
