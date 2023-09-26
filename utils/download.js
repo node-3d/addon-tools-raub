@@ -10,10 +10,8 @@ const protocols = { http, https };
 
 
 const downloadRecursive = async (url, count = 1) => {
-	url = url.toLowerCase();
-	
 	const stream = new WritableBuffer();
-	const proto = protocols[url.match(/^https?/)[0]];
+	const proto = protocols[url.match(/^https?/i)[0].toLowerCase()];
 	
 	const response = await new Promise((res, rej) => {
 		const request = proto.get(url, (response) => res(response));
