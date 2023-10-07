@@ -3,10 +3,11 @@
 This is a part of [Node3D](https://github.com/node-3d) project.
 
 [![NPM](https://badge.fury.io/js/addon-tools-raub.svg)](https://badge.fury.io/js/addon-tools-raub)
-[![CodeFactor](https://www.codefactor.io/repository/github/node-3d/addon-tools-raub/badge)](https://www.codefactor.io/repository/github/node-3d/addon-tools-raub)
+[![ESLint](https://github.com/node-3d/addon-tools-raub/actions/workflows/eslint.yml/badge.svg)](https://github.com/node-3d/addon-tools-raub/actions/workflows/eslint.yml)
+[![Test](https://github.com/node-3d/addon-tools-raub/actions/workflows/test.yml/badge.svg)](https://github.com/node-3d/addon-tools-raub/actions/workflows/test.yml)
 
 ```
-npm i addon-tools-raub
+npm i -s addon-tools-raub
 ```
 
 
@@ -65,9 +66,9 @@ See the [TypeScript definitions](/index.d.ts) with comments.
 	the **napi.h** include path won't be a part of the returned string.
 
 
-### Example of `cpbin` usage in **package.json :: scripts**:
+### Example of `cpbin` in **package.json :: scripts**:
 
 ```
-	"build-all": "cd src && node-gyp rebuild -j max --silent && node -e \"require('addon-tools-raub').cpbin('segfault')\" && cd ..",
+	"build": "cd src && node-gyp rebuild -j max --silent && node -e \"require('addon-tools-raub').cpbin('segfault')\" && cd ..",
 	"build-only": "cd src && node-gyp build -j max --silent && node -e \"require('addon-tools-raub').cpbin('segfault')\" && cd ..",
 ```
