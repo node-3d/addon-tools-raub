@@ -1,7 +1,7 @@
 {
 	"author": "Luis Blanco <luisblanco1337@gmail.com>",
 	"name": "addon-tools-raub",
-	"version": "7.2.1",
+	"version": "7.3.0",
 	"description": "Helpers for Node.js addons and dependency packages",
 	"license": "MIT",
 	"main": "index.js",
@@ -34,9 +34,8 @@
 	},
 	"scripts": {
 		"eslint": "eslint .",
-		"test": "jest --coverage=false --watch --config=conf/jest.json",
-		"test-ci": "jest --ci --runInBand --coverage=false --forceExit --detectOpenHandles --config=conf/jest.json",
-		"test-coverage": "rm -rf doc/jest && jest --coverage --silent --config=conf/jest.json",
+		"test": "node --test --watch",
+		"test-ci": "node --test",
 		"build-test": "cd test-addon && node-gyp rebuild -j max --silent && cd .."
 	},
 	"repository": {
@@ -44,17 +43,15 @@
 		"url": "https://github.com/node-3d/addon-tools-raub.git"
 	},
 	"peerDependencies": {
-		"node-addon-api": "^6.1.0"
+		"node-addon-api": "^7.0.0"
 	},
 	"peerDependenciesMeta": {
 		"node-addon-api": { "optional": true }
 	},
 	"devDependencies": {
-		"eslint-plugin-jest": "^27.2.1",
 		"eslint-plugin-node": "^11.1.0",
-		"eslint": "^8.40.0",
-		"jest": "^29.5.0",
-		"node-addon-api": "^6.1.0",
-		"typescript": "^5.0.4"
+		"eslint": "^8.51.0",
+		"node-addon-api": "^7.0.0",
+		"typescript": "^5.2.2"
 	}
 }

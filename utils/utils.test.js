@@ -1,5 +1,8 @@
 'use strict';
 
+const assert = require('node:assert').strict;
+const { describe, it } = require('node:test');
+
 const utils = require('.');
 
 
@@ -13,7 +16,7 @@ describe('AT / utils', () => {
 	
 	methods.forEach((name) => {
 		it(`exports the "${name}" function`, () => {
-			expect(typeof utils[name]).toBe('function');
+			assert.strictEqual(typeof utils[name], 'function');
 		});
 	});
 });

@@ -1,5 +1,8 @@
 'use strict';
 
+const assert = require('node:assert').strict;
+const { describe, it } = require('node:test');
+
 const tools = require('.');
 
 
@@ -9,30 +12,30 @@ describe('AT / include', () => {
 	stringMethods.forEach((name) => {
 		describe(`#${name}()`, () => {
 			it('is a function', () => {
-				expect(typeof tools[name]).toBe('function');
+				assert.strictEqual(typeof tools[name], 'function');
 			});
 			
 			it('returns an object', () => {
-				expect(typeof tools[name]()).toBe('string');
+				assert.strictEqual(typeof tools[name](), 'string');
 			});
 		});
 	});
 	
 	describe('#getPaths()', () => {
 		it('is a function', () => {
-			expect(typeof tools.getPaths).toBe('function');
+			assert.strictEqual(typeof tools.getPaths, 'function');
 		});
 		
 		it('returns an object', () => {
-			expect(typeof tools.getPaths(__dirname)).toBe('object');
+			assert.strictEqual(typeof tools.getPaths(__dirname), 'object');
 		});
 		
 		it('has "include" string', () => {
-			expect(typeof tools.getPaths(__dirname).include).toBe('string');
+			assert.strictEqual(typeof tools.getPaths(__dirname).include, 'string');
 		});
 		
 		it('has "bin" string', () => {
-			expect(typeof tools.getPaths(__dirname).include).toBe('string');
+			assert.strictEqual(typeof tools.getPaths(__dirname).include, 'string');
 		});
 	});
 });

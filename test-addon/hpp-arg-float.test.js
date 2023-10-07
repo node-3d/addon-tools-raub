@@ -1,96 +1,100 @@
 'use strict';
 
+const assert = require('node:assert').strict;
+const { describe, it } = require('node:test');
+
 const test = require('./build/Release/test.node');
 
 
-const numArgMsg = 'Argument 0 must be of type `Number`';
+const numArgMsg = { message: 'Argument 0 must be of type `Number`' };
+const numArgLetMsg = { message: 'Argument 0 must be of type `Number` or be `null`/`undefined`' };
 
-describe('AT / addon-tools.hpp / REQ_FLOAT_ARG', () => {
+describe('AT / HPP / REQ_FLOAT_ARG', () => {
 	it('exports reqFloatArg', () => {
-		expect(typeof test.reqFloatArg).toBe('function');
+		assert.strictEqual(typeof test.reqFloatArg, 'function');
 	});
 	it('throws if arg was not passed', () => {
-		expect(() => test.reqFloatArg()).toThrow(numArgMsg);
+		assert.throws(() => test.reqFloatArg(), numArgMsg);
 	});
 	it('throws if arg was passed undefined', () => {
-		expect(() => test.reqFloatArg(undefined)).toThrow(numArgMsg);
+		assert.throws(() => test.reqFloatArg(undefined), numArgMsg);
 	});
 	it('throws if arg was passed null', () => {
-		expect(() => test.reqFloatArg(null)).toThrow(numArgMsg);
+		assert.throws(() => test.reqFloatArg(null), numArgMsg);
 	});
 	it('throws if arg was passed a string', () => {
-		expect(() => test.reqFloatArg('1')).toThrow(numArgMsg);
+		assert.throws(() => test.reqFloatArg('1'), numArgMsg);
 	});
 	it('throws if arg was passed a boolean', () => {
-		expect(() => test.reqFloatArg(true)).toThrow(numArgMsg);
+		assert.throws(() => test.reqFloatArg(true), numArgMsg);
 	});
 	it('throws if arg was passed an object', () => {
-		expect(() => test.reqFloatArg({})).toThrow(numArgMsg);
+		assert.throws(() => test.reqFloatArg({}), numArgMsg);
 	});
 	it('throws if arg was passed an array', () => {
-		expect(() => test.reqFloatArg([])).toThrow(numArgMsg);
+		assert.throws(() => test.reqFloatArg([]), numArgMsg);
 	});
 	it('accepts a number', () => {
-		expect(test.reqFloatArg(55)).toEqual(55);
+		assert.strictEqual(test.reqFloatArg(55), 55);
 	});
 });
 
 describe('addon-tools.hpp: LET_FLOAT_ARG', () => {
 	it('exports letFloatArg', () => {
-		expect(typeof test.letFloatArg).toBe('function');
+		assert.strictEqual(typeof test.letFloatArg, 'function');
 	});
 	it('throws if arg was passed a string', () => {
-		expect(() => test.letFloatArg('1')).toThrow(numArgMsg);
+		assert.throws(() => test.letFloatArg('1'), numArgLetMsg);
 	});
 	it('throws if arg was passed a boolean', () => {
-		expect(() => test.letFloatArg(true)).toThrow(numArgMsg);
+		assert.throws(() => test.letFloatArg(true), numArgLetMsg);
 	});
 	it('throws if arg was passed an object', () => {
-		expect(() => test.letFloatArg({})).toThrow(numArgMsg);
+		assert.throws(() => test.letFloatArg({}), numArgLetMsg);
 	});
 	it('throws if arg was passed an array', () => {
-		expect(() => test.letFloatArg([])).toThrow(numArgMsg);
+		assert.throws(() => test.letFloatArg([]), numArgLetMsg);
 	});
 	it('accepts an empty arg', () => {
-		expect(test.letFloatArg()).toEqual(0);
+		assert.strictEqual(test.letFloatArg(), 0);
 	});
 	it('accepts undefined', () => {
-		expect(test.letFloatArg(undefined)).toEqual(0);
+		assert.strictEqual(test.letFloatArg(undefined), 0);
 	});
 	it('accepts null', () => {
-		expect(test.letFloatArg(null)).toEqual(0);
+		assert.strictEqual(test.letFloatArg(null), 0);
 	});
 	it('accepts a number', () => {
-		expect(test.letFloatArg(55)).toEqual(55);
+		assert.strictEqual(test.letFloatArg(55), 55);
 	});
 });
 
 describe('addon-tools.hpp: USE_FLOAT_ARG', () => {
 	it('exports useFloatArg', () => {
-		expect(typeof test.useFloatArg).toBe('function');
+		assert.strictEqual(typeof test.useFloatArg, 'function');
 	});
 	it('throws if arg was passed a string', () => {
-		expect(() => test.useFloatArg('1')).toThrow(numArgMsg);
+		assert.throws(() => test.useFloatArg('1'), numArgLetMsg);
 	});
 	it('throws if arg was passed a boolean', () => {
-		expect(() => test.useFloatArg(true)).toThrow(numArgMsg);
+		assert.throws(() => test.useFloatArg(true), numArgLetMsg);
 	});
 	it('throws if arg was passed an object', () => {
-		expect(() => test.useFloatArg({})).toThrow(numArgMsg);
+		assert.throws(() => test.useFloatArg({}), numArgLetMsg);
 	});
 	it('throws if arg was passed an array', () => {
-		expect(() => test.useFloatArg([])).toThrow(numArgMsg);
+		assert.throws(() => test.useFloatArg([]), numArgLetMsg);
 	});
 	it('accepts an empty arg', () => {
-		expect(test.useFloatArg()).toEqual(10);
+		assert.strictEqual(test.useFloatArg(), 10);
 	});
 	it('accepts undefined', () => {
-		expect(test.useFloatArg(undefined)).toEqual(10);
+		assert.strictEqual(test.useFloatArg(undefined), 10);
 	});
 	it('accepts null', () => {
-		expect(test.useFloatArg(null)).toEqual(10);
+		assert.strictEqual(test.useFloatArg(null), 10);
 	});
 	it('accepts a number', () => {
-		expect(test.useFloatArg(55)).toEqual(55);
+		assert.strictEqual(test.useFloatArg(55), 55);
 	});
 });

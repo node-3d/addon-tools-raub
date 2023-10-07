@@ -1,105 +1,109 @@
 'use strict';
 
+const assert = require('node:assert').strict;
+const { describe, it } = require('node:test');
+
 const test = require('./build/Release/test.node');
 
 
-const extArgMsg = 'Argument 0 must be of type `Pointer`';
+const extArgMsg = { message: 'Argument 0 must be of type `Pointer`' };
+const extArgLetMsg = { message: 'Argument 0 must be of type `Pointer` or be `null`/`undefined`' };
 
-describe('AT / addon-tools.hpp / REQ_EXT_ARG', () => {
+describe('AT / HPP / REQ_EXT_ARG', () => {
 	it('exports reqExtArg', () => {
-		expect(typeof test.reqExtArg).toBe('function');
+		assert.strictEqual(typeof test.reqExtArg, 'function');
 	});
 	it('throws if arg was not passed', () => {
-		expect(() => test.reqExtArg()).toThrow(extArgMsg);
+		assert.throws(() => test.reqExtArg(), extArgMsg);
 	});
 	it('throws if arg was passed undefined', () => {
-		expect(() => test.reqExtArg(undefined)).toThrow(extArgMsg);
+		assert.throws(() => test.reqExtArg(undefined), extArgMsg);
 	});
 	it('throws if arg was passed null', () => {
-		expect(() => test.reqExtArg(null)).toThrow(extArgMsg);
+		assert.throws(() => test.reqExtArg(null), extArgMsg);
 	});
 	it('throws if arg was passed a string', () => {
-		expect(() => test.reqExtArg('1')).toThrow(extArgMsg);
+		assert.throws(() => test.reqExtArg('1'), extArgMsg);
 	});
 	it('throws if arg was passed a number', () => {
-		expect(() => test.reqExtArg(1)).toThrow(extArgMsg);
+		assert.throws(() => test.reqExtArg(1), extArgMsg);
 	});
 	it('throws if arg was passed a boolean', () => {
-		expect(() => test.reqExtArg(true)).toThrow(extArgMsg);
+		assert.throws(() => test.reqExtArg(true), extArgMsg);
 	});
 	it('throws if arg was passed an object', () => {
-		expect(() => test.reqExtArg({})).toThrow(extArgMsg);
+		assert.throws(() => test.reqExtArg({}), extArgMsg);
 	});
 	it('throws if arg was passed an array', () => {
-		expect(() => test.reqExtArg([])).toThrow(extArgMsg);
+		assert.throws(() => test.reqExtArg([]), extArgMsg);
 	});
 	it('accepts a pointer', () => {
-		expect(typeof test.reqExtArg(test.retExt())).toBe('object');
+		assert.strictEqual(typeof test.reqExtArg(test.retExt()), 'object');
 	});
 });
 
 describe('addon-tools.hpp: LET_EXT_ARG', () => {
 	it('exports letExtArg', () => {
-		expect(typeof test.letExtArg).toBe('function');
+		assert.strictEqual(typeof test.letExtArg, 'function');
 	});
 	it('throws if arg was passed a string', () => {
-		expect(() => test.letExtArg('1')).toThrow(extArgMsg);
+		assert.throws(() => test.letExtArg('1'), extArgLetMsg);
 	});
 	it('throws if arg was passed a number', () => {
-		expect(() => test.letExtArg(1)).toThrow(extArgMsg);
+		assert.throws(() => test.letExtArg(1), extArgLetMsg);
 	});
 	it('throws if arg was passed a boolean', () => {
-		expect(() => test.letExtArg(true)).toThrow(extArgMsg);
+		assert.throws(() => test.letExtArg(true), extArgLetMsg);
 	});
 	it('throws if arg was passed an object', () => {
-		expect(() => test.letExtArg({})).toThrow(extArgMsg);
+		assert.throws(() => test.letExtArg({}), extArgLetMsg);
 	});
 	it('throws if arg was passed an array', () => {
-		expect(() => test.letExtArg([])).toThrow(extArgMsg);
+		assert.throws(() => test.letExtArg([]), extArgLetMsg);
 	});
 	it('accepts an empty arg', () => {
-		expect(typeof test.letExtArg()).toBe('object');
+		assert.strictEqual(typeof test.letExtArg(), 'object');
 	});
 	it('accepts undefined', () => {
-		expect(typeof test.letExtArg(undefined)).toBe('object');
+		assert.strictEqual(typeof test.letExtArg(undefined), 'object');
 	});
 	it('accepts null', () => {
-		expect(typeof test.letExtArg(null)).toBe('object');
+		assert.strictEqual(typeof test.letExtArg(null), 'object');
 	});
 	it('accepts a pointer', () => {
-		expect(typeof test.reqExtArg(test.retExt())).toBe('object');
+		assert.strictEqual(typeof test.reqExtArg(test.retExt()), 'object');
 	});
 });
 
 describe('addon-tools.hpp: USE_EXT_ARG', () => {
 	it('exports useExtArg', () => {
-		expect(typeof test.useExtArg).toBe('function');
+		assert.strictEqual(typeof test.useExtArg, 'function');
 	});
 	it('throws if arg was passed a string', () => {
-		expect(() => test.useExtArg('1')).toThrow(extArgMsg);
+		assert.throws(() => test.useExtArg('1'), extArgLetMsg);
 	});
 	it('throws if arg was passed a number', () => {
-		expect(() => test.useExtArg(1)).toThrow(extArgMsg);
+		assert.throws(() => test.useExtArg(1), extArgLetMsg);
 	});
 	it('throws if arg was passed a boolean', () => {
-		expect(() => test.useExtArg(true)).toThrow(extArgMsg);
+		assert.throws(() => test.useExtArg(true), extArgLetMsg);
 	});
 	it('throws if arg was passed an object', () => {
-		expect(() => test.useExtArg({})).toThrow(extArgMsg);
+		assert.throws(() => test.useExtArg({}), extArgLetMsg);
 	});
 	it('throws if arg was passed an array', () => {
-		expect(() => test.useExtArg([])).toThrow(extArgMsg);
+		assert.throws(() => test.useExtArg([]), extArgLetMsg);
 	});
 	it('accepts an empty arg', () => {
-		expect(typeof test.useExtArg()).toBe('object');
+		assert.strictEqual(typeof test.useExtArg(), 'object');
 	});
 	it('accepts undefined', () => {
-		expect(typeof test.useExtArg(undefined)).toBe('object');
+		assert.strictEqual(typeof test.useExtArg(undefined), 'object');
 	});
 	it('accepts null', () => {
-		expect(typeof test.useExtArg(null)).toBe('object');
+		assert.strictEqual(typeof test.useExtArg(null), 'object');
 	});
 	it('accepts a number', () => {
-		expect(typeof test.useExtArg(test.retExt())).toBe('object');
+		assert.strictEqual(typeof test.useExtArg(test.retExt()), 'object');
 	});
 });
