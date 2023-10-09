@@ -41,4 +41,6 @@ jobs:
         run: pip install cpplint
 
       - name: Run Cpplint
-        run: cpplint --recursive ./test-addon
+        run: |
+          cpplint --recursive ./test-addon
+          cpplint --recursive ./include
