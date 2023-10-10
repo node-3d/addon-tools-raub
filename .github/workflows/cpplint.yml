@@ -42,5 +42,6 @@ jobs:
 
       - name: Run Cpplint
         run: |
+          node -e "require('.').cpcpplint()"
           cpplint --recursive ./test-addon
           cpplint --recursive ./include
