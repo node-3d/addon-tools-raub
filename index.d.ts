@@ -98,7 +98,7 @@ declare module "addon-tools-raub" {
 	 * id: pack-files
 	 * run: node -e "require('addon-tools-raub').actionPack()" >> $GITHUB_OUTPUT
 	 * - name: Store Binaries
-	 * uses: softprops/action-gh-release@v1
+	 * uses: softprops/action-gh-release@v2
 	 * with:
 	 * 	files: ${{ steps.pack-files.outputs.pack }}
 	 * ```
