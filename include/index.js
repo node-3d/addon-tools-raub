@@ -44,7 +44,7 @@ const getInclude = () => {
 	let napi = null;
 	try {
 		napi = require('node-addon-api');
-	} catch (ex) {
+	} catch (_ex) {
 		// do nothing
 	}
 	
