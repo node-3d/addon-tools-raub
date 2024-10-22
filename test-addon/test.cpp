@@ -227,6 +227,28 @@ JS_METHOD(reqTypedArg) { NAPI_ENV;
 	RET_VALUE(arg);
 }
 
+JS_METHOD(consoleLogString) { NAPI_ENV;
+	consoleLog(env, "test");
+	RET_UNDEFINED;
+}
+
+JS_METHOD(consoleLogArgs) { NAPI_ENV;
+	Napi::Value args[2] = { JS_STR("test"), JS_NUM(2) };
+	consoleLog(env, 2, &args[0]);
+	RET_UNDEFINED;
+}
+
+JS_METHOD(globalLogString) { NAPI_ENV;
+	globalLog(env, "cpp", "info", "test");
+	RET_UNDEFINED;
+}
+
+JS_METHOD(globalLogArgs) { NAPI_ENV;
+	Napi::Value args[2] = { JS_STR("test"), JS_NUM(2) };
+	globalLog(env, "cpp", "warn", 2, &args[0]);
+	RET_UNDEFINED;
+}
+
 
 #define TEST_SET_METHOD(name)                                                 \
 	exports.DefineProperty(                                                   \
@@ -295,6 +317,11 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
 	TEST_SET_METHOD(reqArrvArg);
 	TEST_SET_METHOD(reqBufArg);
 	TEST_SET_METHOD(reqTypedArg);
+	
+	TEST_SET_METHOD(consoleLogString);
+	TEST_SET_METHOD(consoleLogArgs);
+	TEST_SET_METHOD(globalLogString);
+	TEST_SET_METHOD(globalLogArgs);
 	
 	return exports;
 }

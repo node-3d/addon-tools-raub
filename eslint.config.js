@@ -15,6 +15,7 @@ module.exports = [
 				sourceType: 'commonjs'
 			},
 			globals: {
+				global: true,
 				require: 'readonly',
 				Buffer: 'readonly',
 				module: 'readonly',

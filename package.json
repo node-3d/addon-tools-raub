@@ -29,12 +29,12 @@
 		"README.md"
 	],
 	"engines": {
-		"node": ">=20.14.0",
-		"npm": ">=10.7.0"
+		"node": ">=22.9.0",
+		"npm": ">=10.8.3"
 	},
 	"scripts": {
 		"eslint": "eslint .",
-		"test": "node --test --watch .",
+		"test": "node --test --watch",
 		"test-ci": "node --test",
 		"build-test": "cd test-addon && node-gyp rebuild -j max --silent && cd .."
 	},
@@ -43,7 +43,7 @@
 		"url": "https://github.com/node-3d/addon-tools-raub.git"
 	},
 	"peerDependencies": {
-		"node-addon-api": "^8.0.0"
+		"node-addon-api": "^8.2.1"
 	},
 	"peerDependenciesMeta": {
 		"node-addon-api": {
@@ -51,10 +51,10 @@
 		}
 	},
 	"devDependencies": {
-		"@types/node": "^20.12.13",
-		"@eslint/js": "^9.3.0",
-		"eslint": "^9.3.0",
-		"node-addon-api": "^8.0.0",
-		"typescript": "^5.4.5"
+		"@types/node": "^22.7.5",
+		"@eslint/js": "^9.12.0",
+		"eslint": "^9.12.0",
+		"node-addon-api": "^8.2.1",
+		"typescript": "^5.6.3"
 	}
 }

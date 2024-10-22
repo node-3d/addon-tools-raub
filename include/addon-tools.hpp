@@ -472,6 +472,36 @@ inline Napi::Value consoleLog(Napi::Env env, const std::string &message) {
 	RET_UNDEFINED;
 }
 
+inline Napi::Value globalLog(
+	Napi::Env env,
+	const std::string &name,
+	const std::string &level,
+	int argc,
+	const Napi::Value *argv
+) {
+	JS_RUN("global.AddonTools.log", log);
+	std::vector<napi_value> args;
+	args.push_back(napi_value(JS_STR(name)));
+	args.push_back(napi_value(JS_STR(level)));
+	for (int i = 0; i < argc; i++) {
+		args.push_back(napi_value(argv[i]));
+	}
+	log.As<Napi::Function>().Call(args);
+	RET_UNDEFINED;
+}
+
+
+inline Napi::Value globalLog(
+	Napi::Env env,
+	const std::string &name,
+	const std::string &level,
+	const std::string &message
+) {
+	Napi::Value arg = JS_STR(message);
+	globalLog(env, name, level, 1, &arg);
+	RET_UNDEFINED;
+}
+
 
 inline void eventEmit(
 	Napi::Object that,

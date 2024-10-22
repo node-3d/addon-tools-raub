@@ -358,4 +358,34 @@ declare module "addon-tools-raub" {
 	 * Must be a file, not a folder. Just `fs.unlink`.
 	 */
 	export const rm: (name: string) => Promise<void>;
+	
+	type TLoggerFn = (...args: any[]) => void;
+	type TGlobalLoggerMethods = Readonly<{
+		debug: TLoggerFn,
+		log: TLoggerFn,
+		info: TLoggerFn,
+		warn: TLoggerFn,
+		error: TLoggerFn,
+	}>;
+	
+	type TGlobalLoggerLevel = keyof TGlobalLoggerMethods;
+	
+	type TGlobalLoggerOpts = TGlobalLoggerMethods & Readonly<{
+		name: string,
+	}>;
+	
+	type TGlobalLogger = TGlobalLoggerMethods & Readonly<{
+		replace: (level: string, fn: TLoggerFn) => void,
+	}>;
+	
+	/**
+	 * Create a named global logger
+	 *
+	 * Copy a folder with all the contained files
+	 */
+	export const createLogger: (opts: TGlobalLoggerOpts) => TGlobalLogger;
+	export const setLevel: (level: TGlobalLoggerLevel | null) => void;
+	export const getLevel: () => (TGlobalLoggerLevel | null);
+	export const getLoggers: () => Readonly<Record<string, TGlobalLogger>>
+	export const getLogger: () => (TGlobalLogger | null)
 }

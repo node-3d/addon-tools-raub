@@ -9,5 +9,6 @@ module.exports = Object.assign(
 	require('./download'),
 	require('./files'),
 	require('./install'),
+	require('./logger'),
 	require('./writable-buffer'),
 );

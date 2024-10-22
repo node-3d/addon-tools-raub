@@ -6,12 +6,13 @@ const { describe, it } = require('node:test');
 const utils = require('.');
 
 
-describe('AT / utils', () => {
+describe('AT / Util Exports', () => {
 	const methods = [
 		'install', 'cpbin', 'download', 'read', 'write', 'copy', 'exists',
 		'mkdir', 'stat', 'isDir', 'isFile', 'dirUp', 'ensuredir', 'copysafe',
 		'readdir', 'subdirs', 'subfiles', 'traverse', 'copyall',
 		'rmdir', 'rm', 'WritableBuffer', 'actionPack',
+		'createLogger', 'setLevel', 'getLevel', 'getLoggers',
 	];
 	
 	methods.forEach((name) => {

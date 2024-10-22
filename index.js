@@ -1,3 +1,9 @@
 'use strict';
 
-module.exports = Object.assign({}, require('./include'), require('./utils'));
+global.AddonTools = global.AddonTools || {};
+
+module.exports = Object.assign(
+	{},
+	require('./include'),
+	require('./utils'),
+);

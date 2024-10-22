@@ -1,45 +1,66 @@
 # include/addon-tools.hpp
 
-There is a C++ header file, `addon-tools.hpp`, shipped with this package. It
-introduces several useful macros and utilities. Also it includes **NAPI**
-implicitly, so you can replace:
+C++ header `addon-tools.hpp` introduces several macros and utilities.
+Also it includes **NAPI** implicitly, so you can replace:
 
-```
+```cpp
 #include <napi.h>
 ```
+
 with
-```
+
+```cpp
 #include <addon-tools.hpp>
 ```
 
-In **GYP**, the include directory should be set for your addon.
-An actual path to the directory is exported from the module
-and is accessible with:
-```
-require('addon-tools-raub').getInclude() // a string
+For **GYP**, the include directory is accessible with:
+
+```gyp
+'include_dirs': [
+	'<!@(node -p "require(\'addon-tools-raub\').getInclude()")',
+],
 ```
 
 For more examples, see [code snippets here](snippets.md).
 
 
+### Logging
+
+Console logging and "global" logging helpers for C++ side are available:
+
+Global logging expects a named logger to be created from JS side.
+See JS Utils section in [README](/README.md).
+
+```js
+	// to `console` by default
+	const logger = utils.createLogger({ name: 'my-logger' });
+```
+
+```cpp
+	consoleLog(env, "test");
+	// or
+	Napi::Value args[2] = { JS_STR("test"), JS_NUM(2) };
+	consoleLog(env, 2, &args[0]);
+	// or
+	globalLog(env, "cpp", "info", "test");
+	// or
+	globalLog(env, "cpp", "warn", 2, &args[0]);
+```
+
+
+
 ### ES5 Classes
 
-The standard class-defining (i.e. exporting a JS class from the C++ side) tools
-from **NAPI** are a bit repetitive and excessive. So instead, Addon Tools
-comes with a set of helpers for old-school class definition.
-Think of it as ES5 classes. Just a function, spawning instances that have their
-constructor and prototype set accordingly. Such classes may be further extended
-and/or manipulated from JS-land. See the [class-wrapping doc here](class-wrapping.md).
+Addon Tools provides C++ macro helpers for ES5 Classes (`function`-based).
+See the [class-wrapping doc here](class-wrapping.md).
 
 
-### Method Helpers
+### Function Helpers
 
-Usually all the helpers work within the context of a method. In this case we
-have `Napi::CallbackInfo info` passed as an argument. And we can return `undefined`
-in case a problem has occured. So most of these macros are only usable
-within `Napi::Value`-returning functions.
+Most of the helpers work within functions, where `Napi::CallbackInfo info` is
+passed as an argument, and `Napi::Value` is to be returned.
 
-```
+```cpp
 #define NAPI_ENV Napi::Env env = info.Env();
 #define NAPI_HS Napi::HandleScope scope(env);
 ```
@@ -48,9 +69,9 @@ Other global helpers:
 * `DBG_EXPORT`- set symbol visibility (mainly for callstack traces). On Windows, that is
 	equal to exporting a symbol: `__declspec(dllexport)`. On Unix it does nothing.
 
-<details>
+---
 
-<summary><b>Return value</b></summary>
+**Return value**
 
 * `RET_VALUE(VAL)`- return a given Napi::Value.
 * `RET_UNDEFINED`- return `undefined`.
@@ -61,13 +82,9 @@ Other global helpers:
 * `RET_BOOL(VAL)` - return `Napi::Boolean`, expected `VAL` is convertible to bool.
 * `RET_ARRAY_STR(VAL)` - return `Napi::Array`, expected `VAL` is `std::vector<std::string>`.
 
-</details>
+---
 
-
-
-<details>
-
-<summary><b>New JS value</b></summary>
+**New JS value**
 
 * `JS_UNDEFINED` - an `undefined` value.
 * `JS_NULL` - a `null` value.
@@ -78,12 +95,9 @@ Other global helpers:
 * `JS_OBJECT` - a new empty `Object` instance.
 * `JS_ARRAY` - a new empty `Array` instance.
 
-</details>
+---
 
-
-<details>
-
-<summary><b>Method check</b></summary>
+**Method check**
 
 These checks throw JS `TypeError` if not passed. `T` is always used as a typename
 in error messages. `C` is a
@@ -101,12 +115,9 @@ destroyed by `destroy()`.
 * `THIS_CHECK` - check if the instance wasn't
 destroyed by `destroy()`, and then fetch `env`.
 
-</details>
+---
 
-
-<details>
-
-<summary><b>Method arguments</b></summary>
+**Method arguments**
 
 Following macros convert JS arguments into C++ variables.
 Three types of argument retrieval are supported:
@@ -116,7 +127,8 @@ Three types of argument retrieval are supported:
 * `SOFT_` - 2 params, is `LET_` without type and arity checks.
 
 What it does, basically:
-```
+
+```cpp
 // REQ_DOUBLE_ARG(0, x)
 double x = info[0].ToNumber().DoubleValue();
 
@@ -174,7 +186,7 @@ That extrapolates well to all the helpers below:
 | `REQ_BUF_ARG`    | `Buffer`      | `Napi::Buffer<uint8_t>` | -         |
 
 
-```
+```cpp
 JS_METHOD(test) {
 	REQ_UINT32_ARG(0, width); // uint32_t width
 	REQ_UINT32_ARG(1, height); // uint32_t height
@@ -184,12 +196,9 @@ JS_METHOD(test) {
 	...
 ```
 
-</details>
+---
 
-
-<details>
-
-<summary><b>Setter argument</b></summary>
+**Setter argument**
 
 Works similar to method arguments. But there is always `value`
 argument, from which a C++ value is extracted.
@@ -208,7 +217,7 @@ argument, from which a C++ value is extracted.
 * `SETTER_OBJ_ARG`
 * `SETTER_ARRV_ARG`
 
-```
+```cpp
 JS_IMPLEMENT_SETTER(MyClass, x) { THIS_CHECK; SETTER_STR_ARG;
 	// Variable created: std::string v;
 	...
@@ -216,12 +225,9 @@ JS_IMPLEMENT_SETTER(MyClass, x) { THIS_CHECK; SETTER_STR_ARG;
 
 See also: [Class Wrapping](class-wrapping.md)
 
-</details>
+---
 
-
-<details>
-
-<summary><b>JS Data to C++ Data</b></summary>
+**JS Data to C++ Data**
 
 * `T *getArrayData(value, num = NULL)` - extracts TypedArray data of any type from
 the given JS value. Does not accept `Array`. Checks with `IsArrayBuffer()`.
@@ -236,5 +242,3 @@ calls `getArrayData` or `getArrayData` on it. Otherwise, if
 `value.data` is a `TypedArray|Buffer`,
 calls `getArrayData` or `getArrayData` on it.
 Returns `nullptr` in other cases.
-
-</details>

@@ -6,12 +6,15 @@ const http = require('node:http');
 const { WritableBuffer } = require('./writable-buffer');
 
 
-const protocols = { http, https };
+const PROTOCOLS = { http, https };
+const REDIRECT_CODES = [301, 302, 303, 307];
+const HTTP_OK = 200;
+const MAX_REDIRECTS = 5;
 
 
 const downloadRecursive = async (url, count = 1) => {
 	const stream = new WritableBuffer();
-	const proto = protocols[url.match(/^https?/i)[0].toLowerCase()];
+	const proto = PROTOCOLS[url.match(/^https?/i)[0].toLowerCase()];
 	
 	const response = await new Promise((res, rej) => {
 		const request = proto.get(url, (response) => res(response));
@@ -19,8 +22,8 @@ const downloadRecursive = async (url, count = 1) => {
 	});
 	
 	// Handle redirects
-	if ([301, 302, 303, 307].includes(response.statusCode)) {
-		if (count < 5) {
+	if (REDIRECT_CODES.includes(response.statusCode)) {
+		if (count < MAX_REDIRECTS) {
 			return downloadRecursive(response.headers.location, count + 1);
 		}
 		console.log(url);
@@ -28,7 +31,7 @@ const downloadRecursive = async (url, count = 1) => {
 	}
 	
 	// Handle bad status
-	if (response.statusCode !== 200) {
+	if (response.statusCode !== HTTP_OK) {
 		console.log(url);
 		throw new Error(`Response status was ${response.statusCode}`);
 	}
