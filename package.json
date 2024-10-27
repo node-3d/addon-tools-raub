@@ -19,14 +19,11 @@
 	],
 	"files": [
 		"include",
-		"utils.js",
-		"utils.d.ts",
 		"index.js",
 		"index.d.ts",
 		"utils",
 		"LICENSE",
-		"package.json",
-		"README.md"
+		"package.json"
 	],
 	"engines": {
 		"node": ">=22.9.0",

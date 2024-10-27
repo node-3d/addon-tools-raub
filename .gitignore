@@ -3,7 +3,7 @@
 .lock-wscript
 .DS_Store
 .project
-.DS_Store
 node_modules/
 test-addon/build/
+bin-*/
 *.log

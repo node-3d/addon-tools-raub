@@ -3,7 +3,7 @@
 const assert = require('node:assert').strict;
 const { describe, it } = require('node:test');
 
-const utils = require('.');
+const utils = require('..');
 
 
 describe('AT / Util Exports', () => {

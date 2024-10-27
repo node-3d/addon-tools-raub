@@ -3,10 +3,10 @@
 const assert = require('node:assert').strict;
 const { describe, it } = require('node:test');
 
-const tools = require('.');
+const tools = require('..');
 
 
-describe('AT / include', () => {
+describe('AT / Include', () => {
 	const stringMethods = ['getBin', 'getPlatform', 'getInclude'];
 	
 	stringMethods.forEach((name) => {

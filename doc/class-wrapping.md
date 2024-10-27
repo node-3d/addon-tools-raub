@@ -14,7 +14,7 @@ and on C++ side there is `inheritEs5` function.
 
 ## Class Declaration
 
-```
+```cpp
 class ClassName {
 DECLARE_ES5_CLASS(ClassName, JSClassName);
 	
@@ -48,7 +48,7 @@ the second is the name of the setter to be created.
 
 ## Class Implementation
 
-```
+```cpp
 IMPLEMENT_ES5_CLASS(ClassName);
 
 // Fill the properties and export the class

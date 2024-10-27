@@ -21,10 +21,8 @@ For **GYP**, the include directory is accessible with:
 ],
 ```
 
-For more examples, see [code snippets here](snippets.md).
 
-
-### Logging
+## Logging
 
 Console logging and "global" logging helpers for C++ side are available:
 
@@ -46,13 +44,6 @@ See JS Utils section in [README](/README.md).
 	// or
 	globalLog(env, "cpp", "warn", 2, &args[0]);
 ```
-
-
-
-### ES5 Classes
-
-Addon Tools provides C++ macro helpers for ES5 Classes (`function`-based).
-See the [class-wrapping doc here](class-wrapping.md).
 
 
 ### Function Helpers
@@ -242,3 +233,9 @@ calls `getArrayData` or `getArrayData` on it. Otherwise, if
 `value.data` is a `TypedArray|Buffer`,
 calls `getArrayData` or `getArrayData` on it.
 Returns `nullptr` in other cases.
+
+
+### ES5 Classes
+
+Addon Tools provides C++ macro helpers for ES5 Classes (`function`-based).
+See the [class-wrapping doc here](class-wrapping.md).

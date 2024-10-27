@@ -371,21 +371,40 @@ declare module "addon-tools-raub" {
 	type TGlobalLoggerLevel = keyof TGlobalLoggerMethods;
 	
 	type TGlobalLoggerOpts = TGlobalLoggerMethods & Readonly<{
+		/** Globally available name for a new logger */
 		name: string,
 	}>;
 	
 	type TGlobalLogger = TGlobalLoggerMethods & Readonly<{
+		/** Replace a logger channel in an existing logger */
 		replace: (level: string, fn: TLoggerFn) => void,
 	}>;
 	
 	/**
 	 * Create a named global logger
-	 *
-	 * Copy a folder with all the contained files
+	 * 
+	 * It will be also available from
+	 * `global.AddonTools.log(name, level, arg1, arg2, ...);`
 	 */
 	export const createLogger: (opts: TGlobalLoggerOpts) => TGlobalLogger;
+	
+	/**
+	 * Set logger level or `null` to turn off
+	 */
 	export const setLevel: (level: TGlobalLoggerLevel | null) => void;
+	
+	/**
+	 * Get logger level
+	 */
 	export const getLevel: () => (TGlobalLoggerLevel | null);
+	
+	/**
+	 * Get an object containing all registered loggers
+	 */
 	export const getLoggers: () => Readonly<Record<string, TGlobalLogger>>
+	
+	/**
+	 * Get a logger by name, returns null if  not found
+	 */
 	export const getLogger: () => (TGlobalLogger | null)
 }
