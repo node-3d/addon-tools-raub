@@ -1,5 +1,4 @@
-#ifndef ADDON_TOOLS_HPP
-#define ADDON_TOOLS_HPP
+#pragma once
 
 #define NODE_ADDON_API_DISABLE_DEPRECATED
 #define NAPI_DISABLE_CPP_EXCEPTIONS
@@ -695,5 +694,3 @@ private:                                                                      \
 		napi_wrap(env, wrapObj, instance, _finalizeEs5, nullptr, nullptr);    \
 		return info.Env().Undefined();                                        \
 	}
-
-#endif // ADDON_TOOLS_HPP
