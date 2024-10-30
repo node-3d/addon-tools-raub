@@ -4,7 +4,6 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${LocalAppData}/node-gyp/Cache/20.14.0/include/node",
                 "${LocalAppData}/node-gyp/Cache/22.9.0/include/node"
             ],
             "windowsSdkVersion": "10.0.19041.0",
