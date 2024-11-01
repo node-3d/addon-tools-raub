@@ -404,7 +404,10 @@ declare module "addon-tools-raub" {
 	export const getLoggers: () => Readonly<Record<string, TGlobalLogger>>
 	
 	/**
-	 * Get a logger by name, returns null if  not found
+	 * Get a logger by name.
+	 * 
+	 * If there is no logger by that name,
+	 * it will create a new one with default parameters.
 	 */
-	export const getLogger: () => (TGlobalLogger | null)
+	export const getLogger: () => (TGlobalLogger)
 }

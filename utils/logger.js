@@ -57,7 +57,7 @@ const getLevel = () => currentLevel;
 
 const getLoggers = () => ({ ...loggers });
 
-const getLogger = (name) => loggers[name] || null;
+const getLogger = (name) => loggers[name] || createLogger({ name });
 
 if (!global.AddonTools.log) {
 	global.AddonTools.log = (name, level, ...args) => {
@@ -68,6 +68,8 @@ if (!global.AddonTools.log) {
 		logger[level](...args);
 	};
 }
+
+createLogger({ name: 'addon-tools' });
 
 module.exports = {
 	createLogger, setLevel, getLevel, getLoggers, getLogger,
