@@ -21,31 +21,31 @@ describe('AT / Logger', () => {
 	
 	it('creates a custom logger', () => {
 		assert.strictEqual(typeof logger, 'object');
-		assert.isOk(logger.debug);
-		assert.isOk(logger.log);
-		assert.isOk(logger.info);
-		assert.isOk(logger.warn);
-		assert.isOk(logger.error);
+		assert.ok(logger.debug);
+		assert.ok(logger.log);
+		assert.ok(logger.info);
+		assert.ok(logger.warn);
+		assert.ok(logger.error);
 	});
 	
 	it('creates a default logger', () => {
 		const logger2 = utils.createLogger({ name: 'test2' });
 		assert.strictEqual(typeof logger2, 'object');
-		assert.isOk(logger2.debug);
-		assert.isOk(logger2.log);
-		assert.isOk(logger2.info);
-		assert.isOk(logger2.warn);
-		assert.isOk(logger2.error);
+		assert.ok(logger2.debug);
+		assert.ok(logger2.log);
+		assert.ok(logger2.info);
+		assert.ok(logger2.warn);
+		assert.ok(logger2.error);
 	});
 	
 	it('creates a fallback logger', () => {
 		const logger3 = utils.getLogger(`logger-${Math.random()}`);
 		assert.strictEqual(typeof logger3, 'object');
-		assert.isOk(logger3.debug);
-		assert.isOk(logger3.log);
-		assert.isOk(logger3.info);
-		assert.isOk(logger3.warn);
-		assert.isOk(logger3.error);
+		assert.ok(logger3.debug);
+		assert.ok(logger3.log);
+		assert.ok(logger3.info);
+		assert.ok(logger3.warn);
+		assert.ok(logger3.error);
 	});
 	
 	it('fetches a named logger', () => {
@@ -89,7 +89,7 @@ describe('AT / Logger', () => {
 	});
 	
 	it('has default "addon-tools" logger', () => {
-		assert.isOk(utils.getLoggers()['addon-tools']);
+		assert.ok(utils.getLoggers()['addon-tools']);
 	});
 	
 });
