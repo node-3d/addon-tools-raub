@@ -34,6 +34,11 @@ const createLogger = (opts) => {
 		return prev;
 	}
 	const newLogger = {
+		debug: console.debug,
+		log: console.log,
+		info: console.info,
+		warn: console.warn,
+		error: console.error,
 		replace: (level, fn) => {
 			if (levelIdx[level]) {
 				newLogger[level] = _wrapOutput(fn || console.log, level);
