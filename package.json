@@ -1,7 +1,7 @@
 {
 	"author": "Luis Blanco <luisblanco1337@gmail.com>",
 	"name": "addon-tools-raub",
-	"version": "9.1.1",
+	"version": "9.2.0",
 	"description": "Helpers for Node.js addons and dependency packages",
 	"license": "MIT",
 	"main": "index.js",
@@ -40,7 +40,7 @@
 		"url": "https://github.com/node-3d/addon-tools-raub.git"
 	},
 	"peerDependencies": {
-		"node-addon-api": "^8.2.1"
+		"node-addon-api": "^8.3.0"
 	},
 	"peerDependenciesMeta": {
 		"node-addon-api": {
@@ -48,10 +48,10 @@
 		}
 	},
 	"devDependencies": {
-		"@types/node": "^22.7.9",
-		"@eslint/js": "^9.13.0",
-		"eslint": "^9.13.0",
-		"node-addon-api": "^8.2.1",
-		"typescript": "^5.6.3"
+		"@types/node": "^22.10.5",
+		"@eslint/js": "^9.17.0",
+		"eslint": "^9.17.0",
+		"node-addon-api": "^8.3.0",
+		"typescript": "^5.7.2"
 	}
 }
