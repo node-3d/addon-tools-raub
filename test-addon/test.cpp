@@ -67,6 +67,11 @@ JS_METHOD(letStrArg) { NAPI_ENV;
 	RET_STR(arg.c_str());
 }
 
+JS_METHOD(weakStrArg) { NAPI_ENV;
+	WEAK_STR_ARG(0, arg);
+	RET_STR(arg.c_str());
+}
+
 JS_METHOD(reqIntArg) { NAPI_ENV;
 	REQ_INT_ARG(0, arg);
 	RET_NUM(arg);
@@ -79,6 +84,11 @@ JS_METHOD(useIntArg) { NAPI_ENV;
 
 JS_METHOD(letIntArg) { NAPI_ENV;
 	LET_INT_ARG(0, arg);
+	RET_NUM(arg);
+}
+
+JS_METHOD(weakIntArg) { NAPI_ENV;
+	WEAK_INT_ARG(0, arg);
 	RET_NUM(arg);
 }
 
@@ -97,6 +107,11 @@ JS_METHOD(letUintArg) { NAPI_ENV;
 	RET_NUM(arg);
 }
 
+JS_METHOD(weakUintArg) { NAPI_ENV;
+	WEAK_UINT_ARG(0, arg);
+	RET_NUM(arg);
+}
+
 JS_METHOD(reqBoolArg) { NAPI_ENV;
 	REQ_BOOL_ARG(0, arg);
 	RET_BOOL(arg);
@@ -109,6 +124,16 @@ JS_METHOD(useBoolArg) { NAPI_ENV;
 
 JS_METHOD(letBoolArg) { NAPI_ENV;
 	LET_BOOL_ARG(0, arg);
+	RET_BOOL(arg);
+}
+
+JS_METHOD(softBoolArg) { NAPI_ENV;
+	SOFT_BOOL_ARG(0, arg);
+	RET_BOOL(arg);
+}
+
+JS_METHOD(weakBoolArg) { NAPI_ENV;
+	WEAK_BOOL_ARG(0, arg);
 	RET_BOOL(arg);
 }
 
@@ -127,6 +152,11 @@ JS_METHOD(letOffsArg) { NAPI_ENV;
 	RET_NUM(arg);
 }
 
+JS_METHOD(weakOffsArg) { NAPI_ENV;
+	WEAK_OFFS_ARG(0, arg);
+	RET_NUM(arg);
+}
+
 JS_METHOD(reqDoubleArg) { NAPI_ENV;
 	REQ_DOUBLE_ARG(0, arg);
 	RET_NUM(arg);
@@ -142,6 +172,11 @@ JS_METHOD(letDoubleArg) { NAPI_ENV;
 	RET_NUM(arg);
 }
 
+JS_METHOD(weakDoubleArg) { NAPI_ENV;
+	WEAK_DOUBLE_ARG(0, arg);
+	RET_NUM(arg);
+}
+
 JS_METHOD(reqFloatArg) { NAPI_ENV;
 	REQ_FLOAT_ARG(0, arg);
 	RET_NUM(arg);
@@ -154,6 +189,11 @@ JS_METHOD(useFloatArg) { NAPI_ENV;
 
 JS_METHOD(letFloatArg) { NAPI_ENV;
 	LET_FLOAT_ARG(0, arg);
+	RET_NUM(arg);
+}
+
+JS_METHOD(weakFloatArg) { NAPI_ENV;
+	WEAK_FLOAT_ARG(0, arg);
 	RET_NUM(arg);
 }
 
@@ -274,30 +314,38 @@ Napi::Object init(Napi::Env env, Napi::Object exports) {
 	TEST_SET_METHOD(reqStrArg);
 	TEST_SET_METHOD(useStrArg);
 	TEST_SET_METHOD(letStrArg);
+	TEST_SET_METHOD(weakStrArg);
 	
 	TEST_SET_METHOD(reqIntArg);
 	TEST_SET_METHOD(useIntArg);
 	TEST_SET_METHOD(letIntArg);
+	TEST_SET_METHOD(weakIntArg);
 	
 	TEST_SET_METHOD(reqUintArg);
 	TEST_SET_METHOD(useUintArg);
 	TEST_SET_METHOD(letUintArg);
+	TEST_SET_METHOD(weakUintArg);
 	
 	TEST_SET_METHOD(reqBoolArg);
 	TEST_SET_METHOD(useBoolArg);
 	TEST_SET_METHOD(letBoolArg);
+	TEST_SET_METHOD(softBoolArg);
+	TEST_SET_METHOD(weakBoolArg);
 	
 	TEST_SET_METHOD(reqOffsArg);
 	TEST_SET_METHOD(useOffsArg);
 	TEST_SET_METHOD(letOffsArg);
+	TEST_SET_METHOD(weakOffsArg);
 	
 	TEST_SET_METHOD(reqDoubleArg);
 	TEST_SET_METHOD(useDoubleArg);
 	TEST_SET_METHOD(letDoubleArg);
+	TEST_SET_METHOD(weakDoubleArg);
 	
 	TEST_SET_METHOD(reqFloatArg);
 	TEST_SET_METHOD(useFloatArg);
 	TEST_SET_METHOD(letFloatArg);
+	TEST_SET_METHOD(weakFloatArg);
 	
 	TEST_SET_METHOD(reqExtArg);
 	TEST_SET_METHOD(useExtArg);

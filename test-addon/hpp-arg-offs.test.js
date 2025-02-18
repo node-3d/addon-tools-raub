@@ -98,3 +98,33 @@ describe('addon-tools.hpp: USE_OFFS_ARG', () => {
 		assert.strictEqual(test.useOffsArg(55), 55);
 	});
 });
+
+describe('addon-tools.hpp: WEAK_OFFS_ARG', () => {
+	it('exports weakOffsArg', () => {
+		assert.strictEqual(typeof test.weakOffsArg, 'function');
+	});
+	it('ok if arg was passed a string', () => {
+		assert.strictEqual(test.weakOffsArg('1'), 1);
+	});
+	it('ok if arg was passed a number', () => {
+		assert.strictEqual(test.weakOffsArg(1), 1);
+	});
+	it('ok if arg was passed an object', () => {
+		assert.strictEqual(test.weakOffsArg({}), 0);
+	});
+	it('ok if arg was passed an array', () => {
+		assert.strictEqual(test.weakOffsArg([]), 0);
+	});
+	it('accepts an empty arg', () => {
+		assert.strictEqual(test.weakOffsArg(), 0);
+	});
+	it('accepts undefined', () => {
+		assert.strictEqual(test.weakOffsArg(undefined), 0);
+	});
+	it('accepts null', () => {
+		assert.strictEqual(test.weakOffsArg(null), 0);
+	});
+	it('accepts a boolean', () => {
+		assert.strictEqual(test.weakOffsArg(true), 1);
+	});
+});

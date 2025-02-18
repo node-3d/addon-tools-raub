@@ -98,3 +98,33 @@ describe('addon-tools.hpp: USE_FLOAT_ARG', () => {
 		assert.strictEqual(test.useFloatArg(55), 55);
 	});
 });
+
+describe('addon-tools.hpp: WEAK_FLOAT_ARG', () => {
+	it('exports weakFloatArg', () => {
+		assert.strictEqual(typeof test.weakFloatArg, 'function');
+	});
+	it('ok if arg was passed a string', () => {
+		assert.strictEqual(test.weakFloatArg('1'), 1);
+	});
+	it('ok if arg was passed a number', () => {
+		assert.strictEqual(test.weakFloatArg(1), 1);
+	});
+	it('ok if arg was passed an object', () => {
+		assert.strictEqual(test.weakFloatArg({}), NaN);
+	});
+	it('ok if arg was passed an array', () => {
+		assert.strictEqual(test.weakFloatArg([]), 0);
+	});
+	it('accepts an empty arg', () => {
+		assert.strictEqual(test.weakFloatArg(), NaN);
+	});
+	it('accepts undefined', () => {
+		assert.strictEqual(test.weakFloatArg(undefined), NaN);
+	});
+	it('accepts null', () => {
+		assert.strictEqual(test.weakFloatArg(null), 0);
+	});
+	it('accepts a boolean', () => {
+		assert.strictEqual(test.weakFloatArg(true), 1);
+	});
+});

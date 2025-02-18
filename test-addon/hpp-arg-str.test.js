@@ -98,3 +98,33 @@ describe('addon-tools.hpp: USE_STR_ARG', () => {
 		assert.strictEqual(test.useStrArg('1abc'), '1abc');
 	});
 });
+
+describe('addon-tools.hpp: WEAK_STR_ARG', () => {
+	it('exports weakStrArg', () => {
+		assert.strictEqual(typeof test.weakStrArg, 'function');
+	});
+	it('ok if arg was passed a string', () => {
+		assert.strictEqual(test.weakStrArg('1'), '1');
+	});
+	it('ok if arg was passed a number', () => {
+		assert.strictEqual(test.weakStrArg(1), '1');
+	});
+	it('ok if arg was passed an object', () => {
+		assert.strictEqual(test.weakStrArg({}), '[object Object]');
+	});
+	it('ok if arg was passed an array', () => {
+		assert.strictEqual(test.weakStrArg([]), '');
+	});
+	it('accepts an empty arg', () => {
+		assert.strictEqual(test.weakStrArg(), 'undefined');
+	});
+	it('accepts undefined', () => {
+		assert.strictEqual(test.weakStrArg(undefined), 'undefined');
+	});
+	it('accepts null', () => {
+		assert.strictEqual(test.weakStrArg(null), 'null');
+	});
+	it('accepts a boolean', () => {
+		assert.strictEqual(test.weakStrArg(true), 'true');
+	});
+});

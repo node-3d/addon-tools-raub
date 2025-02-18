@@ -59,6 +59,7 @@ passed as an argument, and `Napi::Value` is to be returned.
 Other global helpers:
 * `DBG_EXPORT`- set symbol visibility (mainly for callstack traces). On Windows, that is
 	equal to exporting a symbol: `__declspec(dllexport)`. On Unix it does nothing.
+* `JS_THROW(text)` - throws JS exception with the given text message.
 
 ---
 
@@ -112,22 +113,31 @@ destroyed by `destroy()`, and then fetch `env`.
 
 Following macros convert JS arguments into C++ variables.
 Three types of argument retrieval are supported:
-* `REQ_` - 2 params, requires an argument to have a value
-* `USE_` - 3 params, allows the argument to be empty and have a default
+* `REQ_` - 2 params, requires an argument to have a value of specific type.
+* `USE_` - 3 params, allows the argument to be empty and have a default.
 * `LET_` - 2 params, is `USE_` with a preset zero-default.
 * `SOFT_` - 2 params, is `LET_` without type and arity checks.
+* `WEAK_` - 2 params, uses type coercion, doesn't check if arg exists.
 
 What it does, basically:
 
 ```cpp
 // REQ_DOUBLE_ARG(0, x)
-double x = info[0].ToNumber().DoubleValue();
+if (info.Length() < 1 || !info[0].IsNumber()) { JS_THROW; RET_UNDEFINED; }
+double x = info[0].As<Napi::Number>().DoubleValue();
 
 // USE_DOUBLE_ARG(0, x, 5.7)
+if (info.Length() < 1 || !info[0].IsNumber()) { JS_THROW; RET_UNDEFINED; }
 double x = IS_ARG_EMPTY(0) ? 5.7 : info[0].ToNumber().DoubleValue();
 
 // LET_DOUBLE_ARG(0, x)
-double x = IS_ARG_EMPTY(0) ? 0.0 : info[0].ToNumber().DoubleValue();
+USE_DOUBLE_ARG(0, x, 0.0);
+
+// SOFT_DOUBLE_ARG(0, x)
+double x = info.Length() < 1 ? 0.0 : info[0].ToNumber().DoubleValue();
+
+// WEAK_DOUBLE_ARG(0, x)
+double x = info[0].ToNumber().DoubleValue();
 ```
 
 That extrapolates well to all the helpers below:
@@ -136,31 +146,40 @@ That extrapolates well to all the helpers below:
 | :---             | :---:         | :---:                   | :---:     |
 | `REQ_STR_ARG`    | `string`      | `std::string`           | -         |
 | `USE_STR_ARG`    | `string`      | `std::string`           | -         |
+| `WEAK_STR_ARG`   | `string`      | `std::string`           | -         |
 | `LET_STR_ARG`    | `string`      | `std::string`           | `""`      |
 | `REQ_INT32_ARG`  | `number`      | `int32_t`               | -         |
 | `USE_INT32_ARG`  | `number`      | `int32_t`               | -         |
+| `WEAK_INT32_ARG` | `number`      | `int32_t`               | -         |
 | `LET_INT32_ARG`  | `number`      | `int32_t`               | `0`       |
 | `REQ_INT_ARG`    | `number`      | `int32_t`               | -         |
 | `USE_INT_ARG`    | `number`      | `int32_t`               | -         |
+| `WEAK_INT_ARG`   | `number`      | `int32_t`               | -         |
 | `LET_INT_ARG`    | `number`      | `int32_t`               | `0`       |
 | `REQ_UINT32_ARG` | `number`      | `uint32_t`              | -         |
 | `USE_UINT32_ARG` | `number`      | `uint32_t`              | -         |
+| `WEAK_UINT32_ARG`| `number`      | `uint32_t`              | -         |
 | `LET_UINT32_ARG` | `number`      | `uint32_t`              | `0`       |
 | `REQ_UINT_ARG`   | `number`      | `uint32_t`              | -         |
 | `USE_UINT_ARG`   | `number`      | `uint32_t`              | -         |
+| `WEAK_UINT_ARG`  | `number`      | `uint32_t`              | -         |
 | `LET_UINT_ARG`   | `number`      | `uint32_t`              | `0`       |
 | `REQ_BOOL_ARG`   | `Boolean`     | `bool`                  | -         |
 | `USE_BOOL_ARG`   | `Boolean`     | `bool`                  | -         |
+| `WEAK_BOOL_ARG`  | `Boolean`     | `bool`                  | -         |
 | `LET_BOOL_ARG`   | `Boolean`     | `bool`                  | `false`   |
 | `SOFT_BOOL_ARG`  | `Boolean`     | `bool`                  | `false`   |
 | `REQ_OFFS_ARG`   | `number`      | `size_t`                | -         |
 | `USE_OFFS_ARG`   | `number`      | `size_t`                | -         |
+| `WEAK_OFFS_ARG`  | `number`      | `size_t`                | -         |
 | `LET_OFFS_ARG`   | `number`      | `size_t`                | `0`       |
 | `REQ_DOUBLE_ARG` | `number`      | `double`                | -         |
 | `USE_DOUBLE_ARG` | `number`      | `double`                | -         |
+| `WEAK_DOUBLE_ARG`| `number`      | `double`                | -         |
 | `LET_DOUBLE_ARG` | `number`      | `double`                | `0.0`     |
 | `REQ_FLOAT_ARG`  | `number`      | `float`                 | -         |
 | `USE_FLOAT_ARG`  | `number`      | `float`                 | -         |
+| `WEAK_FLOAT_ARG` | `number`      | `float`                 | -         |
 | `LET_FLOAT_ARG`  | `number`      | `float`                 | `0.f`     |
 | `REQ_EXT_ARG`    | `native`      | `void*`                 | -         |
 | `USE_EXT_ARG`    | `native`      | `void*`                 | -         |
@@ -171,7 +190,7 @@ That extrapolates well to all the helpers below:
 | `REQ_ARRAY_ARG`  | `object`      | `Napi::Array`           | -         |
 | `USE_ARRAY_ARG`  | `object`      | `Napi::Array`           | -         |
 | `LET_ARRAY_ARG`  | `object`      | `Napi::Array`           | `[]`      |
-| `LET_ARRAY_STR_ARG` | `object`   | `std::vector<std::string>` | `std::vector<std::string>()`   |
+| `LET_ARRAY_STR_ARG` | `object`   | `std::vector<std::string>` | `std::vector<std::string>()` |
 | `REQ_FUN_ARG`    | `function`    | `Napi::Function`        | -         |
 | `REQ_ARRV_ARG`   | `ArrayBuffer` | `Napi::ArrayBuffer`     | -         |
 | `REQ_BUF_ARG`    | `Buffer`      | `Napi::Buffer<uint8_t>` | -         |
@@ -220,18 +239,18 @@ See also: [Class Wrapping](class-wrapping.md)
 
 **JS Data to C++ Data**
 
-* `T *getArrayData(value, num = NULL)` - extracts TypedArray data of any type from
-the given JS value. Does not accept `Array`. Checks with `IsArrayBuffer()`.
+* `T *getArrayData(env, obj, num = NULL)` - extracts TypedArray data of any type from
+the given JS object. Does not accept `Array`. Checks with `IsArrayBuffer()`.
 Returns `nullptr` for empty JS values. For unacceptable values throws TypeError.
 
-* `T *getBufferData(value, num = NULL)` - extracts Buffer data from
-the given JS value. Checks with `IsBuffer()`.
+* `T *getBufferData(env, obj, num = NULL)` - extracts Buffer data from
+the given JS object. Checks with `IsBuffer()`.
 Returns `nullptr` for empty JS values. For unacceptable values throws TypeError.
 
-* `void *getData(value)` - if `value` is a `TypedArray|Buffer`,
-calls `getArrayData` or `getArrayData` on it. Otherwise, if 
-`value.data` is a `TypedArray|Buffer`,
-calls `getArrayData` or `getArrayData` on it.
+* `void *getData(env, obj)` - if `obj` is a `TypedArray|Buffer`,
+calls `getArrayData` or `getBufferData` on it. Otherwise, if 
+`obj.data` is a `TypedArray|Buffer`,
+calls `getArrayData` or `getBufferData` on it.
 Returns `nullptr` in other cases.
 
 

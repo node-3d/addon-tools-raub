@@ -137,8 +137,8 @@ Copy the addon file, for example, from `./src/build/Release/glfw.node`
 to `./bin-windows/glfw.node`, but each platform uses a different folder.
 
 ```json
-"build": "cd src && node-gyp rebuild -j max --silent && node -e \"require('addon-tools-raub').cpbin('glfw')\" && cd ..",
-"build-only": "cd src && node-gyp build -j max --silent && node -e \"require('addon-tools-raub').cpbin('glfw')\" && cd ..",
+"build": "cd src && node-gyp rebuild -j max --silent && node -e \"require('addon-tools-raub').cpbin('glfw')\"",
+"build-only": "cd src && node-gyp build -j max --silent && node -e \"require('addon-tools-raub').cpbin('glfw')\"",
 ```
 
 ### Example of `cpcpplint` in **cpplint.yml**:

@@ -72,92 +72,115 @@
 
 #define REQ_STR_ARG(I, VAR)                                                   \
 	CHECK_REQ_ARG(I, IsString(), "String");                                   \
-	std::string VAR = info[I].ToString().Utf8Value();
+	std::string VAR = info[I].As<Napi::String>().Utf8Value();
 
 #define USE_STR_ARG(I, VAR, DEF)                                              \
 	CHECK_LET_ARG(I, IsString(), "String");                                   \
-	std::string VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].ToString().Utf8Value();
+	std::string VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As<Napi::String>().Utf8Value();
+
+#define WEAK_STR_ARG(I, VAR)                                                  \
+	std::string VAR = info[I].ToString().Utf8Value();
 
 #define LET_STR_ARG(I, VAR) USE_STR_ARG(I, VAR, "")
 
 
 #define REQ_INT32_ARG(I, VAR)                                                 \
 	CHECK_REQ_ARG(I, IsNumber(), "Int32");                                    \
-	int VAR = info[I].ToNumber().Int32Value();
+	int32_t VAR = info[I].As<Napi::Number>().Int32Value();
 
 #define USE_INT32_ARG(I, VAR, DEF)                                            \
 	CHECK_LET_ARG(I, IsNumber(), "Int32");                                    \
-	int VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].ToNumber().Int32Value();
+	int32_t VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As<Napi::Number>().Int32Value();
+
+#define WEAK_INT32_ARG(I, VAR)                                                \
+	int32_t VAR = info[I].ToNumber().Int32Value();
 
 #define LET_INT32_ARG(I, VAR) USE_INT32_ARG(I, VAR, 0)
 
 #define REQ_INT_ARG(I, VAR) REQ_INT32_ARG(I, VAR)
 #define USE_INT_ARG(I, VAR, DEF) USE_INT32_ARG(I, VAR, DEF)
+#define WEAK_INT_ARG(I, VAR) WEAK_INT32_ARG(I, VAR)
 #define LET_INT_ARG(I, VAR) LET_INT32_ARG(I, VAR)
 
 
 #define REQ_UINT32_ARG(I, VAR)                                                \
 	CHECK_REQ_ARG(I, IsNumber(), "Uint32");                                   \
-	unsigned int VAR = info[I].ToNumber().Uint32Value();
+	uint32_t VAR = info[I].As<Napi::Number>().Uint32Value();
 
 #define USE_UINT32_ARG(I, VAR, DEF)                                           \
 	CHECK_LET_ARG(I, IsNumber(), "Uint32");                                   \
-	unsigned int VAR = IS_ARG_EMPTY(I)                                        \
+	uint32_t VAR = IS_ARG_EMPTY(I)                                            \
 		? (DEF)                                                               \
-		: info[I].ToNumber().Uint32Value();
+		: info[I].As<Napi::Number>().Uint32Value();
+
+#define WEAK_UINT32_ARG(I, VAR)                                               \
+	uint32_t VAR = info[I].ToNumber().Uint32Value();
 
 #define LET_UINT32_ARG(I, VAR) USE_UINT32_ARG(I, VAR, 0)
 
 #define REQ_UINT_ARG(I, VAR) REQ_UINT32_ARG(I, VAR)
 #define USE_UINT_ARG(I, VAR, DEF) USE_UINT32_ARG(I, VAR, DEF)
+#define WEAK_UINT_ARG(I, VAR) WEAK_UINT32_ARG(I, VAR)
 #define LET_UINT_ARG(I, VAR) LET_UINT32_ARG(I, VAR)
 
 
 #define REQ_BOOL_ARG(I, VAR)                                                  \
 	CHECK_REQ_ARG(I, IsBoolean(), "Bool");                                    \
-	bool VAR = info[I].ToBoolean().Value();
+	bool VAR = info[I].As<Napi::Boolean>().Value();
 
 #define USE_BOOL_ARG(I, VAR, DEF)                                             \
 	CHECK_LET_ARG(I, IsBoolean(), "Bool");                                    \
-	bool VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].ToBoolean().Value();
+	bool VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As<Napi::Boolean>().Value();
+
+#define WEAK_BOOL_ARG(I, VAR)                                                 \
+	bool VAR = info[I].ToBoolean().Value();
 
 #define LET_BOOL_ARG(I, VAR) USE_BOOL_ARG(I, VAR, false)
 
 #define SOFT_BOOL_ARG(I, VAR)                                                 \
-	bool VAR = (info.Length() >= (I) && info[I].ToBoolean().Value()) || false;
+	bool VAR = (info.Length() > (I) && info[I].ToBoolean().Value()) || false;
 
 
 #define REQ_OFFS_ARG(I, VAR)                                                  \
 	CHECK_REQ_ARG(I, IsNumber(), "Number");                                   \
-	size_t VAR = static_cast<size_t>(info[I].ToNumber().DoubleValue());
+	int64_t VAR = info[I].As<Napi::Number>().Int64Value();
 
 #define USE_OFFS_ARG(I, VAR, DEF)                                             \
 	CHECK_LET_ARG(I, IsNumber(), "Number");                                   \
-	size_t VAR = IS_ARG_EMPTY(I)                                              \
-	? (DEF)                                                                   \
-	: static_cast<size_t>(info[I].ToNumber().DoubleValue());
+	int64_t VAR = IS_ARG_EMPTY(I)                                              \
+		? (DEF)                                                               \
+		: info[I].As<Napi::Number>().Int64Value();
+
+#define WEAK_OFFS_ARG(I, VAR)                                                 \
+	int64_t VAR = info[I].ToNumber().Int64Value();
 
 #define LET_OFFS_ARG(I, VAR) USE_OFFS_ARG(I, VAR, 0)
 
 
 #define REQ_DOUBLE_ARG(I, VAR)                                                \
 	CHECK_REQ_ARG(I, IsNumber(), "Number");                                   \
-	double VAR = info[I].ToNumber().DoubleValue();
+	double VAR = info[I].As<Napi::Number>().DoubleValue();
 
 #define USE_DOUBLE_ARG(I, VAR, DEF)                                           \
 	CHECK_LET_ARG(I, IsNumber(), "Number");                                   \
-	double VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].ToNumber().DoubleValue();
+	double VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As<Napi::Number>().DoubleValue();
+
+#define WEAK_DOUBLE_ARG(I, VAR)                                               \
+	double VAR = info[I].ToNumber().DoubleValue();
 
 #define LET_DOUBLE_ARG(I, VAR) USE_DOUBLE_ARG(I, VAR, 0.0)
 
 
 #define REQ_FLOAT_ARG(I, VAR)                                                 \
 	CHECK_REQ_ARG(I, IsNumber(), "Number");                                   \
-	float VAR = info[I].ToNumber().FloatValue();
+	float VAR = info[I].As<Napi::Number>().FloatValue();
 
 #define USE_FLOAT_ARG(I, VAR, DEF)                                            \
 	CHECK_LET_ARG(I, IsNumber(), "Number");                                   \
-	float VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].ToNumber().FloatValue();
+	float VAR = IS_ARG_EMPTY(I) ? (DEF) : info[I].As<Napi::Number>().FloatValue();
+
+#define WEAK_FLOAT_ARG(I, VAR)                                                \
+	float VAR = info[I].ToNumber().FloatValue();
 
 #define LET_FLOAT_ARG(I, VAR) USE_FLOAT_ARG(I, VAR, 0.f)
 
@@ -216,7 +239,7 @@ inline std::vector<std::string> arrayStrToVec(const Napi::Array &arr) {
 	for (uint32_t i = 0; i < count; i++) {
 		Napi::Value item = arr[i];
 		if (item.IsString()) {
-			result[i] = item.ToString().Utf8Value();
+			result[i] = item.As<Napi::String>().Utf8Value();
 		}
 	}
 	return result;
@@ -291,35 +314,35 @@ inline Napi::Array vecStrToArray(Napi::Env env, const std::vector<std::string> &
 
 #define SETTER_STR_ARG                                                        \
 	SETTER_CHECK(IsString(), "String");                                       \
-	std::string v = value.ToString().Utf8Value();
+	std::string v = value.As<Napi::String>().Utf8Value();
 
 #define SETTER_INT32_ARG                                                      \
 	SETTER_CHECK(IsNumber(), "Int32");                                        \
-	int v = value.ToNumber().Int32Value();
+	int32_t v = value.As<Napi::Number>().Int32Value();
 
 #define SETTER_INT_ARG SETTER_INT32_ARG
 
 #define SETTER_BOOL_ARG                                                       \
 	SETTER_CHECK(IsBoolean(), "Bool");                                        \
-	bool v = value.ToBoolean().Value();
+	bool v = value.As<Napi::Boolean>().Value();
 
 #define SETTER_UINT32_ARG                                                     \
 	SETTER_CHECK(IsNumber(), "Uint32");                                       \
-	unsigned int v = value.ToNumber().Uint32Value();
+	uint32_t v = value.As<Napi::Number>().Uint32Value();
 
 #define SETTER_UINT_ARG SETTER_UINT32_ARG
 
 #define SETTER_OFFS_ARG                                                       \
 	SETTER_CHECK(IsNumber(), "Number");                                       \
-	size_t v = static_cast<size_t>(value.ToNumber().DoubleValue());
+	int64_t v = value.As<Napi::Number>().Int64Value();
 
 #define SETTER_DOUBLE_ARG                                                     \
 	SETTER_CHECK(IsNumber(), "Number");                                       \
-	double v = value.ToNumber().DoubleValue();
+	double v = value.As<Napi::Number>().DoubleValue();
 
 #define SETTER_FLOAT_ARG                                                      \
 	SETTER_CHECK(IsNumber(), "Number");                                       \
-	float v = value.ToNumber().FloatValue();
+	float v = value.As<Napi::Number>().FloatValue();
 
 #define SETTER_EXT_ARG                                                        \
 	SETTER_CHECK(IsExternal(), "Pointer");                                    \
@@ -373,7 +396,7 @@ template<typename Type = uint8_t>
 inline Type* getArrayData(
 	Napi::Env env,
 	Napi::Object obj,
-	int *num = nullptr
+	int32_t *num = nullptr
 ) {
 	Type *out = nullptr;
 	
@@ -407,7 +430,7 @@ template<typename Type = uint8_t>
 inline Type* getBufferData(
 	Napi::Env env,
 	Napi::Object obj,
-	int *num = nullptr
+	int32_t *num = nullptr
 ) {
 	Type *out = nullptr;
 	
@@ -452,12 +475,12 @@ inline void *getData(Napi::Env env, Napi::Object obj) {
 
 inline Napi::Value consoleLog(
 	Napi::Env env,
-	int argc,
+	int32_t argc,
 	const Napi::Value *argv
 ) {
 	JS_RUN("console.log", log);
 	std::vector<napi_value> args;
-	for (int i = 0; i < argc; i++) {
+	for (int32_t i = 0; i < argc; i++) {
 		args.push_back(napi_value(argv[i]));
 	}
 	log.As<Napi::Function>().Call(args);
@@ -475,14 +498,14 @@ inline Napi::Value globalLog(
 	Napi::Env env,
 	const std::string &name,
 	const std::string &level,
-	int argc,
+	int32_t argc,
 	const Napi::Value *argv
 ) {
 	JS_RUN("global.AddonTools.log", log);
 	std::vector<napi_value> args;
 	args.push_back(napi_value(JS_STR(name)));
 	args.push_back(napi_value(JS_STR(level)));
-	for (int i = 0; i < argc; i++) {
+	for (int32_t i = 0; i < argc; i++) {
 		args.push_back(napi_value(argv[i]));
 	}
 	log.As<Napi::Function>().Call(args);
@@ -505,7 +528,7 @@ inline Napi::Value globalLog(
 inline void eventEmit(
 	Napi::Object that,
 	const std::string &name,
-	int argc = 0,
+	int32_t argc = 0,
 	const Napi::Value *argv = nullptr,
 	napi_async_context context = nullptr
 ) {
@@ -520,7 +543,7 @@ inline void eventEmit(
 	
 	std::vector<napi_value> args;
 	args.push_back(napi_value(eventName));
-	for (int i = 0; i < argc; i++) {
+	for (int32_t i = 0; i < argc; i++) {
 		args.push_back(napi_value(argv[i]));
 	}
 	
@@ -558,14 +581,14 @@ private:                                                                      \
 	static napi_value _createEs5(napi_env e, napi_callback_info i);           \
 	inline void super(                                                        \
 		const Napi::CallbackInfo& info,                                       \
-		int argc,                                                             \
+		int32_t argc,                                                         \
 		const Napi::Value *argv                                               \
 	) {                                                                       \
 		Napi::Function ctor = _ctorEs5.Value();                               \
 		if (ctor.Has("super_")) {                                             \
 			Napi::Function _super = ctor.Get("super_").As<Napi::Function>();  \
 			std::vector<napi_value> args;                                     \
-			for (int i = 0; i < argc; i++) {                                  \
+			for (int32_t i = 0; i < argc; i++) {                              \
 				args.push_back(argv[i]);                                      \
 			}                                                                 \
 			_super.Call(info.This(), args);                                   \
@@ -573,7 +596,7 @@ private:                                                                      \
 	}                                                                         \
 	inline void super(                                                        \
 		const Napi::CallbackInfo& info,                                       \
-		int argc = 0,                                                         \
+		int32_t argc = 0,                                                     \
 		const napi_value *argv = nullptr                                      \
 	) {                                                                       \
 		Napi::Function ctor = _ctorEs5.Value();                               \

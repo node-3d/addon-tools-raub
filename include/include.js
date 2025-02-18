@@ -14,7 +14,6 @@ const platformNames = {
 };
 
 const platformName = platformNames[platformAndArch] || platformAndArch;
-
 const isWindows = platformName === nameWindows;
 
 
@@ -31,14 +30,9 @@ const getPaths = (dir) => {
 	return { bin, include };
 };
 
+const getBin = () => `bin-${platformName}`;
 
-const getBin = () => {
-	return `bin-${platformName}`;
-};
-
-const getPlatform = () => {
-	return platformName;
-};
+const getPlatform = () => platformName;
 
 const getInclude = () => {
 	let napi = null;

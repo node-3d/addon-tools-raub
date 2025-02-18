@@ -98,3 +98,63 @@ describe('addon-tools.hpp: USE_BOOL_ARG', () => {
 		assert.ok(test.useBoolArg(true));
 	});
 });
+
+describe('addon-tools.hpp: SOFT_BOOL_ARG', () => {
+	it('exports softBoolArg', () => {
+		assert.strictEqual(typeof test.softBoolArg, 'function');
+	});
+	it('ok if arg was passed a string', () => {
+		assert.ok(() => test.softBoolArg('1'));
+	});
+	it('ok if arg was passed a number', () => {
+		assert.ok(() => test.softBoolArg(1));
+	});
+	it('ok if arg was passed an object', () => {
+		assert.ok(() => test.softBoolArg({}));
+	});
+	it('ok if arg was passed an array', () => {
+		assert.ok(() => test.softBoolArg([]));
+	});
+	it('accepts an empty arg', () => {
+		assert.ok(test.softBoolArg() === false);
+	});
+	it('accepts undefined', () => {
+		assert.ok(test.softBoolArg(undefined) === false);
+	});
+	it('accepts null', () => {
+		assert.ok(test.softBoolArg(null) === false);
+	});
+	it('accepts a boolean', () => {
+		assert.ok(test.softBoolArg(true));
+	});
+});
+
+describe('addon-tools.hpp: WEAK_BOOL_ARG', () => {
+	it('exports weakBoolArg', () => {
+		assert.strictEqual(typeof test.weakBoolArg, 'function');
+	});
+	it('ok if arg was passed a string', () => {
+		assert.ok(() => test.weakBoolArg('1'));
+	});
+	it('ok if arg was passed a number', () => {
+		assert.ok(() => test.weakBoolArg(1));
+	});
+	it('ok if arg was passed an object', () => {
+		assert.ok(() => test.weakBoolArg({}));
+	});
+	it('ok if arg was passed an array', () => {
+		assert.ok(() => test.weakBoolArg([]));
+	});
+	it('accepts an empty arg', () => {
+		assert.ok(test.weakBoolArg() === false);
+	});
+	it('accepts undefined', () => {
+		assert.ok(test.weakBoolArg(undefined) === false);
+	});
+	it('accepts null', () => {
+		assert.ok(test.weakBoolArg(null) === false);
+	});
+	it('accepts a boolean', () => {
+		assert.ok(test.weakBoolArg(true));
+	});
+});

@@ -98,3 +98,33 @@ describe('addon-tools.hpp: USE_UINT_ARG / USE_UINT32_ARG', () => {
 		assert.strictEqual(test.useUintArg(55), 55);
 	});
 });
+
+describe('addon-tools.hpp: WEAK_UINT_ARG', () => {
+	it('exports weakUintArg', () => {
+		assert.strictEqual(typeof test.weakUintArg, 'function');
+	});
+	it('ok if arg was passed a string', () => {
+		assert.strictEqual(test.weakUintArg('1'), 1);
+	});
+	it('ok if arg was passed a number', () => {
+		assert.strictEqual(test.weakUintArg(1), 1);
+	});
+	it('ok if arg was passed an object', () => {
+		assert.strictEqual(test.weakUintArg({}), 0);
+	});
+	it('ok if arg was passed an array', () => {
+		assert.strictEqual(test.weakUintArg([]), 0);
+	});
+	it('accepts an empty arg', () => {
+		assert.strictEqual(test.weakUintArg(), 0);
+	});
+	it('accepts undefined', () => {
+		assert.strictEqual(test.weakUintArg(undefined), 0);
+	});
+	it('accepts null', () => {
+		assert.strictEqual(test.weakUintArg(null), 0);
+	});
+	it('accepts a boolean', () => {
+		assert.strictEqual(test.weakUintArg(true), 1);
+	});
+});

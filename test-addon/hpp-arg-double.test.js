@@ -98,3 +98,33 @@ describe('addon-tools.hpp: USE_DOUBLE_ARG', () => {
 		assert.strictEqual(test.useDoubleArg(55), 55);
 	});
 });
+
+describe('addon-tools.hpp: WEAK_DOUBLE_ARG', () => {
+	it('exports weakDoubleArg', () => {
+		assert.strictEqual(typeof test.weakDoubleArg, 'function');
+	});
+	it('ok if arg was passed a string', () => {
+		assert.strictEqual(test.weakDoubleArg('1'), 1);
+	});
+	it('ok if arg was passed a number', () => {
+		assert.strictEqual(test.weakDoubleArg(1), 1);
+	});
+	it('ok if arg was passed an object', () => {
+		assert.strictEqual(test.weakDoubleArg({}), NaN);
+	});
+	it('ok if arg was passed an array', () => {
+		assert.strictEqual(test.weakDoubleArg([]), 0);
+	});
+	it('accepts an empty arg', () => {
+		assert.strictEqual(test.weakDoubleArg(), NaN);
+	});
+	it('accepts undefined', () => {
+		assert.strictEqual(test.weakDoubleArg(undefined), NaN);
+	});
+	it('accepts null', () => {
+		assert.strictEqual(test.weakDoubleArg(null), 0);
+	});
+	it('accepts a boolean', () => {
+		assert.strictEqual(test.weakDoubleArg(true), 1);
+	});
+});

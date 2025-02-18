@@ -1,7 +1,7 @@
 {
 	"author": "Luis Blanco <luisblanco1337@gmail.com>",
 	"name": "addon-tools-raub",
-	"version": "9.2.0",
+	"version": "9.3.0",
 	"description": "Helpers for Node.js addons and dependency packages",
 	"license": "MIT",
 	"main": "index.js",
@@ -26,14 +26,14 @@
 		"package.json"
 	],
 	"engines": {
-		"node": ">=22.9.0",
-		"npm": ">=10.8.3"
+		"node": ">=22.14.0",
+		"npm": ">=10.9.2"
 	},
 	"scripts": {
 		"eslint": "eslint .",
 		"test": "node --test --watch",
 		"test-ci": "node --test",
-		"build-test": "cd test-addon && node-gyp rebuild -j max --silent && cd .."
+		"build-test": "cd test-addon && node-gyp rebuild -j max --silent"
 	},
 	"repository": {
 		"type": "git",
@@ -48,10 +48,10 @@
 		}
 	},
 	"devDependencies": {
-		"@types/node": "^22.10.5",
-		"@eslint/js": "^9.17.0",
-		"eslint": "^9.17.0",
+		"@types/node": "^22.13.4",
+		"@eslint/js": "^9.20.0",
+		"eslint": "^9.20.1",
 		"node-addon-api": "^8.3.0",
-		"typescript": "^5.7.2"
+		"typescript": "^5.7.3"
 	}
 }
