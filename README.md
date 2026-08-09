@@ -164,12 +164,16 @@ here's how it can be used:
 
 Since all my addons use the same C++ formatting style, I don't keep
 copies of the [.clang-format config](utils/.clang-format) in every addon.
-If that same config fits for you, here's how it can be used:
+If that same config fits for you, use `clang-format-node` from package scripts
+so the formatter version is locked by `package-lock.json`:
 
 ```json
-"format:src": "node -e \"import('@node-3d/addon-tools').then((m) => m.cpclangformat())\" && clang-format -i \"src/cpp/**/*.{cpp,hpp}\"",
-"format:src:ci": "node -e \"import('@node-3d/addon-tools').then((m) => m.cpclangformat())\" && clang-format --dry-run --Werror \"src/cpp/**/*.{cpp,hpp}\""
+"format:src": "node -e \"import('@node-3d/addon-tools').then((m) => m.cpclangformat())\" && node -e \"const { readdirSync } = require('node:fs'); const { execFileSync } = require('node:child_process'); const { clangFormatPath } = require('clang-format-node'); const files = readdirSync('src/cpp').filter((file) => /\\.(?:cpp|hpp)$/.test(file)).map((file) => 'src/cpp/' + file); execFileSync(clangFormatPath, ['-i', ...files], { stdio: 'inherit' });\"",
+"format:src:ci": "node -e \"import('@node-3d/addon-tools').then((m) => m.cpclangformat())\" && node -e \"const { readdirSync } = require('node:fs'); const { execFileSync } = require('node:child_process'); const { clangFormatPath } = require('clang-format-node'); const files = readdirSync('src/cpp').filter((file) => /\\.(?:cpp|hpp)$/.test(file)).map((file) => 'src/cpp/' + file); execFileSync(clangFormatPath, ['--dry-run', '--Werror', ...files], { stdio: 'inherit' });\""
 ```
+
+The copied `.clang-format` is a generated package-local file. Keep it ignored
+and let `cpclangformat()` overwrite it.
 
 ### Example of `install` in **install.js**:
 
